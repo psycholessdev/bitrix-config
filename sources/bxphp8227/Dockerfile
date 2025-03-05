@@ -58,9 +58,17 @@ COPY --from=builder /usr/local/lib/php/extensions/ /usr/local/lib/php/extensions
 
 COPY --from=builder /usr/local/etc/ /usr/local/etc/
 
+RUN mkdir -p /etc/periodic/1min
+
+COPY bitrix.sh /etc/periodic/1min/bitrix
+
 RUN docker-php-source delete && \
     apk add --no-cache -X http://dl-cdn.alpinelinux.org/alpine/edge/testing catdoc && \
     apk add --no-cache poppler-utils aspell bzip2 gettext libmcrypt libldap libsasl cyrus-sasl libmemcached libmemcached-libs icu-libs libxslt freetype libpng libjpeg-turbo libxpm libwebp libgomp zip libzip libxml2 lz4 liblzf zstd libpq rabbitmq-c libssh2 imagemagick
     curl -fsSL https://getcomposer.org/download/latest-stable/composer.phar -o composer.phar && \
     chmod +x composer.phar && \
-    mv composer.phar /usr/local/bin/composer
+    mv composer.phar /usr/local/bin/composer && \
+    echo "*       *       *       *       *       run-parts /etc/periodic/1min" >> /etc/crontabs/root && \
+    sed -i '/^$/d' /etc/crontabs/root && \
+    echo "" >> /etc/crontabs/root && \
+    chmod -R a+x /etc/periodic/1min/bitrix
