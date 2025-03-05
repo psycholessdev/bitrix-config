@@ -125,6 +125,7 @@ services:
     env_file:
       - .env
       - .env_push
+      - .env_push_sub
       - .env_redis
     ports:
       - "8010:8010"
@@ -132,6 +133,8 @@ services:
       dev:
         aliases:
           - push_sub
+    depends_on:
+      - redis
   push-pub:
     image: bx-push:3.0-alpine
     container_name: dev_push_pub
@@ -139,6 +142,7 @@ services:
     env_file:
       - .env
       - .env_push
+      - .env_push_pub
       - .env_redis
     ports:
       - "9010:9010"
@@ -146,6 +150,8 @@ services:
       dev:
         aliases:
           - push_pub
+    depends_on:
+      - redis
   sphinx:
     image: bx-sphinx:2.2.11-alpine
     container_name: dev_sphinx
