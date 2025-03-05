@@ -35,7 +35,7 @@ services:
       - "6379:6379"
     volumes:
       - redis_data:/data
-      - ./conf/redis/redis.conf:/usr/local/etc/redis/redis.conf
+      - ./confs/redis/redis.conf:/usr/local/etc/redis/redis.conf
     networks:
       dev:
         aliases:
@@ -56,7 +56,7 @@ services:
         aliases:
           - postgres
   mysql:
-    image: percona/percona-server:8.0.40
+    image: percona/percona-server:8.0.41
     container_name: dev_mysql
     restart: unless-stopped
     env_file:
@@ -68,9 +68,9 @@ services:
     volumes:
       - mysql_log_data:/var/log/mysql
       - mysql_lib_data:/var/lib/mysql
-      - ./conf/mysql/etc/my.cnf:/etc/my.cnf
-      - ./conf/mysql/etc/my.cnf.d/docker.cnf:/etc/my.cnf.d/docker.cnf
-      - ./conf/mysql/etc/my.cnf.d/my.cnf:/etc/my.cnf.d/my.cnf
+      - ./confs/mysql/etc/my.cnf:/etc/my.cnf
+      - ./confs/mysql/etc/my.cnf.d/docker.cnf:/etc/my.cnf.d/docker.cnf
+      - ./confs/mysql/etc/my.cnf.d/my.cnf:/etc/my.cnf.d/my.cnf
     cap_add:
       - SYS_NICE
     networks:
@@ -88,7 +88,7 @@ services:
     ports:
       - "9000:9000"
     volumes:
-      - ./conf/php/etc/:/usr/local/etc/
+      - ./confs/php/etc/:/usr/local/etc/
       - www_data:/opt/www/
       - bxtemp_data:/opt/.bx_temp/
 #      - ./www/:/opt/www/
@@ -108,7 +108,7 @@ services:
       - "8588:80"
       - "8589:443"
     volumes:
-      - ./conf/nginx/:/etc/nginx/
+      - ./confs/nginx/:/etc/nginx/
       - www_data:/opt/www/
       - bxtemp_data:/opt/.bx_temp/
 #      - ./www/:/opt/www/
@@ -155,7 +155,7 @@ services:
     env_file:
       - .env
     volumes:
-      - ./conf/sphinx/sphinx.conf:/opt/sphinx/conf/sphinx.conf
+      - ./confs/sphinx/sphinx.conf:/opt/sphinx/conf/sphinx.conf
     networks:
       dev:
         aliases:
@@ -171,7 +171,7 @@ services:
     ports:
       - "9001:9000"
     volumes:
-      - ./conf/php/etc/:/usr/local/etc/
+      - ./confs/php/etc/:/usr/local/etc/
       - www_data:/opt/www/
       - bxtemp_data:/opt/.bx_temp/
 #      - ./www/:/opt/www/
