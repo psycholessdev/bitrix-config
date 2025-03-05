@@ -56,7 +56,7 @@ services:
         aliases:
           - postgres
   mysql:
-    image: percona/percona-server:8.0.41
+    image: percona/percona-server:8.0.40
     container_name: dev_mysql
     restart: unless-stopped
     env_file:

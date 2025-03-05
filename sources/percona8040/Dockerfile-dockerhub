@@ -16,15 +16,14 @@ RUN set -ex; \
     useradd -u 1001 -r -g 1001 -s /sbin/nologin \
         -m -c "Default Application User" mysql
 
-ENV PS_VERSION 8.0.41-32.1
-ENV MYSQL_SHELL_VERSION 8.0.41-1
+ENV PS_VERSION 8.0.39-30.1
+ENV MYSQL_SHELL_VERSION 8.0.38-1
 ENV OS_VER el9
 ENV FULL_PERCONA_VERSION "$PS_VERSION.$OS_VER"
 ENV FULL_MYSQL_SHELL_VERSION "$MYSQL_SHELL_VERSION.$OS_VER"
 ENV PS_REPO testing
-ENV PS_TELEMETRY_VERSION 8.0.41-32-1
+ENV PS_TELEMETRY_VERSION 8.0.39-30-1
 ENV CALL_HOME_DOWNLOAD_SHA256 5e84d2f1a5d57f44c46e6a1f16794d649d3de09fe8021f0294bc321c89e51068
-ENV KEY_RPM_DOWNLOAD_SHA256 fcf0eab4f05a1c0de6363ac4b707600a27a9d774e9b491059e59e6921b255a84
 ENV CALL_HOME_VERSION 0.1
 # Do not report during Docker image creation.
 # Note that doing so, would create telemetry config file
@@ -50,7 +49,6 @@ RUN set -ex; \
     percona-release enable ps-80 ${PS_REPO}; \
     percona-release enable mysql-shell ${PS_REPO}; \
     curl -O https://dl.fedoraproject.org/pub/epel/RPM-GPG-KEY-EPEL-9; \
-    echo "$KEY_RPM_DOWNLOAD_SHA256 RPM-GPG-KEY-EPEL-9" | sha256sum --strict --check; \
     rpm --import RPM-GPG-KEY-EPEL-9; \
     curl -Lf -o /tmp/jemalloc.rpm https://rpmfind.net/linux/epel/9/Everything/x86_64/Packages/j/jemalloc-5.2.1-2.el9.x86_64.rpm; \
     curl -Lf -o /tmp/gflags.rpm https://rpmfind.net/linux/epel/9/Everything/x86_64/Packages/g/gflags-2.2.2-9.el9.x86_64.rpm; \
