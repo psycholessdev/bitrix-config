@@ -85,6 +85,7 @@ services:
     user: root
     env_file:
       - .env
+      - .env_php
     ports:
       - "9000:9000"
     volumes:
