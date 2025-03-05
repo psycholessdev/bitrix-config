@@ -1,0 +1,191 @@
+volumes:
+  redis_data:
+    driver: local
+  mysql_log_data:
+    driver: local
+  mysql_lib_data:
+    driver: local
+  postgres_data:
+    driver: local
+  www_data:
+    driver: local
+  bxtemp_data:
+    driver: local
+services:
+  memcache:
+    image: memcached:1.6.37-alpine
+    container_name: dev_memcache
+    restart: unless-stopped
+    env_file:
+      - .env
+    ports:
+      - "11211:11211"
+    networks:
+      dev:
+        aliases:
+          - memcache
+  redis:
+    image: redis:7.2.7-alpine
+    container_name: dev_redis
+    restart: unless-stopped
+    command: redis-server /usr/local/etc/redis/redis.conf
+    env_file:
+      - .env
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+      - ./conf/redis/redis.conf:/usr/local/etc/redis/redis.conf
+    networks:
+      dev:
+        aliases:
+          - redis
+  postgres:
+    image: postgres:16.8-bookworm
+    container_name: dev_postgres
+    restart: unless-stopped
+    env_file:
+      - .env
+      - .env_sql
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      dev:
+        aliases:
+          - postgres
+  mysql:
+    image: percona/percona-server:8.0.41
+    container_name: dev_mysql
+    restart: unless-stopped
+    env_file:
+      - .env
+      - .env_sql
+    ports:
+      - "3306:3306"
+      - "33060:33060"
+    volumes:
+      - mysql_log_data:/var/log/mysql
+      - mysql_lib_data:/var/lib/mysql
+      - ./conf/mysql/etc/my.cnf:/etc/my.cnf
+      - ./conf/mysql/etc/my.cnf.d/docker.cnf:/etc/my.cnf.d/docker.cnf
+      - ./conf/mysql/etc/my.cnf.d/my.cnf:/etc/my.cnf.d/my.cnf
+    cap_add:
+      - SYS_NICE
+    networks:
+      dev:
+        aliases:
+          - mysql
+  php:
+    image: bx-php:8.2.27-fpm-alpine
+    container_name: dev_php
+    restart: unless-stopped
+    command: php-fpm -R
+    user: root
+    env_file:
+      - .env
+    ports:
+      - "9000:9000"
+    volumes:
+      - ./conf/php/etc/:/usr/local/etc/
+      - www_data:/opt/www/
+      - bxtemp_data:/opt/.bx_temp/
+#      - ./www/:/opt/www/
+#      - ./.bx_temp/:/opt/.bx_temp/
+    networks:
+      dev:
+        aliases:
+          - php
+  nginx:
+    image: nginx:1.26.3-alpine-slim
+    container_name: dev_ginx
+    restart: unless-stopped
+    user: root
+    env_file:
+      - .env
+    ports:
+      - "8588:80"
+      - "8589:443"
+    volumes:
+      - ./conf/nginx/:/etc/nginx/
+      - www_data:/opt/www/
+      - bxtemp_data:/opt/.bx_temp/
+#      - ./www/:/opt/www/
+#      - ./.bx_temp/:/opt/.bx_temp/
+    networks:
+      dev:
+        aliases:
+          - nginx
+  push-sub:
+    image: bx-push:3.0-alpine
+    container_name: dev_push_sub
+    restart: unless-stopped
+    env_file:
+      - .env
+      - .env_push
+      - .env_redis
+    ports:
+      - "8010:8010"
+    networks:
+      dev:
+        aliases:
+          - push_sub
+  push-pub:
+    image: bx-push:3.0-alpine
+    container_name: dev_push_pub
+    restart: unless-stopped
+    env_file:
+      - .env
+      - .env_push
+      - .env_redis
+    ports:
+      - "9010:9010"
+    networks:
+      dev:
+        aliases:
+          - push_pub
+  sphinx:
+    image: bx-sphinx:2.2.11-alpine
+    container_name: dev_sphinx
+    ports:
+      - "9306:9306"
+      - "9312:9312"
+    restart: unless-stopped
+    env_file:
+      - .env
+    volumes:
+      - ./conf/sphinx/sphinx.conf:/opt/sphinx/conf/sphinx.conf
+    networks:
+      dev:
+        aliases:
+          - sphinx
+  cron:
+    image: bx-php:8.2.27-fpm-alpine
+    container_name: dev_cron
+    restart: unless-stopped
+    command: crond -f -d 8
+    user: root
+    env_file:
+      - .env
+    ports:
+      - "9001:9000"
+    volumes:
+      - ./conf/php/etc/:/usr/local/etc/
+      - www_data:/opt/www/
+      - bxtemp_data:/opt/.bx_temp/
+#      - ./www/:/opt/www/
+#      - ./.bx_temp/:/opt/.bx_temp/
+    networks:
+      dev:
+        aliases:
+          - cron
+networks:
+  dev:
+    driver: bridge
+    attachable: true
+    internal: false
+    ipam:
+      driver: default
+      config:
+        - subnet: 10.10.10.0/24
