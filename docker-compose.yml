@@ -175,6 +175,7 @@ services:
     user: root
     env_file:
       - .env
+      - .env_php
     ports:
       - "9001:9000"
     volumes:
@@ -187,6 +188,8 @@ services:
       dev:
         aliases:
           - cron
+    depends_on:
+      - php
 networks:
   dev:
     driver: bridge
