@@ -27,26 +27,24 @@ rabbitmq-c rabbitmq-c-dev libpq libpq-dev \
 libssh2-dev \
 imagemagick imagemagick-dev
 
-RUN docker-php-source extract
+RUN docker-php-source extract && \
+    mkdir -p /usr/src/php/ext/memcache && curl -fsSL https://github.com/cyrax13/pecl.php.net/raw/main/memcache-8.2.tgz | tar xvz -C "/usr/src/php/ext/memcache" --strip 1 && \
+    mkdir -p /usr/src/php/ext/apcu && curl -fsSL https://github.com/cyrax13/pecl.php.net/raw/main/apcu-5.1.24.tgz | tar xvz -C "/usr/src/php/ext/apcu" --strip 1 && \
+    mkdir -p /usr/src/php/ext/mcrypt && curl -fsSL https://github.com/cyrax13/pecl.php.net/raw/main/mcrypt-1.0.7.tgz | tar xvz -C "/usr/src/php/ext/mcrypt" --strip 1 && \
+    mkdir -p /usr/src/php/ext/msgpack && curl -fsSL https://github.com/cyrax13/pecl.php.net/raw/main/msgpack-3.0.0.tgz | tar xvz -C "/usr/src/php/ext/msgpack" --strip 1 && \
+    mkdir -p /usr/src/php/ext/igbinary && curl -fsSL https://github.com/cyrax13/pecl.php.net/raw/main/igbinary-3.2.16.tgz | tar xvz -C "/usr/src/php/ext/igbinary" --strip 1 && \
+    mkdir -p /usr/src/php/ext/redis && curl -fsSL https://github.com/cyrax13/pecl.php.net/raw/main/redis-6.1.0.tgz | tar xvz -C "/usr/src/php/ext/redis" --strip 1 && \
+    mkdir -p /usr/src/php/ext/xhprof && curl -fsSL https://github.com/cyrax13/pecl.php.net/raw/main/xhprof-2.3.10.tgz | tar xvz -C "/usr/src/php/ext/xhprof" --strip 1 && \
+    mkdir -p /usr/src/php/ext/xdebug && curl -fsSL https://github.com/cyrax13/pecl.php.net/raw/main/xdebug-3.4.1.tgz | tar xvz -C "/usr/src/php/ext/xdebug" --strip 1 && \
+    mkdir -p /usr/src/php/ext/amqp && curl -fsSL https://github.com/cyrax13/pecl.php.net/raw/main/amqp-2.1.2.tgz | tar xvz -C "/usr/src/php/ext/amqp" --strip 1 && \
+    mkdir -p /usr/src/php/ext/ssh2 && curl -fsSL https://github.com/cyrax13/pecl.php.net/raw/main/ssh2-1.4.1.tgz | tar xvz -C "/usr/src/php/ext/ssh2" --strip 1 && \
+    mkdir -p /usr/src/php/ext/imagick && curl -fsSL https://github.com/cyrax13/pecl.php.net/raw/main/imagick-3.7.0.tgz | tar xvz -C "/usr/src/php/ext/imagick" --strip 1 && \
+    cp -fr /usr/src/php/ext/igbinary /usr/local/include/php/ext/igbinary && \
+    cp -fr /usr/src/php/ext/msgpack /usr/local/include/php/ext/msgpack
 
-RUN mkdir -p /usr/src/php/ext/memcache && curl -fsSL https://github.com/cyrax13/pecl.php.net/raw/main/memcache-8.2.tgz | tar xvz -C "/usr/src/php/ext/memcache" --strip 1 && \
-mkdir -p /usr/src/php/ext/apcu && curl -fsSL https://github.com/cyrax13/pecl.php.net/raw/main/apcu-5.1.24.tgz | tar xvz -C "/usr/src/php/ext/apcu" --strip 1 && \
-mkdir -p /usr/src/php/ext/mcrypt && curl -fsSL https://github.com/cyrax13/pecl.php.net/raw/main/mcrypt-1.0.7.tgz | tar xvz -C "/usr/src/php/ext/mcrypt" --strip 1 && \
-mkdir -p /usr/src/php/ext/msgpack && curl -fsSL https://github.com/cyrax13/pecl.php.net/raw/main/msgpack-3.0.0.tgz | tar xvz -C "/usr/src/php/ext/msgpack" --strip 1 && \
-mkdir -p /usr/src/php/ext/igbinary && curl -fsSL https://github.com/cyrax13/pecl.php.net/raw/main/igbinary-3.2.16.tgz | tar xvz -C "/usr/src/php/ext/igbinary" --strip 1 && \
-mkdir -p /usr/src/php/ext/redis && curl -fsSL https://github.com/cyrax13/pecl.php.net/raw/main/redis-6.1.0.tgz | tar xvz -C "/usr/src/php/ext/redis" --strip 1 && \
-mkdir -p /usr/src/php/ext/xhprof && curl -fsSL https://github.com/cyrax13/pecl.php.net/raw/main/xhprof-2.3.10.tgz | tar xvz -C "/usr/src/php/ext/xhprof" --strip 1 && \
-mkdir -p /usr/src/php/ext/xdebug && curl -fsSL https://github.com/cyrax13/pecl.php.net/raw/main/xdebug-3.4.1.tgz | tar xvz -C "/usr/src/php/ext/xdebug" --strip 1 && \
-mkdir -p /usr/src/php/ext/amqp && curl -fsSL https://github.com/cyrax13/pecl.php.net/raw/main/amqp-2.1.2.tgz | tar xvz -C "/usr/src/php/ext/amqp" --strip 1 && \
-mkdir -p /usr/src/php/ext/ssh2 && curl -fsSL https://github.com/cyrax13/pecl.php.net/raw/main/ssh2-1.4.1.tgz | tar xvz -C "/usr/src/php/ext/ssh2" --strip 1 && \
-mkdir -p /usr/src/php/ext/imagick && curl -fsSL https://github.com/cyrax13/pecl.php.net/raw/main/imagick-3.7.0.tgz | tar xvz -C "/usr/src/php/ext/imagick" --strip 1 && \
-cp -fr /usr/src/php/ext/igbinary /usr/local/include/php/ext/igbinary && cp -fr /usr/src/php/ext/msgpack /usr/local/include/php/ext/msgpack
-
-RUN docker-php-ext-configure gd --with-freetype --with-jpeg --with-xpm --with-webp
-
-RUN docker-php-ext-configure opcache --enable-opcache
-
-RUN docker-php-ext-configure redis --enable-redis-igbinary --enable-redis-msgpack --enable-redis-lzf --enable-redis-zstd
+RUN docker-php-ext-configure gd --with-freetype --with-jpeg --with-xpm --with-webp && \
+    docker-php-ext-configure opcache --enable-opcache && \
+    docker-php-ext-configure redis --enable-redis-igbinary --enable-redis-msgpack --enable-redis-lzf --enable-redis-zstd
 
 RUN docker-php-ext-install mysqli pdo_mysql bz2 pgsql pdo_pgsql zip gd opcache ldap exif intl calendar sodium gettext pspell xml xmlwriter xsl shmop sysvmsg sysvsem sysvshm sockets memcache apcu mcrypt msgpack igbinary redis xhprof xdebug amqp ssh2 imagick
 
@@ -60,10 +58,9 @@ COPY --from=builder /usr/local/lib/php/extensions/ /usr/local/lib/php/extensions
 
 COPY --from=builder /usr/local/etc/ /usr/local/etc/
 
-RUN docker-php-source delete
-
-RUN apk add --no-cache -X http://dl-cdn.alpinelinux.org/alpine/edge/testing catdoc
-
-RUN apk add --no-cache poppler-utils aspell bzip2 gettext libmcrypt libldap libsasl cyrus-sasl libmemcached libmemcached-libs icu-libs libxslt freetype libpng libjpeg-turbo libxpm libwebp libgomp zip libzip libxml2 lz4 liblzf zstd libpq rabbitmq-c libssh2 imagemagick
-
-RUN curl -fsSL https://getcomposer.org/download/latest-stable/composer.phar -o composer.phar && chmod +x composer.phar && mv composer.phar /usr/local/bin/composer
+RUN docker-php-source delete && \
+    apk add --no-cache -X http://dl-cdn.alpinelinux.org/alpine/edge/testing catdoc && \
+    apk add --no-cache poppler-utils aspell bzip2 gettext libmcrypt libldap libsasl cyrus-sasl libmemcached libmemcached-libs icu-libs libxslt freetype libpng libjpeg-turbo libxpm libwebp libgomp zip libzip libxml2 lz4 liblzf zstd libpq rabbitmq-c libssh2 imagemagick
+    curl -fsSL https://getcomposer.org/download/latest-stable/composer.phar -o composer.phar && \
+    chmod +x composer.phar && \
+    mv composer.phar /usr/local/bin/composer

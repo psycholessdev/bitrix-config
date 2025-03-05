@@ -1,10 +1,10 @@
 FROM alpine:3.21
 
-RUN addgroup -g 9999 sphinx && adduser -D -u 9999 -G sphinx sphinx
+RUN addgroup -g 9999 sphinx && \
+    adduser -D -u 9999 -G sphinx sphinx
 
-RUN apk add --no-cache bash expat libgcc libpq libstdc++ mariadb-connector-c musl unixodbc zlib sphinx sphinx-doc sphinx-php
-
-RUN mkdir -pv /opt/sphinx/conf /opt/sphinx/log /opt/sphinx/run /opt/sphinx/dict /opt/sphinx/lib /opt/sphinx/binlogs
+RUN apk add --no-cache bash expat libgcc libpq libstdc++ mariadb-connector-c musl unixodbc zlib sphinx sphinx-doc sphinx-php && \
+    mkdir -pv /opt/sphinx/conf /opt/sphinx/log /opt/sphinx/run /opt/sphinx/dict /opt/sphinx/lib /opt/sphinx/binlogs
 
 COPY start.sh /opt/sphinx/
 COPY *.pak /opt/sphinx/dict/
