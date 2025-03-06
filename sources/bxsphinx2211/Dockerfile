@@ -10,7 +10,9 @@ COPY start.sh /opt/sphinx/
 COPY *.pak /opt/sphinx/dict/
 COPY sample_sphinx.conf /opt/sphinx/conf/sphinx.conf
 
-RUN chown -R sphinx:sphinx /opt/
+RUN ln -sf /dev/stdout /opt/sphinx/log/searchd.log && \
+    ln -sf /dev/stderr /opt/sphinx/log/query.log && \
+    chown -R sphinx:sphinx /opt/
 
 # VOLUME ["/opt/sphinx/conf", "/opt/sphinx/log", "/opt/sphinx/dict", "/opt/sphinx/lib"]
 
