@@ -99,7 +99,7 @@ services:
         aliases:
           - php
   nginx:
-    image: nginx:1.26.3-alpine-slim
+    image: bx-nginx:1.26.3-alpine-slim
     container_name: dev_nginx
     restart: unless-stopped
     user: root
