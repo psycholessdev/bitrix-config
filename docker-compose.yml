@@ -12,9 +12,9 @@ volumes:
   bxtemp_data:
     driver: local
 services:
-  memcache:
+  memcached:
     image: memcached:1.6.37-alpine
-    container_name: dev_memcache
+    container_name: dev_memcached
     restart: unless-stopped
     env_file:
       - .env
@@ -23,7 +23,7 @@ services:
     networks:
       dev:
         aliases:
-          - memcache
+          - memcached
   redis:
     image: redis:7.2.7-alpine
     container_name: dev_redis
