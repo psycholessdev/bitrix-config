@@ -9,6 +9,7 @@
 
 # Содержимое
 
+* [Docker и Docker Compose](#docker)
 * [Сборка или скачавание Docker образов](#dockerimages)
   * [Базовые образы](#basicimages)
   * [Битрикс образы (bx-*)](#bitriximages)
@@ -16,6 +17,34 @@
 * [Адресация](#iporurls)
 * [Порты](#ports)
 * [Доступ к сайту](#siteaccess)
+
+<a id="docker"></a>
+# Docker и Docker Compose
+
+Для запуска проекта понадобится Docker. Для оркестировки и управления Docker Compose.
+
+Способ развертывания зависит от вашей операционной системы, используемой на хосте.
+
+Возможны варианты:
+- рабочая станция, персональный компьютер, ноутбук и т.д. с рабочим столом и графической средой, он же desktop
+- сервер, без графической среды, но с консолью или удаленным доступом, он же server
+
+Для взаимодействия с docker в графическом режиме будем использовать продукт [Docker Desktop](https://docs.docker.com/desktop/), который возможно запустить на ОС Windows, Linux, MacOS.
+
+Ознакомтесь с документацией и выполните развертывание docker, в зависимости от используемой вами ОС:
+- Docker Desktop on Windows: https://docs.docker.com/desktop/setup/install/windows-install/
+- Docker Desktop on Linux: https://docs.docker.com/desktop/setup/install/linux/
+- Docker Desktop on Mac: https://docs.docker.com/desktop/setup/install/mac-install/
+
+Для взаимодействия с docker в режиме командной строки (без графического режима) будем использовать продукт [Docker Engine](https://docs.docker.com/engine/), который возможно запустить на ОС Linux.
+
+Ознакомтесь с документацией и выполните развертывание docker, в зависимости от используемой вами ОС Linux:
+- Docker Engine: https://docs.docker.com/engine/install/
+
+В современных версиях продуктов Docker обычно в их состав уже включен Docker Compose.
+
+Ознакомтесь с документацией и выполните развертывание Docker Compose, если это требуется отдельно:
+- Docker Compose: https://docs.docker.com/compose/
 
 <a id="dockerimages"></a>
 # Сборка или скачавание Docker образов
