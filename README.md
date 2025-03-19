@@ -77,4 +77,62 @@ cd dev/sources/bxnginx1263/
 docker build -f Dockerfile -t bx-nginx:1.26.3-alpine --no-cache .
 ```
 
+# Управление
+
+Управление (или оркестровка) набором контейнеров или одним из контейнеров осуществляется через Docker Compose.
+
+Переходим в каталог проекта `cd dev` и выполняем команды ниже:
+
+Запустить все контейнеры и оставить их работать в фоне:
+```bash
+docker compose up -d
+```
+
+Отобразить список контейнеров и их статус:
+```bash
+docker compose ps
+```
+
+Показать логи сразу всех контейнеров:
+```bash
+docker compose logs
+```
+
+Показать лог определенного сервиса-контейнера:
+```bash
+docker compose logs redis
+```
+
+Перезапустить определенный контейнер:
+```bash
+docker compose restart nginx
+```
+
+Перезапустить все контейнеры:
+```bash
+docker compose restart
+```
+
+Остановить все контейнеры:
+```bash
+docker compose stop
+```
+
+Остановить все контейнеры, удалить их:
+```bash
+docker compose down
+```
+
+Остановить все контейнеры, удалить их и удалить все тома этих контейнеров:
+```bash
+docker compose down -v
+```
+
+Зайти в sh консоль определенного контейнера, например nginx:
+```bash
+docker compose exec nginx sh
+```
+
+Подробней в документации docker compose: https://docs.docker.com/reference/cli/docker/compose/
+
 ......ToDo......
