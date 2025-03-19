@@ -10,7 +10,7 @@
 # Содержимое
 
 * [Docker и Docker Compose](#docker)
-* [Сборка или скачавание Docker образов](#dockerimages)
+* [Сборка или скачивание Docker образов](#dockerimages)
   * [Базовые образы](#basicimages)
   * [Битрикс образы (bx-*)](#bitriximages)
 * [Управление](#management)
@@ -26,7 +26,7 @@
 <a id="docker"></a>
 # Docker и Docker Compose
 
-Для запуска проекта понадобится Docker. Для оркестировки и управления Docker Compose.
+Для запуска проекта понадобится `Docker`. Для оркестировки и управления `Docker Compose`.
 
 Способ развертывания зависит от вашей операционной системы, используемой на хосте.
 
@@ -34,36 +34,36 @@
 - рабочая станция, персональный компьютер, ноутбук и т.д. с рабочим столом и графической средой, он же desktop
 - сервер, без графической среды, но с консолью или удаленным доступом, он же server
 
-Для взаимодействия с docker в графическом режиме будем использовать продукт [Docker Desktop](https://docs.docker.com/desktop/), который возможно запустить на ОС Windows, Linux, MacOS.
+Для взаимодействия с `Docker` в графическом режиме будем использовать продукт [Docker Desktop](https://docs.docker.com/desktop/), который возможно запустить на ОС Windows, Linux, MacOS.
 
-Ознакомтесь с документацией и выполните развертывание docker, в зависимости от используемой вами ОС:
-- Docker Desktop on Windows: https://docs.docker.com/desktop/setup/install/windows-install/
-- Docker Desktop on Linux: https://docs.docker.com/desktop/setup/install/linux/
-- Docker Desktop on Mac: https://docs.docker.com/desktop/setup/install/mac-install/
+Ознакомтесь с документацией и выполните развертывание `Docker`, в зависимости от используемой вами ОС:
+- `Docker Desktop on Windows`: https://docs.docker.com/desktop/setup/install/windows-install/
+- `Docker Desktop on Linux`: https://docs.docker.com/desktop/setup/install/linux/
+- `Docker Desktop on Mac`: https://docs.docker.com/desktop/setup/install/mac-install/
 
-Для взаимодействия с docker в режиме командной строки (без графического режима) будем использовать продукт [Docker Engine](https://docs.docker.com/engine/), который возможно запустить на ОС Linux.
+Для взаимодействия с `Docker` в режиме командной строки (без графического режима) будем использовать продукт [Docker Engine](https://docs.docker.com/engine/), который возможно запустить на ОС Linux.
 
-Ознакомтесь с документацией и выполните развертывание docker, в зависимости от используемой вами ОС Linux:
-- Docker Engine: https://docs.docker.com/engine/install/
+Ознакомтесь с документацией и выполните развертывание `Docker Engine`, в зависимости от используемой вами ОС Linux:
+- `Docker Engine`: https://docs.docker.com/engine/install/
 
-В современных версиях продуктов Docker обычно в их состав уже включен Docker Compose.
+В современных версиях продуктов `Docker` обычно в их состав уже включен `Docker Compose`.
 
-Ознакомтесь с документацией и выполните развертывание Docker Compose, если это требуется отдельно:
-- Docker Compose: https://docs.docker.com/compose/
+Ознакомтесь с документацией и выполните развертывание `Docker Compose`, если это требуется отдельно:
+- `Docker Compose`: https://docs.docker.com/compose/
 
 <a id="dockerimages"></a>
-# Сборка или скачавание Docker образов
+# Сборка или скачивание Docker образов
 
 Наша цель - подготовить или собрать максимально совместимые и готовые для Bitrix образы, запускающие набор ПО в контейнерах.
 
 <a id="basicimages"></a>
 ## Базовые образы
 
-Там где возможно будем использовать официальные Docker образы ПО, теги для которых будем брать с DockerHub-а:
-- Percona Server: https://hub.docker.com/_/percona
-- PostgreSQL: https://hub.docker.com/_/postgres
-- Redis: https://hub.docker.com/_/redis
-- Memcached: https://hub.docker.com/_/memcached
+Там где возможно будем использовать официальные Docker образы ПО, теги для которых будем брать с [DockerHub](https://hub.docker.com/):
+- `Percona Server`: https://hub.docker.com/_/percona
+- `PostgreSQL`: https://hub.docker.com/_/postgres
+- `Redis`: https://hub.docker.com/_/redis
+- `Memcached`: https://hub.docker.com/_/memcached
 
 В этот список попадают (формат `название`:`полный_тег_с_указанием_версии_и_ос`):
 - `percona/percona-server:8.0.40`
@@ -88,10 +88,10 @@ docker pull memcached:1.6.37-alpine
 - поиск: готового образа sphinx нет, но есть собранный пакет sphinx на базе alpine linux в официальной репе, соберем `bx-sphinx:2.2.11-alpine` установив пакет
 - push сервер: готового образа нет, используем NodeJS 20-ой версии, соберем `bx-push:3.0-alpine`, используя его исходники `push-server-0.4.0`
 
-Список официальных Docker образов, которые будем брать с DockerHub-а:
-- Nginx: https://hub.docker.com/_/nginx
-- PHP: https://hub.docker.com/_/php
-- NodeJS: https://hub.docker.com/_/node
+Список официальных Docker образов, которые будем брать с [DockerHub](https://hub.docker.com/):
+- `Nginx`: https://hub.docker.com/_/nginx
+- `PHP`: https://hub.docker.com/_/php
+- `NodeJS`: https://hub.docker.com/_/node
 
 Для сборки нам понадобятся следующие образы (их можно предварительно скачать используя команды):
 ```bash
