@@ -29,14 +29,14 @@ docker pull memcached:1.6.37-alpine
 
 Так же нам понадобятся:
 - веб сервер: используем стабильный `nginx:1.26.3-alpine-slim`, добавим модули слоем сверху, соберем `bx-nginx:1.26.3-alpine`
-- интерпритарор php кода: готового совместимого образа php увы нет, берем по умолчанию `php:8.2.27-fpm-alpine` и добавляем то, что нам надо через пару слоев сверху, соберем `bx-php:8.2.27-fpm-alpine`
+- интерпритарор php кода: готового совместимого образа php увы нет, берем по умолчанию `php:8.2.28-fpm-alpine` и добавляем то, что нам надо через пару слоев сверху, соберем `bx-php:8.2.28-fpm-alpine`
 - поиск: готового образа sphinx нет, но есть собранный пакет sphinx на базе alpine linux в официальной репе, соберем `bx-sphinx:2.2.11-alpine` установив пакет
 - push сервер: готового образа нет, используем NodeJS 20-ой версии, соберем `bx-push:3.0-alpine`, используя его исходники `push-server-0.4.0`
 
 Для сборки нам понадобятся следующие образы (их можно предварительно скачать используя команды):
 ```bash
 docker pull nginx:1.26.3-alpine-slim
-docker pull php:8.2.27-fpm-alpine
+docker pull php:8.2.28-fpm-alpine
 docker pull alpine:3.21
 docker pull node:20
 docker pull node:20-alpine
@@ -58,8 +58,8 @@ docker build -f Dockerfile -t bx-push:3.0-alpine --no-cache .
 
 - bx-php:
 ```bash
-cd dev/sources/bxphp8227/
-docker build -f Dockerfile -t bx-php:8.2.27-fpm-alpine --no-cache .
+cd dev/sources/bxphp8228/
+docker build -f Dockerfile -t bx-php:8.2.28-fpm-alpine --no-cache .
 ```
 
 - bx-nginx:

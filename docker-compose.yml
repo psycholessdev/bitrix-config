@@ -78,7 +78,7 @@ services:
         aliases:
           - mysql
   php:
-    image: bx-php:8.2.27-fpm-alpine
+    image: bx-php:8.2.28-fpm-alpine
     container_name: dev_php
     restart: unless-stopped
     command: php-fpm -R
@@ -168,7 +168,7 @@ services:
         aliases:
           - sphinx
   cron:
-    image: bx-php:8.2.27-fpm-alpine
+    image: bx-php:8.2.28-fpm-alpine
     container_name: dev_cron
     restart: unless-stopped
     command: crond -f -d 8
