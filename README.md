@@ -17,6 +17,7 @@
 * [Адресация](#iporurls)
 * [Порты](#ports)
 * [Доступ к сайту](#siteaccess)
+* [Базовая проверка конфигурации веб-сервера](#bitrixservertestphp)
 
 <a id="docker"></a>
 # Docker и Docker Compose
@@ -238,5 +239,41 @@ firewall-cmd --add-port=8858/tcp --permanent && firewall-cmd --add-port=8859/tcp
 > <b>НЕ</b> используйте `127.0.0.1` или `localhost` при работе с сайтом на локальной машине. Используйте ip или домен, пример `10.0.1.119` или `dev.bx`.
 
 В примерах ниже будет использоваться локальный ip `10.0.1.119`.
+
+<a id="bitrixservertestphp"></a>
+# Базовая проверка конфигурации веб-сервера
+
+После запуска сайта необходимо провести базовую проверку конфигурации веб-сервера. Она выполняется с помощью скрипта `bitrix_server_test.php`.
+
+Используем способ, который работает одинаково на всех ОС.
+
+Заходим в sh-консоль контейнера `php` из под `root`:
+```bash
+docker compose exec --user=root php sh
+```
+
+Переходим в корневой каталог сайта и скачиваем скрипт `bitrix_server_test.php`:
+```bash
+cd /opt/www/
+wget https://dev.1c-bitrix.ru/download/scripts/bitrix_server_test.php
+```
+
+В браузере переходим по ссылке вида:
+```bash
+http://10.0.1.119:8588/bitrix_server_test.php
+```
+
+После проверки скрипт нужно удалить.
+
+PS: для Docker Engine на Linux расположение каталога сайта зависит от режима работы docker-а:
+- rootfull:
+```bash
+/var/lib/docker/volumes/dev_www_data/_data/
+```
+
+- rootless:
+```bash
+/home/[USERNAME]/.local/share/docker/volumes/dev_www_data/_data
+```
 
 ......ToDo......
