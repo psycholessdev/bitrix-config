@@ -18,6 +18,9 @@
 * [Порты](#ports)
 * [Доступ к сайту](#siteaccess)
 * [Базовая проверка конфигурации веб-сервера](#bitrixservertestphp)
+* [BitrixSetup / Restore](#bitrixsetupphprestorephp)
+* [Установка дистрибутивов](#installdistro)
+* [Восстановление из резервной копии](#restorebackup)
 
 <a id="docker"></a>
 # Docker и Docker Compose
@@ -265,7 +268,7 @@ http://10.0.1.119:8588/bitrix_server_test.php
 
 После проверки скрипт нужно удалить.
 
-PS: для Docker Engine на Linux расположение каталога сайта зависит от режима работы docker-а:
+PS: для Docker Engine на Linux расположение каталога сайта на хосте зависит от режима работы docker-а:
 - rootfull:
 ```bash
 /var/lib/docker/volumes/dev_www_data/_data/
@@ -275,5 +278,71 @@ PS: для Docker Engine на Linux расположение каталога с
 ```bash
 /home/[USERNAME]/.local/share/docker/volumes/dev_www_data/_data
 ```
+
+<a id="bitrixsetupphprestorephp"></a>
+# BitrixSetup / Restore
+
+Для установки продуктов Битрикс можно использовать скрипт `bitrixsetup.php`: https://dev.1c-bitrix.ru/learning/course/index.php?COURSE_ID=135&LESSON_ID=4523&LESSON_PATH=10495.4495.4523
+
+Для восстановления из резервной копии скрипт `restore.php`: https://dev.1c-bitrix.ru/learning/course/index.php?COURSE_ID=135&CHAPTER_ID=02014&LESSON_PATH=10495.4496.2014
+
+Заходим в sh-консоль контейнера `php` из под `root`:
+```bash
+docker compose exec --user=root php sh
+```
+
+Переходим в корневой каталог сайта и скачиваем скрипт(ы):
+```bash
+cd /opt/www/
+wget https://www.1c-bitrix.ru/download/scripts/bitrixsetup.php
+wget https://www.1c-bitrix.ru/download/scripts/restore.php
+```
+
+В браузере переходим по ссылке вида:
+- для установки:
+```bash
+http://10.0.1.119:8588/bitrixsetup.php
+```
+
+- для восстановления:
+```bash
+http://10.0.1.119:8588/restore.php
+```
+
+Устанавливаем продукт или восстанавливаем сайт, зависит от вашего выбора.
+
+<a id="installdistro"></a>
+# Установка дистрибутивов
+
+Используем скрипт `bitrixsetup.php`, скачиваем дистрибутив Битрикс, будь это демо версия или лицензионная версия. Редакция и тип базы зависит от вашего выбора.
+После переходим на сайт используя урл:
+```bash
+http://10.0.1.119:8588/
+```
+
+Проходим мастер установки дистрибутива:
+- `1С-Битрикс: Управление сайтом` - https://dev.1c-bitrix.ru/learning/course/index.php?COURSE_ID=135&CHAPTER_ID=04522&LESSON_PATH=10495.4495.4522
+- `1С-Битрикс24` - https://dev.1c-bitrix.ru/learning/course/index.php?COURSE_ID=135&CHAPTER_ID=04522&LESSON_PATH=10495.4495.4522
+
+На шаге создания базы вводим параметры подключения к ней:
+
+1) для `mysql` версии:
+Имя хоста (алиас) - `mysql`
+Имя суперпользователя - `root`
+Пароль суперпользователя - `BiTRiX@#2025`
+
+2) для `pgsql` версии:
+Имя хоста (алиас) - `postgres`
+Имя суперпользователя - `postgres`
+Пароль суперпользователя - `BiTRiX@#2025`
+
+Пароль суперпользователя для обеих баз хранится в файле `.env_sql` и по умолчанию его значение равно `BiTRiX@#2025`.
+
+<a id="restorebackup"></a>
+# Восстановление из резервной копии
+
+Используем скрипт `restore.php`.............
+
+(___ToDo___)
 
 ......ToDo......
