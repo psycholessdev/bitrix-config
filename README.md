@@ -14,6 +14,7 @@
   * [Базовые образы](#basicimages)
   * [Битрикс образы (bx-*)](#bitriximages)
 * [Управление](#management)
+* [Часовой пояс (timezone)](#timezone)
 * [Адресация](#iporurls)
 * [Порты](#ports)
 * [Доступ к сайту](#siteaccess)
@@ -185,6 +186,25 @@ docker compose exec nginx sh
 ```
 
 Подробней в документации docker compose: https://docs.docker.com/reference/cli/docker/compose/
+
+<a id="timezone"></a>
+# Часовой пояс (timezone)
+
+Значение таймзоны, используемой контейнерами, хранится в файле `.env`.
+Значение по умолчание задано как:
+```bash
+TZ=Europe/Kaliningrad
+```
+
+Исключение составляет контейнер с `php`, значение тамйзоны для которого продублировано в отдельном файле `confs/php/etc/php/conf.d/timezone.ini` как:
+```bash
+date.timezone = Europe/Kaliningrad
+```
+
+При необходимости смените значение в обоих файлах. Перезапустите все контейнеры:
+```bash
+docker compose restart
+```
 
 <a id="iporurls"></a>
 # Адресация
