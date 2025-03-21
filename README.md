@@ -22,6 +22,7 @@
 * [BitrixSetup / Restore](#bitrixsetupphprestorephp)
 * [Установка дистрибутивов](#installdistro)
 * [Восстановление из резервной копии](#restorebackup)
+* [Настройки модулей](#modulessettings)
 
 <a id="docker"></a>
 # Docker и Docker Compose
@@ -367,5 +368,14 @@ http://10.0.1.119:8588/
 Используем скрипт `restore.php`.............
 
 (___ToDo___)
+
+<a id="modulessettings"></a>
+# Настройки модулей
+
+После установки дистрибутива или восстановления сайта из бекапа необходимо подстроить сайт.
+
+Например, настроить `Главный модуль (main)` (/bitrix/admin/settings.php?lang=ru&mid=main)
+
+(___ToDo_описать_важные_опции_и_ссылка_на_доку___)
 
 ......ToDo......
