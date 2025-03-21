@@ -59,6 +59,8 @@ services:
     image: percona/percona-server:8.0.40
     container_name: dev_mysql
     restart: unless-stopped
+    command: mysqld --user=root
+    user: root
     env_file:
       - .env
       - .env_sql
