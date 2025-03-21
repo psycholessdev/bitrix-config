@@ -24,7 +24,7 @@
 * [Восстановление из резервной копии](#restorebackup)
 * [Настройки модулей](#modulessettings)
 * [Проверка системы](#sitechecker)
-* [Тест производителности](#perfmonpanel)
+* [Тест производительности](#perfmonpanel)
 
 <a id="docker"></a>
 # Docker и Docker Compose
@@ -376,23 +376,23 @@ http://10.0.1.119:8588/
 
 После установки дистрибутива или восстановления сайта из бекапа необходимо подстроить сайт.
 
-Например, настроить `Главный модуль (main)` (/bitrix/admin/settings.php?lang=ru&mid=main).
+Например, настроить `Главный модуль (main)` (`/bitrix/admin/settings.php?lang=ru&mid=main`).
 
 (___ToDo_описать_важные_опции_и_ссылка_на_доку___)
 
 <a id="sitechecker"></a>
 # Проверка системы
 
-Для всесторонней проверки соответствия параметров системы, на которой осуществляется функционирование сайта, минимальным и рекомендуемым техническим требованиям продукта используйте страницу `Проверка системы` (/bitrix/admin/site_checker.php?lang=ru).
+Для всесторонней проверки соответствия параметров системы, на которой осуществляется функционирование сайта, минимальным и рекомендуемым техническим требованиям продукта используйте страницу `Проверка системы` (`/bitrix/admin/site_checker.php?lang=ru`).
 
 Документация:
-https://dev.1c-bitrix.ru/learning/course/index.php?COURSE_ID=35&LESSON_ID=14020&LESSON_PATH=3906.4493.4506.2024.14020
-https://dev.1c-bitrix.ru/user_help/settings/utilities/site_checker.php
+- https://dev.1c-bitrix.ru/learning/course/index.php?COURSE_ID=35&LESSON_ID=14020&LESSON_PATH=3906.4493.4506.2024.14020
+- https://dev.1c-bitrix.ru/user_help/settings/utilities/site_checker.php
 
 <a id="perfmonpanel"></a>
-# Тест производителности
+# Тест производительности
 
-Для оценки производительности перейдите на страницу `Панель производительности` (/bitrix/admin/perfmon_panel.php?lang=ru).
+Для оценки производительности перейдите на страницу `Панель производительности` (`/bitrix/admin/perfmon_panel.php?lang=ru`).
 
 Выполните тест конфигурации. Результаты подскажут "узкие" места системы или её конфигурации.
 
