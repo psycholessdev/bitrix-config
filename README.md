@@ -25,6 +25,9 @@
 * [Настройки модулей](#modulessettings)
 * [Проверка системы](#sitechecker)
 * [Тест производительности](#perfmonpanel)
+* [Cron](#cron)
+  * [Выполнение агентов на cron](#agentsoncron)
+  * [Кастомные cron задания](#owncrontasks)
 
 <a id="docker"></a>
 # Docker и Docker Compose
@@ -397,5 +400,77 @@ http://10.0.1.119:8588/
 Выполните тест конфигурации. Результаты подскажут "узкие" места системы или её конфигурации.
 
 Документация: https://dev.1c-bitrix.ru/learning/course/index.php?COURSE_ID=35&CHAPTER_ID=03376&LESSON_PATH=3906.6663.4904.3376
+
+<a id="cron"></a>
+# Cron
+
+<a id="agentsoncron"></a>
+## Выполнение агентов на cron
+
+Для работы cron заданий используется отдельный контейнер `cron` на базе образа `php`.
+По умолчанию контейнер сконфигурирован на выполнение задания раз в минуту:
+```bash
+php -f /opt/www/bitrix/modules/main/tools/cron_events.php
+```
+
+Это задание будет выполнятся только если дистрибутив установлен.
+
+Для включения выполнения агентов на кроне нужно отредактировать файл `/bitrix/php_interface/dbconn.php`, добавить строку:
+```bash
+define('BX_CRONTAB_SUPPORT', true);
+```
+
+И сохранить.
+
+Проверить настройку можно на странице `Проверка системы` (`/bitrix/admin/site_checker.php?lang=ru`) и на странице `Список агентов` (`/bitrix/admin/agent_list.php?lang=ru`).
+
+<a id="owncrontasks"></a>
+## Кастомные cron задания
+
+Cron задания хранятся в папке `/etc/periodic/` контейнера `cron`. Внутри каталога размещены подкаталоги, указывающие на периодичность запуска заданий:
+```bash
+1min
+15min
+hourly
+daily
+weekly
+monthly
+```
+
+Для примера создадим задание, которое выполняется раз в сутки - создание резервной копии сайта с базой MySQL - бекап.
+
+Заходим в `cron` контейнер в sh с правами root-а:
+```bash
+docker compose exec --user=root cron sh
+```
+
+В каталоге `/etc/periodic/daily/` создадим файл `backup` без указания расширения файла.
+```bash
+apk add mc
+mcedit /etc/periodic/daily/backup
+```
+
+Заполним содержимое файла:
+```bash
+#!/bin/sh
+#
+php -f /opt/www/bitrix/modules/main/tools/backup.php; > /dev/null 2>&1
+#
+```
+
+Сохраняем файл.
+Делаем его исполняемым:
+```bash
+chmod -R a+x /etc/periodic/daily
+```
+
+Создаем файл `/etc/crontabs/cron.update`, чтобы `crond` демон перезапустил задания крона:
+```bash
+touch /etc/crontabs/cron.update
+```
+
+Итог: раз в день (в 2ч ночи) контейнер запустит `backup` задание и выполнит резервное копирование.
+
+Документация: https://dev.1c-bitrix.ru/learning/course/index.php?COURSE_ID=35&LESSON_ID=4464&LESSON_PATH=3906.4833.4464
 
 ......ToDo......
