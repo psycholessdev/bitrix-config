@@ -92,8 +92,6 @@ services:
       - ./confs/php/etc/:/usr/local/etc/
       - www_data:/opt/www/
       - bxtemp_data:/opt/.bx_temp/
-#      - ./www/:/opt/www/
-#      - ./.bx_temp/:/opt/.bx_temp/
     networks:
       dev:
         aliases:
@@ -112,8 +110,6 @@ services:
       - ./confs/nginx/:/etc/nginx/
       - www_data:/opt/www/
       - bxtemp_data:/opt/.bx_temp/
-#      - ./www/:/opt/www/
-#      - ./.bx_temp/:/opt/.bx_temp/
     networks:
       dev:
         aliases:
@@ -182,8 +178,6 @@ services:
       - ./confs/php/etc/:/usr/local/etc/
       - www_data:/opt/www/
       - bxtemp_data:/opt/.bx_temp/
-#      - ./www/:/opt/www/
-#      - ./.bx_temp/:/opt/.bx_temp/
     networks:
       dev:
         aliases:
