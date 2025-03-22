@@ -38,6 +38,8 @@
   * [Browser Capabilities](#phpbrowsercapabilities)
   * [GeoIP2](#phpgeoip2)
   * [Расширения (extensions)](#phpextensions)
+  * [Imagick Engine для изображений](#phpimagickimageengine)
+  * [security: Веб-антивирус](#phpsecurityantivirus)
 
 <a id="docker"></a>
 # Docker и Docker Compose
@@ -775,5 +777,102 @@ mcedit /usr/local/etc/php/conf.d/docker-php-ext-imagick.ini
 ```bash
 docker compose restart php
 ```
+
+<a id="phpimagickimageengine"></a>
+## PHP Imagick Engine для изображений
+
+Чтобы работать с изображениями с помощью PHP расширения Imagick (а не GD) активируем библиотеку для работы с изображениями на базе ImagickImageEngine.
+
+Убедимся что в файле `/usr/local/etc/php/conf.d/docker-php-ext-imagick.ini` активировано подключение расширения `extension=imagick.so`.
+
+Заходим в sh-консоль контейнера `php` из под пользователя `root`:
+```bash
+docker compose exec --user=root php sh
+```
+
+Выполняем команду:
+```bash
+\cp /usr/local/etc/image.png /opt/www/bitrix/images/
+```
+
+В административной части продукта:
+- редактируем файл `/bitrix/.settings.php`
+- добавляем блок настроек:
+```bash
+        'services' => [
+                'value' => [
+                        'main.imageEngine' => [
+                                'className' => '\Bitrix\Main\File\Image\Imagick',
+                                'constructorParams' => [
+                                        null,
+                                        [
+                                                'allowAnimatedImages' => true,
+                                                'maxSize' => [
+                                                        7000,
+                                                        7000
+                                                ],
+                                                'jpegLoadSize' => [
+                                                        2000,
+                                                        2000
+                                                ],
+                                                'substImage' => $_SERVER['DOCUMENT_ROOT'].'/bitrix/images/image.png',
+                                        ]
+                                ],
+                        ],
+                ],
+                'readonly' => true,
+        ],
+```
+
+Сохраняем файл.
+
+Для выключения отредактируем файл `/bitrix/.settings.php` и уберем блок настроек выше.
+
+<a id="phpsecurityantivirus"></a>
+## PHP веб-антивирус
+
+Веб-антивирус включен в состав модуля `Проактивная защита (security)`, с помощью которого реализуется целый комплекс защитных мероприятий для сайта и сторонних приложений.
+
+Для детектирования вирусов, внедренных до старта буферизации вывода, добавим в контейнер `php` файл `/usr/local/etc/php/conf.d/security.ini`.
+
+Заходим в sh-консоль контейнера `php` из под пользователя `root`:
+```bash
+docker compose exec --user=root php sh
+```
+
+Выполняем команду:
+```bash
+echo "auto_prepend_file = /opt/www/bitrix/modules/security/tools/start.php" > /usr/local/etc/php/conf.d/security.ini
+```
+
+Перезапускаем контейнер с `php`:
+```bash
+docker compose restart php
+```
+
+На странице `Веб-антивирус` (`/bitrix/admin/security_antivirus.php?lang=ru`) включаем его, нажимаем кнопку `Включить веб-антивирус`.
+
+Для выключения обратный порядок действий.
+
+На странице `Веб-антивирус` (`/bitrix/admin/security_antivirus.php?lang=ru`) выключаем его, нажимаем кнопку `Выключить веб-антивирус`.
+
+Заходим в sh-консоль контейнера `php` из под пользователя `root`:
+```bash
+docker compose exec --user=root php sh
+```
+
+Выполняем команду:
+```bash
+rm -f /usr/local/etc/php/conf.d/security.ini
+```
+
+Перезапускаем контейнер с `php`:
+```bash
+docker compose restart php
+```
+
+Документация:
+https://dev.1c-bitrix.ru/user_help/settings/security/security_antivirus.php
+https://dev.1c-bitrix.ru/learning/course/index.php?COURSE_ID=35&LESSON_ID=2674#antivirus
 
 ......ToDo......
