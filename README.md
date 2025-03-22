@@ -28,6 +28,7 @@
 * [Cron](#cron)
   * [Выполнение агентов на cron](#agentsoncron)
   * [Кастомные cron задания](#owncrontasks)
+* [Хранение временных файлов вне корневой директории сайта](#bxtemporaryfilesdirectory)
 
 <a id="docker"></a>
 # Docker и Docker Compose
@@ -98,14 +99,15 @@ docker pull memcached:1.6.38-alpine
 - `Nginx`: https://hub.docker.com/_/nginx
 - `PHP`: https://hub.docker.com/_/php
 - `NodeJS`: https://hub.docker.com/_/node
+- `Alpine`: https://hub.docker.com/_/alpine
 
 Для сборки нам понадобятся следующие образы (их можно предварительно скачать используя команды):
 ```bash
 docker pull nginx:1.26.3-alpine-slim
 docker pull php:8.2.28-fpm-alpine
-docker pull alpine:3.21
 docker pull node:20
 docker pull node:20-alpine
+docker pull alpine:3.21
 ```
 
 Собираем образы, в названии используем bx-:
@@ -250,7 +252,7 @@ firewall-cmd --add-port=8858/tcp --permanent && firewall-cmd --add-port=8859/tcp
 <a id="siteaccess"></a>
 # Доступ к сайту
 
-Итак, согласно разделам Адресация и Порты выше, к сайту можно обратиться по http/https следующим образом:
+Итак, согласно разделам `Адресация` и `Порты` выше, к сайту можно обратиться по http/https следующим образом:
 
 - через локалхост:
   - http://127.0.0.1:8858/
@@ -267,7 +269,7 @@ firewall-cmd --add-port=8858/tcp --permanent && firewall-cmd --add-port=8859/tcp
 > [!IMPORTANT]
 > <b>НЕ</b> используйте `127.0.0.1` или `localhost` при работе с сайтом на локальной машине. Используйте ip или домен, пример `10.0.1.119` или `dev.bx`.
 
-В примерах ниже будет использоваться локальный ip `10.0.1.119`.
+В примерах ниже будет использоваться локальный ip `10.0.1.119` или локальный домен `dev.bx`.
 
 <a id="bitrixservertestphp"></a>
 # Базовая проверка конфигурации веб-сервера
@@ -276,7 +278,7 @@ firewall-cmd --add-port=8858/tcp --permanent && firewall-cmd --add-port=8859/tcp
 
 Используем способ, который работает одинаково на всех ОС.
 
-Заходим в sh-консоль контейнера `php` из под `root`:
+Заходим в sh-консоль контейнера `php` из под пользователя `root`:
 ```bash
 docker compose exec --user=root php sh
 ```
@@ -312,7 +314,7 @@ PS: для Docker Engine на Linux расположение каталога с
 
 Для восстановления из резервной копии скрипт `restore.php`: https://dev.1c-bitrix.ru/learning/course/index.php?COURSE_ID=135&CHAPTER_ID=02014&LESSON_PATH=10495.4496.2014
 
-Заходим в sh-консоль контейнера `php` из под `root`:
+Заходим в sh-консоль контейнера `php` из под пользователя `root`:
 ```bash
 docker compose exec --user=root php sh
 ```
@@ -442,7 +444,7 @@ monthly
 
 Для примера создадим задание, которое выполняется раз в сутки - создание резервной копии сайта с базой MySQL - бекап.
 
-Заходим в `cron` контейнер в sh с правами root-а:
+Заходим в sh-консоль контейнера `cron` из под пользователя `root`:
 ```bash
 docker compose exec --user=root cron sh
 ```
@@ -475,5 +477,18 @@ touch /etc/crontabs/cron.update
 Итог: раз в день (в 2ч ночи) контейнер запустит `backup` задание и выполнит резервное копирование.
 
 Документация: https://dev.1c-bitrix.ru/learning/course/index.php?COURSE_ID=35&LESSON_ID=4464&LESSON_PATH=3906.4833.4464
+
+<a id="bxtemporaryfilesdirectory"></a>
+# Хранение временных файлов вне корневой директории сайта
+
+По умолчанию конфигурация `nginx` подготовлена таким образом, чтобы временные файлы хранились вне пределах корневой директории проекта.
+Чтобы окончательно заработало надо отредактировать файл `/bitrix/php_interface/dbconn.php`, добавить строку:
+```bash
+define("BX_TEMPORARY_FILES_DIRECTORY", "/opt/.bx_temp");
+```
+
+И сохранить.
+
+Проверить настройку можно на странице `Сканер безопасности` (/bitrix/admin/security_scanner.php?lang=ru) модуля `Проактивной защиты (security)`.
 
 ......ToDo......
