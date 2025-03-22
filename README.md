@@ -20,8 +20,8 @@
 * [Доступ к сайту](#siteaccess)
 * [Базовая проверка конфигурации веб-сервера](#bitrixservertestphp)
 * [BitrixSetup / Restore](#bitrixsetupphprestorephp)
-* [Установка дистрибутивов](#installdistro)
-* [Восстановление из резервной копии](#restorebackup)
+  * [Установка дистрибутивов](#installdistro)
+  * [Восстановление из резервной копии](#restorebackup)
 * [Настройки модулей](#modulessettings)
 * [Проверка системы](#sitechecker)
 * [Тест производительности](#perfmonpanel)
@@ -33,6 +33,9 @@
   * [Push сервер](#pushserver)
 * [Sphinx](#sphinx)
   * [Поиск с помощью Sphinx](#sphinxsearch)
+* [PHP](#php)
+  * [Composer](#phpcomposer)
+  * [Browser Capabilities](#phpbrowsercapabilities)
 
 <a id="docker"></a>
 # Docker и Docker Compose
@@ -344,7 +347,7 @@ http://10.0.1.119:8588/restore.php
 Устанавливаем продукт или восстанавливаем сайт, зависит от вашего выбора.
 
 <a id="installdistro"></a>
-# Установка дистрибутивов
+## Установка дистрибутивов
 
 Используем скрипт `bitrixsetup.php`, скачиваем дистрибутив Битрикс, будь это демо версия или лицензионная версия.
 
@@ -374,7 +377,7 @@ http://10.0.1.119:8588/
 Пароль суперпользователя для обеих баз хранится в файле `.env_sql` и по умолчанию его значение равно `BiTRiX@#2025`.
 
 <a id="restorebackup"></a>
-# Восстановление из резервной копии
+## Восстановление из резервной копии
 
 Используем скрипт `restore.php`.............
 
@@ -584,6 +587,69 @@ oqq2gaHWkogJHDfYY8CRzBaR9d26ZuCmTHIZa2egZ2Kk3IN3QKWDRB2Ixlt7usICbi1Qlvla3MylfqRr
 
 Документация: https://dev.1c-bitrix.ru/learning/course/index.php?COURSE_ID=35&CHAPTER_ID=04507&LESSON_PATH=3906.4507
 
-Примечение: для продуктов, использующих базу данных PostgreSQL, нужно обновление модуля `search` версии `25.0.0`.
+> [!IMPORTANT]
+> Для продуктов, использующих базу данных PostgreSQL, нужно обновление модуля `search` версии `25.0.0` и выше.
+
+# PHP
+<a id="php"></a>
+
+<a id="phpcomposer"></a>
+## PHP Composer
+
+В контейнере с `php` по умолчанию доступен [PHP Composer](https://getcomposer.org/).
+
+Чтобы его использовать, заходим в sh-консоль контейнера `php` из под пользователя `root`:
+```bash
+docker compose exec --user=root php sh
+```
+
+Проверяем его версию командой:
+```bash
+composer --version
+```
+
+Устанавливаем зависимости:
+```bash
+cd /opt/www/bitrix/
+COMPOSER=composer-bx.json composer install
+```
+
+После запусаем Bitrix CLI:
+```bash
+php bitrix.php -h
+```
+
+Полный набор команд и параметров доступен в документции: https://dev.1c-bitrix.ru/learning/course/index.php?COURSE_ID=43&LESSON_ID=11685&LESSON_PATH=3913.3516.4776.2483.11685
+
+<a id="phpbrowsercapabilities"></a>
+## PHP Browser Capabilities
+
+Возможно пригодится настроить если нужна `История входов`: https://helpdesk.bitrix24.ru/open/16615982/
+
+Заходим в sh-консоль контейнера `php` из под пользователя `root`:
+```bash
+docker compose exec --user=root php sh
+```
+
+Создадим каталог `/opt/browscap`, загрузим в него `browscap.ini`, подключим в настройках php. Выполняем:
+```bash
+apk add mc curl
+mkdir -p /opt/browscap
+cd /opt/browscap
+curl http://browscap.org/stream?q=PHP_BrowsCapINI -o php_browscap.ini
+echo 'browscap = /opt/browscap/php_browscap.ini' > /usr/local/etc/php/conf.d/browscap.ini
+exit
+```
+
+Перезапускаем контейнер с `php`:
+```bash
+docker compose restart php
+```
+
+На странице настроек `Главного модуля (main)` (`/bitrix/admin/settings.php?lang=ru&mid=main`) на табе `Журнал событий`:
+- ставим галочку - `Сохранять историю входов с устройств пользователя` - Да
+- запоняем поле - `Сколько дней хранить историю входов` - 365
+
+Сохраняем настройки.
 
 ......ToDo......
