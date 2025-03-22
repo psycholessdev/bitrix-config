@@ -36,6 +36,8 @@
 * [PHP](#php)
   * [Composer](#phpcomposer)
   * [Browser Capabilities](#phpbrowsercapabilities)
+  * [GeoIP2](#phpgeoip2)
+  * [Расширения (extensions)](#phpextensions)
 
 <a id="docker"></a>
 # Docker и Docker Compose
@@ -651,5 +653,127 @@ docker compose restart php
 - запоняем поле - `Сколько дней хранить историю входов` - 365
 
 Сохраняем настройки.
+
+<a id="phpgeoip2"></a>
+## PHP GeoIP2
+
+Возможно пригодится настроить если нужно отслеживать геопозицию устройства для `Истории входов`: https://helpdesk.bitrix24.ru/open/16615982/
+
+Заходим в sh-консоль контейнера `php` из под пользователя `root`:
+```bash
+docker compose exec --user=root php sh
+```
+
+Создадим каталог `/opt/geoip2` и перейдем в него:
+```bash
+mkdir -p /opt/geoip2
+cd /opt/geoip2
+```
+
+Размещаем в нем файлы в формате mmdb, список:
+```bash
+GeoLite2-ASN.mmdb
+GeoLite2-City.mmdb
+GeoLite2-Country.mmdb
+```
+
+На странице `Список обработчиков геолокации` (`/bitrix/admin/geoip_handlers_list.php?lang=ru`) редактируем обработчик `GeoIP2` (`/bitrix/admin/geoip_handler_edit.php?lang=ru&ID=1&CLASS_NAME=%5CBitrix%5CMain%5CService%5CGeoIp%5CGeoIP2`).
+
+На табе Дополнительные:
+- выбираем - `Тип базы данных` - `GeoIP2/GeoLite2 City`
+- заполняем - `Абсолютный путь к файлу базы данных (*.mmdb)` - `/opt/geoip2/GeoLite2-City.mmdb`
+
+или
+
+- выбираем - `Тип базы данных` - `GeoIP2/GeoLite2 Country`
+- заполняем - `Абсолютный путь к файлу базы данных (*.mmdb)` - `/opt/geoip2/GeoLite2-Country.mmdb`
+
+Сохраняем настройки.
+
+На странице настроек `Главного модуля (main)` (`/bitrix/admin/settings.php?lang=ru&mid=main`) на табе `Журнал событий`:
+- ставим галочку - `Собирать IP-геоданные для истории входов` - Да
+
+Сохраняем настройки.
+
+<a id="phpextensions"></a>
+## PHP расширения (extensions)
+
+Образ `bx-php` в своем составе содержит следующие php расширения (extensions):
+```bash
+amqp
+apcu
+bz2
+calendar
+exif
+gd
+gettext
+igbinary
+imagick
+intl
+ldap
+mcrypt
+memcache
+msgpack
+mysqli
+opcache
+pdo_mysql
+pdo_pgsql
+pgsql
+pspell
+redis
+shmop
+sockets
+sodium
+ssh2
+sysvmsg
+sysvsem
+sysvshm
+xdebug
+xhprof
+xml
+xmlwriter
+xsl
+zip
+```
+
+Большинство из них активны по умолчанию.
+
+Чтобы активировать php расширение:
+- заходим в sh-консоль контейнера `php` из под пользователя `root`:
+```bash
+docker compose exec --user=root php sh
+```
+- находим файл `/usr/local/etc/php/conf.d/docker-php-ext-***.ini`, где *** название расширения, пример для imagick:
+```bash
+mcedit /usr/local/etc/php/conf.d/docker-php-ext-imagick.ini
+```
+- внутри файла меняем строку активируем подключение: `extension=***.so`, где *** название расширения:
+```bash
+extension=imagick.so
+```
+- сохраняем изменения и выходим
+- перезапускаем контейнер с `php`:
+```bash
+docker compose restart php
+```
+
+Чтобы  деактивировать php расширение:
+- заходим в sh-консоль контейнера `php` из под пользователя `root`:
+```bash
+docker compose exec --user=root php sh
+```
+- находим файл `/usr/local/etc/php/conf.d/docker-php-ext-***.ini`, где *** название расширения, пример для imagick:
+```bash
+mcedit /usr/local/etc/php/conf.d/docker-php-ext-imagick.ini
+```
+- внутри файла меняем строку деактивируем подключение: `; extension=***.so`, где *** название расширения:
+```bash
+; extension=imagick.so
+```
+- сохраняем изменения и выходим
+- перезапускаем контейнер с `php`:
+```bash
+docker compose restart php
+```
 
 ......ToDo......
