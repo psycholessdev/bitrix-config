@@ -33,6 +33,9 @@
   * [Push сервер](#pushserver)
 * [Sphinx](#sphinx)
   * [Поиск с помощью Sphinx](#sphinxsearch)
+* [Почта](#email)
+  * [Отправка почты через SMTP-сервера отправителя](#emailsmtpmailer)
+  * [Логирование отправки почты в файл](#emaildebuglog)
 * [PHP](#php)
   * [Composer](#phpcomposer)
   * [Browser Capabilities](#phpbrowsercapabilities)
@@ -594,8 +597,55 @@ oqq2gaHWkogJHDfYY8CRzBaR9d26ZuCmTHIZa2egZ2Kk3IN3QKWDRB2Ixlt7usICbi1Qlvla3MylfqRr
 > [!IMPORTANT]
 > Для продуктов, использующих базу данных PostgreSQL, нужно обновление модуля `search` версии `25.0.0` и выше.
 
-# PHP
+<a id="email"></a>
+# Почта
+
+<a id="emailsmtpmailer"></a>
+## Отправка почты через SMTP-сервера отправителя
+
+Для отправки почты используем возможности `Главного модуля (main)` без каких либо дополнительных контейнеров и т.д.
+
+Активируем возможность использования SMTP-сервера отправителя: https://dev.1c-bitrix.ru/learning/course/index.php?COURSE_ID=43&LESSON_ID=23612&LESSON_PATH=3913.3516.5062.2795.23612
+
+Для этого редактируем файл `/bitrix/.settings.php`, добавляем блок настроек:
+```bash
+    'smtp' => [
+	'value' => [
+	    'enabled' => true,
+	    'debug' => true,
+	    'log_file' => $_SERVER["DOCUMENT_ROOT"]."/bitrix/modules/smtp_mailer.log",
+	],
+	'readonly' => false,
+    ],
+```
+
+После переходим на страницу `Добавление SMTP подключения` (`/bitrix/admin/smtp_edit.php?lang=ru`).
+
+Заполняем поля на странице, указываем параметры smtp и сохраняем настройки.
+
+После необходимо настроить модули, указав email отправителя (или От кого):
+- `Главный модуль (main)` (bitrix/admin/settings.php?lang=ru&mid=main)
+- `Email-маркетинг (sender)` (/bitrix/admin/settings.php?lang=ru&mid=sender)
+- `Интернет-магазин (sale)` (/bitrix/admin/settings.php?lang=ru&mid=sale)
+- `Подписка, рассылки (subscribe)` (/bitrix/admin/settings.php?lang=ru&mid=subscribe)
+- `Форум (forum)` (/bitrix/admin/settings.php?lang=ru&mid=forum)
+
+Настройки почтовых сервисов: https://dev.1c-bitrix.ru/learning/course/index.php?COURSE_ID=37&LESSON_ID=12265
+
+Проверить настройки можно отправив письмо самому себе. Для этого нужно отредактировать параметры пользователя, указав `E-Mail` и поставив галочку `Оповестить пользователя`.
+
+Лог отправки будет в файле `/bitrix/modules/smtp_mailer.log`.
+
+> [!NOTE]
+> (___ToDo_проверка_системы_эту_настройку_не_использует_для_теста_почты___)
+
+<a id="emaildebuglog"></a>
+## Логирование отправки почты в файл
+
+(___ToDo_добавить_и_описать___)
+
 <a id="php"></a>
+# PHP
 
 <a id="phpcomposer"></a>
 ## PHP Composer
