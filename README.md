@@ -31,6 +31,8 @@
 * [Хранение временных файлов вне корневой директории сайта](#bxtemporaryfilesdirectory)
 * [Push & pull](#pushpull)
   * [Push сервер](#pushserver)
+* [Sphinx](#sphinx)
+  * [Поиск с помощью Sphinx](#sphinxsearch)
 
 <a id="docker"></a>
 # Docker и Docker Compose
@@ -556,5 +558,32 @@ oqq2gaHWkogJHDfYY8CRzBaR9d26ZuCmTHIZa2egZ2Kk3IN3QKWDRB2Ixlt7usICbi1Qlvla3MylfqRr
 Сохраняем файл.
 
 Для продукта Битрикс24 проверить настройку push сервера можно на странице `Проверка системы` (`/bitrix/admin/site_checker.php?lang=ru`), используя таб `Работа портала`.
+
+<a id="sphinx"></a>
+# Sphinx
+
+<a id="sphinxsearch"></a>
+## Поиск с помощью Sphinx
+
+Для работы полнотекстового поиска, используя `Sphinx`, будет запущен один контейнер на базе образа `bx-sphinx`.
+
+Для запуска и настройки:
+- переходим в настройки модуля `Поиск` (`/bitrix/admin/settings.php?lang=ru&mid=search`)
+- на табе `Морфология`:
+  - выбираем `Полнотекстовый поиск с помощью` - `Sphinx`
+  - заполняем строку `Строка подключения для управления индексом (протокол MySql)` - `sphinx:3306`
+  - поле `Идентификатор индекса` не меняем - `bitrix`
+
+Сохраняем настройки модуля.
+
+На странице `Переиндексация сайта` (`/bitrix/admin/search_reindex.php?lang=ru`) снимаем галку `Переиндексировать только измененные` и выполняем полную переиндексацию сайта.
+
+Настройка завершена.
+
+Для продукта Битрикс24 проверить работу можно в разделе `/search/` сайта.
+
+Документация: https://dev.1c-bitrix.ru/learning/course/index.php?COURSE_ID=35&CHAPTER_ID=04507&LESSON_PATH=3906.4507
+
+Примечение: для продуктов, использующих базу данных PostgreSQL, нужно обновление модуля `search` версии `25.0.0`.
 
 ......ToDo......
