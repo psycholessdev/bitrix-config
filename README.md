@@ -29,6 +29,8 @@
   * [Выполнение агентов на cron](#agentsoncron)
   * [Кастомные cron задания](#owncrontasks)
 * [Хранение временных файлов вне корневой директории сайта](#bxtemporaryfilesdirectory)
+* [Push & pull](#pushpull)
+  * [Push сервер](#pushserver)
 
 <a id="docker"></a>
 # Docker и Docker Compose
@@ -482,13 +484,77 @@ touch /etc/crontabs/cron.update
 # Хранение временных файлов вне корневой директории сайта
 
 По умолчанию конфигурация `nginx` подготовлена таким образом, чтобы временные файлы хранились вне пределах корневой директории проекта.
+
 Чтобы окончательно заработало надо отредактировать файл `/bitrix/php_interface/dbconn.php`, добавить строку:
 ```bash
 define("BX_TEMPORARY_FILES_DIRECTORY", "/opt/.bx_temp");
 ```
 
-И сохранить.
+Cохранить.
 
-Проверить настройку можно на странице `Сканер безопасности` (/bitrix/admin/security_scanner.php?lang=ru) модуля `Проактивной защиты (security)`.
+Проверить настройку можно на странице `Сканер безопасности` (`/bitrix/admin/security_scanner.php?lang=ru`) модуля `Проактивной защиты (security)`.
+
+<a id="pushpull"></a>
+# Push & pull
+
+<a id="pushserver"></a>
+## Push сервер
+
+Для работы push сервера будет запущено два контейнера: один для режима `pub`, второй для режима `sub`. Оба используют один образ `bx-push`.
+
+Параметры переменных сред контейнеров хранятся в файлах `.env_push_pub` и `.env_push_sub`.
+
+Секретный ключ сгенерирован предварительно и хранится в файле `.env_push`. По умолчанию его значение равно:
+```bash
+oqq2gaHWkogJHDfYY8CRzBaR9d26ZuCmTHIZa2egZ2Kk3IN3QKWDRB2Ixlt7usICbi1Qlvla3MylfqRrl1Cxhy9Af0nKDVH4GYWtE7FXbTZO8Kb9TUpysiDvPvMvTUy2
+```
+
+Возвращаемся к главам `Адресация` и `Порты` этого документа. Определяемся по какой схеме работает сайт. Например:
+- используется локальный IP вида `10.0.1.119`
+- порт для http `8588`
+- порт для https `8589`
+
+Итого получается:
+- для http: `10.0.1.119:8588`
+- для https: `10.0.1.119:8589`
+
+Запоминаем эти значения.
+
+В административной части продукта:
+- редактируем файл `/bitrix/.settings.php`
+- добавляем блок настроек, но меняем значения выше для http и https по примеру:
+```bash
+  'pull_s1' => 'BEGIN GENERATED PUSH SETTINGS. DON\'T DELETE COMMENT!!!!',
+  'pull' => array(
+    'value' => array(
+      'path_to_listener' => 'http://10.0.1.119:8588/bitrix/sub/',
+      'path_to_listener_secure' => 'https://10.0.1.119:8589/bitrix/sub/',
+      'path_to_modern_listener' => 'http://10.0.1.119:8588/bitrix/sub/',
+      'path_to_modern_listener_secure' => 'https://10.0.1.119:8589/bitrix/sub/',
+      'path_to_mobile_listener' => 'http://#DOMAIN#:8893/bitrix/sub/',
+      'path_to_mobile_listener_secure' => 'https://#DOMAIN#:8894/bitrix/sub/',
+      'path_to_websocket' => 'ws://10.0.1.119:8588/bitrix/subws/',
+      'path_to_websocket_secure' => 'wss://10.0.1.119:8589/bitrix/subws/',
+      'path_to_publish' => 'http://10.0.1.119:8588/bitrix/pub/',
+      'path_to_publish_web' => 'http://10.0.1.119:8588/bitrix/rest/',
+      'path_to_publish_web_secure' => 'https://10.0.1.119:8589/bitrix/rest/',
+      'path_to_json_rpc' => 'http://10.0.1.119:8588/bitrix/api/',
+      'nginx_version' => '4',
+      'nginx_command_per_hit' => '100',
+      'nginx' => 'Y',
+      'nginx_headers' => 'N',
+      'push' => 'Y',
+      'websocket' => 'Y',
+      'signature_key' => 'oqq2gaHWkogJHDfYY8CRzBaR9d26ZuCmTHIZa2egZ2Kk3IN3QKWDRB2Ixlt7usICbi1Qlvla3MylfqRrl1Cxhy9Af0nKDVH4GYWtE7FXbTZO8Kb9TUpysiDvPvMvTUy2',
+      'signature_algo' => 'sha1',
+      'guest' => 'N',
+    ),
+  ),
+  'pull_e1' => 'END GENERATED PUSH SETTINGS. DON\'T DELETE COMMENT!!!!',
+```
+
+Сохраняем файл.
+
+Для продукта Битрикс24 проверить настройку push сервера можно на странице `Проверка системы` (`/bitrix/admin/site_checker.php?lang=ru`), используя таб `Работа портала`.
 
 ......ToDo......
