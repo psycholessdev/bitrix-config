@@ -43,6 +43,11 @@
   * [Расширения (extensions)](#phpextensions)
   * [Imagick Engine для изображений](#phpimagickimageengine)
   * [security: Веб-антивирус](#phpsecurityantivirus)
+* [Memcache и Redis](#memcacheandredis)
+  * [Memcache](#memcache)
+  * [Redis](#redis)
+  * [Кеширование](#cachestorage)
+  * [Хранение сессий](#sessionstorage)
 
 <a id="docker"></a>
 # Docker и Docker Compose
@@ -649,7 +654,7 @@ oqq2gaHWkogJHDfYY8CRzBaR9d26ZuCmTHIZa2egZ2Kk3IN3QKWDRB2Ixlt7usICbi1Qlvla3MylfqRr
 define('LOG_FILENAME', $_SERVER["DOCUMENT_ROOT"]."/bitrix/modules/mail_log.txt");
 ```
 
-Создаем файл `/bitrix/php_interface/init.php` если его нет, добавляем код функции custom_mail:
+Создаем файл `/bitrix/php_interface/init.php` если его нет, добавляем код функции `custom_mail`:
 ```bash
 function custom_mail($to, $subject, $message, $additional_headers='', $additional_parameters='')
 {
@@ -955,5 +960,125 @@ docker compose restart php
 Документация:
 https://dev.1c-bitrix.ru/user_help/settings/security/security_antivirus.php
 https://dev.1c-bitrix.ru/learning/course/index.php?COURSE_ID=35&LESSON_ID=2674#antivirus
+
+<a id="memcacheandredis"></a>
+# Memcache и Redis
+
+<a id="memcache"></a>
+## Memcache
+
+Контейнер `memcached` может быть использован для хранения кеша и для хранения данных сессий.
+
+<a id="redis"></a>
+## Redis
+
+Контейнер `redis` используется в связке с `push` сервером.
+
+Так же может быть использован для хранения кеша и для хранения данных сессий.
+
+<a id="cachestorage"></a>
+## Кеширование
+
+Ядро поддерживает несколько вариантов для хранения кеша: файлы, redis, memcache и т.д.
+
+В административной части продукта отредактируем файл `/bitrix/.settings.php`, добавляем блок настроек, который определит вариант хранения:
+
+- `memcache`:
+```bash
+        'cache' => [
+                'value' => [
+                        'type' => [
+                                'class_name' => '\\Bitrix\\Main\\Data\\CacheEngineMemcache',
+                                'extension' => 'memcache'
+                        ],
+                        'memcache' => [
+                                'host' => 'memcached',
+                                'port' => '11211',
+                        ]
+                ],
+                'sid' => $_SERVER["DOCUMENT_ROOT"]."#01234"
+        ],
+```
+
+- `redis`:
+```bash
+        'cache' => [
+                'value' => [
+                        'type' => [
+                                'class_name' => '\\Bitrix\\Main\\Data\\CacheEngineRedis',
+                                'extension' => 'redis'
+                        ],
+                        'redis' => [
+                                'host' => 'redis',
+                                'port' => '6379',
+                        ]
+                ],
+                'sid' => $_SERVER["DOCUMENT_ROOT"]."#01234"
+        ],
+```
+
+Документация: https://dev.1c-bitrix.ru/learning/course/index.php?COURSE_ID=43&CHAPTER_ID=02795&LESSON_PATH=3913.3516.5062.2795#cache
+
+<a id="sessionstorage"></a>
+## Хранение сессий
+
+Ядро поддерживает четыре варианта для хранения данных сессии: файлы, database, redis, memcache.
+
+В административной части продукта отредактируем файл `/bitrix/.settings.php`, добавляем блок настроек, который определит вариант хранения:
+
+- `memcache`, разделённая сессия:
+```bash
+        // memcache separated
+        'session' => [
+                'value' => [
+                        'lifetime' => 14400,
+                        'mode' => 'separated',
+                        'handlers' => [
+                                'kernel' => 'encrypted_cookies',
+                                'general' => [
+                                        'type' => 'memcache',
+                                        'port' => '11211',
+                                        'host' => 'memcached',
+                                ],
+                        ],
+                ],
+        ],
+```
+
+- `redis`:
+```bash
+        // redis
+        'session' => [
+                'value' => [
+                        'mode' => 'default',
+                        'handlers' => [
+                                'general' => [
+                                        'type' => 'redis',
+                                        'port' => '6379',
+                                        'host' => 'redis',
+                                ],
+                        ],
+                ],
+        ],
+```
+
+- `database`:
+```bash
+        // database
+        'session' => [
+                'value' => [
+                        'mode' => 'default',
+                        'handlers' => [
+                                'general' => [
+                                        'type' => 'database',
+                                ],
+                        ],
+                ],
+        ],
+```
+
+Сохраняем файл.
+
+Все возможные варианты доступны в документации: https://dev.1c-bitrix.ru/learning/course/index.php?COURSE_ID=43&LESSON_ID=14026
 
 ......ToDo......
