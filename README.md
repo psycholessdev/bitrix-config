@@ -624,11 +624,11 @@ oqq2gaHWkogJHDfYY8CRzBaR9d26ZuCmTHIZa2egZ2Kk3IN3QKWDRB2Ixlt7usICbi1Qlvla3MylfqRr
 Заполняем поля на странице, указываем параметры smtp и сохраняем настройки.
 
 После необходимо настроить модули, указав email отправителя (или От кого):
-- `Главный модуль (main)` (bitrix/admin/settings.php?lang=ru&mid=main)
-- `Email-маркетинг (sender)` (/bitrix/admin/settings.php?lang=ru&mid=sender)
-- `Интернет-магазин (sale)` (/bitrix/admin/settings.php?lang=ru&mid=sale)
-- `Подписка, рассылки (subscribe)` (/bitrix/admin/settings.php?lang=ru&mid=subscribe)
-- `Форум (forum)` (/bitrix/admin/settings.php?lang=ru&mid=forum)
+- `Главный модуль (main)` (`bitrix/admin/settings.php?lang=ru&mid=main`)
+- `Email-маркетинг (sender)` (`/bitrix/admin/settings.php?lang=ru&mid=sender`)
+- `Интернет-магазин (sale)` (`/bitrix/admin/settings.php?lang=ru&mid=sale`)
+- `Подписка, рассылки (subscribe)` (`/bitrix/admin/settings.php?lang=ru&mid=subscribe`)
+- `Форум (forum)` (`/bitrix/admin/settings.php?lang=ru&mid=forum`)
 
 Настройки почтовых сервисов: https://dev.1c-bitrix.ru/learning/course/index.php?COURSE_ID=37&LESSON_ID=12265
 
@@ -642,7 +642,38 @@ oqq2gaHWkogJHDfYY8CRzBaR9d26ZuCmTHIZa2egZ2Kk3IN3QKWDRB2Ixlt7usICbi1Qlvla3MylfqRr
 <a id="emaildebuglog"></a>
 ## Логирование отправки почты в файл
 
-(___ToDo_добавить_и_описать___)
+Если почта не ходит, можно залогировать ход отправки в файл.
+
+Для этого редактируем файл `/bitrix/php_interface/dbconn.php`, добавляем строку:
+```bash
+define('LOG_FILENAME', $_SERVER["DOCUMENT_ROOT"]."/bitrix/modules/mail_log.txt");
+```
+
+Создаем файл `/bitrix/php_interface/init.php` если его нет, добавляем код функции custom_mail:
+```bash
+function custom_mail($to, $subject, $message, $additional_headers='', $additional_parameters='')
+{
+    AddMessage2Log(
+	'To: '.$to.PHP_EOL.
+	'Subject: '.$subject.PHP_EOL.
+	'Message: '.$message.PHP_EOL.
+	'Headers: '.$additional_headers.PHP_EOL.
+	'Params: '.$additional_parameters.PHP_EOL
+    );
+    if ($additional_parameters!='')
+    {
+	return @mail($to, $subject, $message, $additional_headers, $additional_parameters);
+    }
+    else
+    {
+	return @mail($to, $subject, $message, $additional_headers);
+    }
+}
+```
+
+Лог отправки будет в файле `/bitrix/modules/mail_log.txt`.
+
+Документация: https://dev.1c-bitrix.ru/api_help/main/functions/other/bxmail.php
 
 <a id="php"></a>
 # PHP
