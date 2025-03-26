@@ -1,7 +1,7 @@
 FROM nginx:1.26.3-alpine-slim
 
 RUN cd /root/ && \
-    apk add git && \
+    apk add git openssl ca-certificates && \
     git clone https://github.com/cyrax13/nginx-modules.git && \
     cp /root/nginx-modules/packages/1.26.3/alpine/v3.20/main/x86_64/abuild-key.rsa.pub /etc/apk/keys/ && \
     echo "/root/nginx-modules/packages/1.26.3/alpine/v3.20/main" >> /etc/apk/repositories && \
