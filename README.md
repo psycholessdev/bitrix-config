@@ -155,6 +155,12 @@ cd dev/sources/bxnginx1263/
 docker build -f Dockerfile -t bx-nginx:1.26.3-alpine --no-cache .
 ```
 
+- bx-ssl:
+```bash
+cd dev/sources/bxssl10/
+docker build -f Dockerfile -t bx-ssl:1.0-alpine --no-cache .
+```
+
 <a id="management"></a>
 # Управление
 
