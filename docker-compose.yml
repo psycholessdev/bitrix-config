@@ -11,6 +11,8 @@ volumes:
     driver: local
   bxtemp_data:
     driver: local
+  ssl_data:
+    driver: local
 services:
   memcached:
     image: memcached:1.6.38-alpine
@@ -94,6 +96,7 @@ services:
       - ./confs/php/etc/:/usr/local/etc/
       - www_data:/opt/www/
       - bxtemp_data:/opt/.bx_temp/
+      - ssl_data:/ssl/
     networks:
       dev:
         aliases:
@@ -112,6 +115,7 @@ services:
       - ./confs/nginx/:/etc/nginx/
       - www_data:/opt/www/
       - bxtemp_data:/opt/.bx_temp/
+      - ssl_data:/ssl/
     networks:
       dev:
         aliases:
@@ -186,6 +190,21 @@ services:
           - cron
     depends_on:
       - php
+  ssl:
+    image: bx-ssl:1.0-alpine
+    container_name: dev_ssl
+    restart: unless-stopped
+    user: root
+    env_file:
+      - .env
+    volumes:
+      - ssl_data:/ssl/
+    networks:
+      dev:
+        aliases:
+          - ssl
+    depends_on:
+      - nginx
 networks:
   dev:
     driver: bridge
