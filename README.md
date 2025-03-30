@@ -406,9 +406,28 @@ http://10.0.1.119:8588/
 
 После установки дистрибутива или восстановления сайта из бекапа необходимо подстроить сайт.
 
-Например, настроить `Главный модуль (main)` (`/bitrix/admin/settings.php?lang=ru&mid=main`).
+Настроим `Главный модуль (main)` (`/bitrix/admin/settings.php?lang=ru&mid=main`):
 
-(___ToDo_описать_важные_опции_и_ссылка_на_доку___)
+- на табе `Настройки`:
+  - указываем `Название сайта`
+  - задаем `URL сайта (без http://, например www.mysite.com)` -  10.0.1.119:8858 или 10.0.1.119:8859, dev.bx:8858 или dev.bx:8859
+  - ставим галку на опцию `Быстрая отдача файлов через Nginx` - она сконфигурирована
+
+- на табе `Авторизация`
+  - снимаем галку `Продлевать сессию при активности посетителя в окне браузера`
+
+- на табе `Журнал событий`
+  - ставим галочки записывать все события в журнал
+
+- на табе Система обновлений
+  - заполняем поле `Лицензионный ключ`
+  - заполняем поле `Имя сервера, содержащего обновления`
+
+Сохраняем настройки.
+
+Для остальных модулей производим настройки, если они нужны.
+
+По описанию значений полей смотрите документацию модуля.
 
 <a id="sitechecker"></a>
 # Проверка системы
@@ -621,12 +640,12 @@ oqq2gaHWkogJHDfYY8CRzBaR9d26ZuCmTHIZa2egZ2Kk3IN3QKWDRB2Ixlt7usICbi1Qlvla3MylfqRr
 Для этого редактируем файл `/bitrix/.settings.php`, добавляем блок настроек:
 ```bash
     'smtp' => [
-	'value' => [
-	    'enabled' => true,
-	    'debug' => true,
-	    'log_file' => $_SERVER["DOCUMENT_ROOT"]."/bitrix/modules/smtp_mailer.log",
-	],
-	'readonly' => false,
+        'value' => [
+            'enabled' => true,
+            'debug' => true,
+            'log_file' => $_SERVER["DOCUMENT_ROOT"]."/bitrix/modules/smtp_mailer.log",
+        ],
+        'readonly' => false,
     ],
 ```
 
@@ -648,7 +667,7 @@ oqq2gaHWkogJHDfYY8CRzBaR9d26ZuCmTHIZa2egZ2Kk3IN3QKWDRB2Ixlt7usICbi1Qlvla3MylfqRr
 Лог отправки будет в файле `/bitrix/modules/smtp_mailer.log`.
 
 > [!NOTE]
-> (___ToDo_проверка_системы_эту_настройку_не_использует_для_теста_почты___)
+> Проверка системы при тестировании параметров не использует SMTP-сервера отправителя. Два теста почты будут красными. Можно это проигнорировать.
 
 <a id="emaildebuglog"></a>
 ## Логирование отправки почты в файл
@@ -665,19 +684,19 @@ define('LOG_FILENAME', $_SERVER["DOCUMENT_ROOT"]."/bitrix/modules/mail_log.txt")
 function custom_mail($to, $subject, $message, $additional_headers='', $additional_parameters='')
 {
     AddMessage2Log(
-	'To: '.$to.PHP_EOL.
-	'Subject: '.$subject.PHP_EOL.
-	'Message: '.$message.PHP_EOL.
-	'Headers: '.$additional_headers.PHP_EOL.
-	'Params: '.$additional_parameters.PHP_EOL
+        'To: '.$to.PHP_EOL.
+        'Subject: '.$subject.PHP_EOL.
+        'Message: '.$message.PHP_EOL.
+        'Headers: '.$additional_headers.PHP_EOL.
+        'Params: '.$additional_parameters.PHP_EOL
     );
     if ($additional_parameters!='')
     {
-	return @mail($to, $subject, $message, $additional_headers, $additional_parameters);
+        return @mail($to, $subject, $message, $additional_headers, $additional_parameters);
     }
     else
     {
-	return @mail($to, $subject, $message, $additional_headers);
+        return @mail($to, $subject, $message, $additional_headers);
     }
 }
 ```
@@ -985,7 +1004,7 @@ https://dev.1c-bitrix.ru/learning/course/index.php?COURSE_ID=35&LESSON_ID=2674#a
 <a id="cachestorage"></a>
 ## Кеширование
 
-Ядро поддерживает несколько вариантов для хранения кеша: файлы, redis, memcache и т.д.
+Ядро поддерживает несколько вариантов для хранения кеша: `файлы`, `redis`, `memcache` и т.д.
 
 В административной части продукта отредактируем файл `/bitrix/.settings.php`, добавляем блок настроек, который определит вариант хранения:
 
@@ -1028,7 +1047,7 @@ https://dev.1c-bitrix.ru/learning/course/index.php?COURSE_ID=35&LESSON_ID=2674#a
 <a id="sessionstorage"></a>
 ## Хранение сессий
 
-Ядро поддерживает четыре варианта для хранения данных сессии: файлы, database, redis, memcache.
+Ядро поддерживает четыре варианта для хранения данных сессии: `файлы`, `database`, `redis`, `memcache`.
 
 В административной части продукта отредактируем файл `/bitrix/.settings.php`, добавляем блок настроек, который определит вариант хранения:
 
