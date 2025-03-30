@@ -33,7 +33,7 @@ RUN docker-php-source extract && \
     mkdir -p /usr/src/php/ext/mcrypt && curl -fsSL https://github.com/cyrax13/pecl.php.net/raw/main/mcrypt-1.0.7.tgz | tar xvz -C "/usr/src/php/ext/mcrypt" --strip 1 && \
     mkdir -p /usr/src/php/ext/msgpack && curl -fsSL https://github.com/cyrax13/pecl.php.net/raw/main/msgpack-3.0.0.tgz | tar xvz -C "/usr/src/php/ext/msgpack" --strip 1 && \
     mkdir -p /usr/src/php/ext/igbinary && curl -fsSL https://github.com/cyrax13/pecl.php.net/raw/main/igbinary-3.2.16.tgz | tar xvz -C "/usr/src/php/ext/igbinary" --strip 1 && \
-    mkdir -p /usr/src/php/ext/redis && curl -fsSL https://github.com/cyrax13/pecl.php.net/raw/main/redis-6.1.0.tgz | tar xvz -C "/usr/src/php/ext/redis" --strip 1 && \
+    mkdir -p /usr/src/php/ext/redis && curl -fsSL https://github.com/cyrax13/pecl.php.net/raw/main/redis-6.2.0.tgz | tar xvz -C "/usr/src/php/ext/redis" --strip 1 && \
     mkdir -p /usr/src/php/ext/xhprof && curl -fsSL https://github.com/cyrax13/pecl.php.net/raw/main/xhprof-2.3.10.tgz | tar xvz -C "/usr/src/php/ext/xhprof" --strip 1 && \
     mkdir -p /usr/src/php/ext/xdebug && curl -fsSL https://github.com/cyrax13/pecl.php.net/raw/main/xdebug-3.4.2.tgz | tar xvz -C "/usr/src/php/ext/xdebug" --strip 1 && \
     mkdir -p /usr/src/php/ext/amqp && curl -fsSL https://github.com/cyrax13/pecl.php.net/raw/main/amqp-2.1.2.tgz | tar xvz -C "/usr/src/php/ext/amqp" --strip 1 && \
