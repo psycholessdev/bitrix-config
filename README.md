@@ -48,6 +48,9 @@
   * [Redis](#redis)
   * [Кеширование](#cachestorage)
   * [Хранение сессий](#sessionstorage)
+* [HTTPS/SSL/TLS/WSS](#httpsssltlswss)
+  * [Самоподписанный сертификат](#selfsignedcerts)
+  * [Бесплатный Lets Encrypt сертификат](#presentcerts)
 
 <a id="docker"></a>
 # Docker и Docker Compose
@@ -1117,5 +1120,172 @@ https://dev.1c-bitrix.ru/learning/course/index.php?COURSE_ID=35&LESSON_ID=2674#a
 Сохраняем файл.
 
 Все возможные варианты доступны в документации: https://dev.1c-bitrix.ru/learning/course/index.php?COURSE_ID=43&LESSON_ID=14026
+
+<a id="httpsssltlswss"></a>
+# HTTPS/SSL/TLS/WSS
+
+<a id="selfsignedcerts"></a>
+## Самоподписанный сертификат
+
+Сгенерировать и использовать ssl сертификат в режиме самоподписи возможно с помощью отдельного контейнера `ssl` на базе образа `bx-ssl`.
+
+Одной командой разово генерируем сертификаты корневого и промежуточного центров сертификации:
+```bash
+docker compose exec --user=root ssl bash -c '~/cas.sh'
+```
+
+Второй - сертификат и приватный ключ для домена `dev.bx`:
+```bash
+docker compose exec --user=root ssl bash -c '~/srv.sh dev.bx'
+```
+
+Итого в папке `/ssl/` внутри контейнера `ssl` будет набор файлов:
+- `rootCA.cert.pem` - сертификат корневого центра сертификации
+- `intermediateCA.cert.pem` - сертификат промежуточного центра сертификации, подписанный корневым сертификатом
+- `ca-chain.cert.pem` - цепочка сертификатов обоих центров сертификации
+- `dev.bx.cert.pem` - сертификат домена, подписанный промежуточным центром сертификации
+- `dev.bx.key.pem` - приватный ключ сертификата
+- `dev.bx.chain.cert.pem` - цепочка сертификатов, содержит сертификат домена и сертификат промежуточного центра сертификации
+- `dev.bx.fullchain.cert.pem` - полная цепочка всех сертификатов, содержит сертификат домена, сертификат промежуточного центра сертификации, сертификат корневого центра сертификации
+- `dhparam.pem` - секретный криптографический ключ, созданный по алгоритму Диффи-Хеллмана для обмена сессионными ключами с клиентом
+
+Файл `dhparam.pem` не создается, а поставляется для примера. Если нужно его сделать уникальным выполните команду:
+```bash
+docker compose exec --user=root ssl bash -c 'openssl dhparam -out /ssl/dhparam.pem 4096'
+```
+
+> [!IMPORTANT]
+> Создание dhparam.pem файла может занять продолжительное время, которое зависит от вашего железа.
+
+Сертификат корневого центра сертификации (`rootCA.cert.pem`) и сертификат промежуточного центра сертификации (`intermediateCA.cert.pem`) нужно добавить в траст контейнеров `nginx` и `php`.
+
+Заходим в sh-консоль контейнера `php` из под пользователя `root`:
+```bash
+docker compose exec --user=root php sh
+```
+
+Выполняем:
+```bash
+mkdir -p /usr/local/share/ca-certificates/
+ln -s /ssl/rootCA.cert.pem /usr/local/share/ca-certificates/rootCA.cert.pem
+ln -s /ssl/intermediateCA.cert.pem /usr/local/share/ca-certificates/intermediateCA.cert.pem
+update-ca-certificates
+```
+
+Если локальный домен не резолвится в вашей сети, нужно в файле `/etc/hosts` контейнера `php` добавить:
+```bash
+apk add mc
+mcedit /etc/hosts
+10.0.1.119 dev.bx
+exit
+```
+
+Заходим в sh-консоль контейнера `nginx` из под пользователя `root`:
+```bash
+docker compose exec --user=root nginx sh
+```
+
+Выполняем:
+```bash
+mkdir -p /usr/local/share/ca-certificates/
+ln -s /ssl/rootCA.cert.pem /usr/local/share/ca-certificates/rootCA.cert.pem
+ln -s /ssl/intermediateCA.cert.pem /usr/local/share/ca-certificates/intermediateCA.cert.pem
+update-ca-certificates
+```
+
+Так же нам нужно в ssl конфигурацию `nginx` прописать новые сертификаты. Редактируем файл `/etc/nginx/ssl/ssl.conf`, меняем настройки опций `ssl_*`:
+```bash
+apk add mc
+mcedit /etc/nginx/ssl/ssl.conf
+```
+
+Меняем опции на:
+```bash
+ssl_certificate /ssl/dev.bx.fullchain.cert.pem;
+ssl_certificate_key /ssl/dev.bx.key.pem;
+ssl_trusted_certificate /ssl/ca-chain.cert.pem;
+ssl_dhparam /ssl/dhparam.pem;
+```
+
+Так же скопируем файлы сертификата корневого центра сертификации (`rootCA.cert.pem`) и сертификата промежуточного центра сертификации (`intermediateCA.cert.pem`) в корень сайта:
+```bash
+cp /ssl/rootCA.cert.pem /opt/www/
+cp /ssl/intermediateCA.cert.pem /opt/www/
+exit
+```
+
+Проверям настройки `nginx`:
+```bash
+docker compose exec --user=root nginx sh -c 'nginx -t'
+```
+
+Если никаких ошибок нет, перезапускаем nginx:
+```bash
+docker compose restart nginx
+```
+
+На хосте, где будем использовать браузер, скачиваем файлы центров сертификации по ссылкам:
+```bash
+http://dev.bx:8588/rootCA.cert.pem
+http://dev.bx:8588/intermediateCA.cert.pem
+```
+
+Добавляем их в траст ОС, на которой работает браузер.
+
+Все ОС: `Windows`, `Linux`, `MacOS`
+
+Общая часть для всех - браузер `Mozilla Firefox`. Имеет своё хранилище сертификатов центров сертификации. Работает одинаково вне зависимости от ОС.
+
+Идем в `Настройки` -> `Приватность и защита` -> `Защита` -> `Сертификаты`.
+
+Нажимаем кнопку `Просмотр сертификатов`, в окне переходим на таб `Центры сертификации`.
+
+Нажимаем кнопку `Импортировать`:
+- первый раз выбираем файл сертификата корневого центра сертификации (`rootCA.cert.pem`)
+- второй раз выбираем файл сертификата промежуточного центра сертификации (`intermediateCA.cert.pem`)
+
+ОС: `Windows`
+
+Браузеры `Google Chrome` и `Microsoft Edge` (и другие на их базе) используют системное хранилище ОС для сертификатов центров сертификации.
+
+Скачанные файлы переименовываем, меняем расширение с `pem` на `crt`:
+- `rootCA.cert.pem` -> `rootCA.cert.crt`
+- `intermediateCA.cert.pem` -> `intermediateCA.cert.crt`
+
+Дважды кликаем на файле `rootCA.cert.crt`, откроект просмотр сертификата.
+
+Нажимаем кнопку `Установить сертификат`.
+
+Проходим мастер импорта. Выбираем `Поместить все сертификаты в следующие хранилища`, в окне выбираем `Доверенные корневые центры сертификации`.
+
+ОС: `Linux`
+ToDo
+
+ОС: `MacOS`
+ToDo
+
+Итог: после настройки выше переходим на сайт по урлу с доменом `dev.bx`, используя `https` и порт `8589` в урле:
+```bash
+https://dev.bx:8589/
+```
+
+Устанавливаем дистрибутив, восстанавливаем бекап сайта - выбора за вами.
+
+Выполняем подстройку сайта как указано выше в этом readme файле.
+
+Страница `Проверка системы` (`/bitrix/admin/site_checker.php?lang=ru`) открывается по `https` и сама проверка проходит, испольхуя `ssl` коннект вида:
+```bash
+Connection to ssl://dev.bx:8589	Success
+```
+
+Push сервер использует "секурные" веб сокеты, коннект происходит по `wss`. Пуши ходят, интерактивность работает.
+
+> [!IMPORTANT]
+> При удалении сайта не забудьте удалить сертификат корневого центра сертификации (`rootCA.cert.pem`) и сертификат промежуточного центра сертификации (`intermediateCA.cert.pem`) из ОС и браузера. Процесс удаления обратный добавлению.
+
+<a id="presentcerts"></a>
+## Бесплатный Lets Encrypt сертификат
+
+ToDo
 
 ......ToDo......
