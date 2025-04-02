@@ -29,6 +29,7 @@ imagemagick imagemagick-dev
 
 RUN docker-php-source extract && \
     mkdir -p /usr/src/php/ext/memcache && curl -fsSL https://github.com/cyrax13/pecl.php.net/raw/main/memcache-8.2.tgz | tar xvz -C "/usr/src/php/ext/memcache" --strip 1 && \
+    mkdir -p /usr/src/php/ext/memcached && curl -fsSL https://github.com/cyrax13/pecl.php.net/raw/main/memcached-3.3.0.tgz | tar xvz -C "/usr/src/php/ext/memcached" --strip 1 && \
     mkdir -p /usr/src/php/ext/apcu && curl -fsSL https://github.com/cyrax13/pecl.php.net/raw/main/apcu-5.1.24.tgz | tar xvz -C "/usr/src/php/ext/apcu" --strip 1 && \
     mkdir -p /usr/src/php/ext/mcrypt && curl -fsSL https://github.com/cyrax13/pecl.php.net/raw/main/mcrypt-1.0.7.tgz | tar xvz -C "/usr/src/php/ext/mcrypt" --strip 1 && \
     mkdir -p /usr/src/php/ext/msgpack && curl -fsSL https://github.com/cyrax13/pecl.php.net/raw/main/msgpack-3.0.0.tgz | tar xvz -C "/usr/src/php/ext/msgpack" --strip 1 && \
@@ -46,7 +47,7 @@ RUN docker-php-ext-configure gd --with-freetype --with-jpeg --with-xpm --with-we
     docker-php-ext-configure opcache --enable-opcache && \
     docker-php-ext-configure redis --enable-redis-igbinary --enable-redis-msgpack --enable-redis-lzf --enable-redis-zstd
 
-RUN docker-php-ext-install mysqli pdo_mysql bz2 pgsql pdo_pgsql zip gd opcache ldap exif intl calendar sodium gettext pspell xml xmlwriter xsl shmop sysvmsg sysvsem sysvshm sockets memcache apcu mcrypt msgpack igbinary redis xhprof xdebug amqp ssh2 imagick
+RUN docker-php-ext-install mysqli pdo_mysql bz2 pgsql pdo_pgsql zip gd opcache ldap exif intl calendar sodium gettext pspell xml xmlwriter xsl shmop sysvmsg sysvsem sysvshm sockets memcache memcached apcu mcrypt msgpack igbinary redis xhprof xdebug amqp ssh2 imagick
 
 RUN docker-php-source delete
 
