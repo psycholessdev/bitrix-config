@@ -58,7 +58,7 @@ services:
         aliases:
           - postgres
   mysql:
-    image: percona/percona-server:8.0.40
+    image: percona/percona-server:8.0.41-32-amd64
     container_name: dev_mysql
     restart: unless-stopped
     command: mysqld --user=root

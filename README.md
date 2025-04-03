@@ -95,14 +95,14 @@
 - `Memcached`: https://hub.docker.com/_/memcached
 
 В этот список попадают (формат `название`:`полный_тег_с_указанием_версии_и_ос`):
-- `percona/percona-server:8.0.40`
+- `percona/percona-server:8.0.41-32-amd64`
 - `postgres:16.8-bookworm`
 - `redis:7.2.7-alpine`
 - `memcached:1.6.38-alpine`
 
 Можно предварительно скачать список выше, используя команды:
 ```bash
-docker pull percona/percona-server:8.0.40
+docker pull percona/percona-server:8.0.41-32-amd64
 docker pull postgres:16.8-bookworm
 docker pull redis:7.2.7-alpine
 docker pull memcached:1.6.38-alpine
