@@ -60,6 +60,7 @@
   * [PostgreSQL](#postgresqlconsole)
   * [Memcache](#memcacheconsole)
   * [Redis](#redisconsole)
+* [Кастомизация](#customization)
 
 <a id="docker"></a>
 # Docker и Docker Compose
@@ -850,6 +851,7 @@ intl
 ldap
 mcrypt
 memcache
+memcached
 msgpack
 mysqli
 opcache
@@ -1411,4 +1413,67 @@ docker compose exec --user=root redis sh -c "redis-cli -h 127.0.0.1 -p 6379"
 
 Выполняем запросы (пример, `ping` или `KEYS *`). Для выхода вводим `exit`.
 
-......ToDo......
+<a id="customization"></a>
+# Кастомизация
+
+Конечно же, встает вопрос "как мне запустить свои разработки" рядом с проектом или внутри него.
+
+Есть два пути, позволяюще это сделать:
+
+- создать отдельный `docker-compose-my.yml` файл, разместить код внутри файла - описать тома, сервисы, сеть и т.д.
+
+Тогда во всех командах компоуза указываем `.yml` файлы через опцию `-f`, пример:
+```bash
+docker compose -f docker-compose.yml -f docker-compose-my.yml ps
+```
+
+- интеграция в существующий `docker-compose.yml` файл проекта - добавить тома, сервисы, указать сеть и т.д.
+
+Для примера, запустим [Valkey](https://hub.docker.com/r/valkey/valkey/), добавив его в проект в сущесвующий `yml` файл.
+
+На странице valkey на DockerHub-е находдим нужный нам тег, пример `7.2.8-alpine`.
+
+Редактируем `docker-compose.yml` файл:
+
+- в раздел `volumes` добавляем описание тома:
+```bash
+  valkey_data:
+    driver: local
+```
+
+- в раздел `services` добавляем описание сервиса:
+```bash
+  valkey:
+    image: valkey:7.2.8-alpine
+    container_name: dev_valkey
+    restart: unless-stopped
+    command: valkey-server
+    env_file:
+      - .env
+#    ports:
+#      - "6379:6379"
+    volumes:
+      - valkey_data:/data
+    networks:
+      dev:
+        aliases:
+          - valkey
+```
+
+Запускаем контейнеры, оставляем их работать в фоне:
+```bash
+docker compose up -d
+```
+
+Заходим в sh-консоль контейнера `valkey`, запуская консоль `valkey-cli`, указывая хост `127.0.0.1` и порт `6379`:
+```bash
+docker compose exec --user=root valkey sh -c "valkey-cli -h 127.0.0.1 -p 6379"
+```
+
+Выполняем запросы (пример, `ping` или `KEYS *`). Выходим `exit`.
+
+Итого: мы успешно запустили новый контейнер valkey, проверили его работу. Теперь его можно использовать для хранеия кеша или хранения сессий по примеру как описано выше в этом файле.
+
+------------------------------------------------
+
+[1С-Битрикс: Разработчикам](https://dev.1c-bitrix.ru/)
