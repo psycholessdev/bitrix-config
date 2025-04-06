@@ -73,8 +73,6 @@ services:
       - mysql_log_data:/var/log/mysql
       - mysql_lib_data:/var/lib/mysql
       - ./confs/mysql/etc/my.cnf:/etc/my.cnf
-      - ./confs/mysql/etc/my.cnf.d/docker.cnf:/etc/my.cnf.d/docker.cnf
-      - ./confs/mysql/etc/my.cnf.d/my.cnf:/etc/my.cnf.d/my.cnf
     cap_add:
       - SYS_NICE
     networks:
