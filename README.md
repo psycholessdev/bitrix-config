@@ -771,9 +771,9 @@ echo 'browscap = /opt/browscap/php_browscap.ini' > /usr/local/etc/php/conf.d/bro
 exit
 ```
 
-Перезапускаем контейнер с `php`:
+Перезапускаем контейнеры `php` и `cron`:
 ```bash
-docker compose restart php
+docker compose restart php cron
 ```
 
 На странице настроек `Главного модуля (main)` (`/bitrix/admin/settings.php?lang=ru&mid=main`) на табе `Журнал событий`:
@@ -880,9 +880,9 @@ mcedit /usr/local/etc/php/conf.d/docker-php-ext-imagick.ini
 extension=imagick.so
 ```
 - сохраняем изменения и выходим
-- перезапускаем контейнер с `php`:
+- перезапускаем контейнеры `php` и `cron`:
 ```bash
-docker compose restart php
+docker compose restart php cron
 ```
 
 Чтобы  деактивировать php расширение:
@@ -899,9 +899,9 @@ mcedit /usr/local/etc/php/conf.d/docker-php-ext-imagick.ini
 ; extension=imagick.so
 ```
 - сохраняем изменения и выходим
-- перезапускаем контейнер с `php`:
+- перезапускаем контейнеры `php` и `cron`:
 ```bash
-docker compose restart php
+docker compose restart php cron
 ```
 
 <a id="phpimagickimageengine"></a>
@@ -971,9 +971,9 @@ docker compose exec --user=root php sh
 echo "auto_prepend_file = /opt/www/bitrix/modules/security/tools/start.php" > /usr/local/etc/php/conf.d/security.ini
 ```
 
-Перезапускаем контейнер с `php`:
+Перезапускаем контейнеры `php` и `cron`:
 ```bash
-docker compose restart php
+docker compose restart php cron
 ```
 
 На странице `Веб-антивирус` (`/bitrix/admin/security_antivirus.php?lang=ru`) включаем его, нажимаем кнопку `Включить веб-антивирус`.
@@ -992,9 +992,9 @@ docker compose exec --user=root php sh
 rm -f /usr/local/etc/php/conf.d/security.ini
 ```
 
-Перезапускаем контейнер с `php`:
+Перезапускаем контейнеры `php` и `cron`:
 ```bash
-docker compose restart php
+docker compose restart php cron
 ```
 
 Документация:
