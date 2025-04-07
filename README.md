@@ -1384,9 +1384,9 @@ docker compose exec mysql bash -c "mysql -u root -p"
 <a id="postgresqlconsole"></a>
 ## PostgreSQL
 
-Заходим в bash-консоль контейнера `postgres`, выполняя команду входа в консоль `psql`:
+Заходим в bash-консоль контейнера `postgres`, выполняя команду входа в консоль `psql` из под пользователя `postgres`:
 ```bash
-docker compose exec postgres bash -c "psql"
+docker compose exec --user=postgres postgres bash -c "psql"
 ```
 
 Вводим пароль суперпользователя `BiTRiX@#2025`, значение по умолчанию, которое хранится в файле `.env_sql`.
@@ -1398,10 +1398,10 @@ docker compose exec postgres bash -c "psql"
 
 Заходим в sh-консоль контейнера `memcache`, запуская консоль `nc`, указывая хост `127.0.0.1` и порт `11211`:
 ```bash
-docker compose exec --user=root memcache sh -c "nc 127.0.0.1 11211"
+docker compose exec --user=root memcached sh -c "nc 127.0.0.1 11211"
 ```
 
-Выполняем запросы (пример, `stat`). Для выхода вводим `exit`.
+Выполняем запросы (пример, `stats`). Для выхода вводим `exit`.
 
 <a id="redisconsole"></a>
 ## Redis
@@ -1444,7 +1444,7 @@ docker compose -f docker-compose.yml -f docker-compose-my.yml ps
 - в раздел `services` добавляем описание сервиса:
 ```bash
   valkey:
-    image: valkey:7.2.8-alpine
+    image: valkey/valkey:7.2.8-alpine
     container_name: dev_valkey
     restart: unless-stopped
     command: valkey-server
