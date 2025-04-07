@@ -1199,12 +1199,12 @@ https://dev.1c-bitrix.ru/learning/course/index.php?COURSE_ID=35&LESSON_ID=2674#a
 
 Одной командой разово генерируем сертификаты корневого и промежуточного центров сертификации:
 ```bash
-docker compose exec --user=root ssl bash -c '~/cas.sh'
+docker compose exec --user=root ssl bash -c "~/cas.sh"
 ```
 
 Второй - сертификат и приватный ключ для домена `dev.bx`:
 ```bash
-docker compose exec --user=root ssl bash -c '~/srv.sh dev.bx'
+docker compose exec --user=root ssl bash -c "~/srv.sh dev.bx"
 ```
 
 Итого в папке `/ssl/` внутри контейнера `ssl` будет набор файлов:
@@ -1219,7 +1219,7 @@ docker compose exec --user=root ssl bash -c '~/srv.sh dev.bx'
 
 Файл `dhparam.pem` не создается, а поставляется для примера. Если нужно его сделать уникальным выполните команду:
 ```bash
-docker compose exec --user=root ssl bash -c 'openssl dhparam -out /ssl/dhparam.pem 4096'
+docker compose exec --user=root ssl bash -c "openssl dhparam -out /ssl/dhparam.pem 4096"
 ```
 
 > [!IMPORTANT]
@@ -1284,7 +1284,7 @@ exit
 
 Проверям настройки `nginx`:
 ```bash
-docker compose exec --user=root nginx sh -c 'nginx -t'
+docker compose exec --user=root nginx sh -c "nginx -t"
 ```
 
 Если никаких ошибок нет, перезапускаем nginx:
