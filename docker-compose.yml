@@ -58,7 +58,7 @@ services:
         aliases:
           - postgres
   mysql:
-    image: percona/percona-server:8.0.41-32-amd64
+    image: bx-percona-server:8.0.41-rhel
     container_name: dev_mysql
     restart: unless-stopped
     env_file:
@@ -70,7 +70,6 @@ services:
     volumes:
       - mysql_log_data:/var/log/mysql
       - mysql_lib_data:/var/lib/mysql
-      - ./confs/mysql/etc/my.cnf:/etc/my.cnf
     cap_add:
       - SYS_NICE
     networks:
