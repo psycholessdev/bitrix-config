@@ -593,9 +593,21 @@ Cохранить.
 
 Параметры переменных сред контейнеров хранятся в файлах `.env_push_pub` и `.env_push_sub`.
 
-Секретный ключ сгенерирован предварительно и хранится в файле `.env_push`. По умолчанию его значение равно:
+Шаблон секретного ключа (`CHANGE_SECURITY_KEY_HERE`) для подписи соединения между клиентом и push-сервером хранится в файле `.env_push` в виде:
 ```bash
-oqq2gaHWkogJHDfYY8CRzBaR9d26ZuCmTHIZa2egZ2Kk3IN3QKWDRB2Ixlt7usICbi1Qlvla3MylfqRrl1Cxhy9Af0nKDVH4GYWtE7FXbTZO8Kb9TUpysiDvPvMvTUy2
+PUSH_SECURITY_KEY=CHANGE_SECURITY_KEY_HERE
+```
+
+Обязательно сгенерируйте ваш уникальный секретный ключ с помощью команды:
+```bash
+docker compose exec --user=root php sh -c '(cat /dev/urandom | tr -dc A-Za-z0-9 | head -c 128) && echo ""'
+```
+
+Обязательно измените значение вашего уникального секретного ключа в файле `.env_push`, заменив шаблон `CHANGE_SECURITY_KEY_HERE`.
+
+Перезапустите оба контейнера push сервера:
+```bash
+docker compose restart push-sub push-pub
 ```
 
 Возвращаемся к главам `Адресация` и `Порты` этого документа. Определяемся по какой схеме работает сайт. Например:
@@ -609,9 +621,11 @@ oqq2gaHWkogJHDfYY8CRzBaR9d26ZuCmTHIZa2egZ2Kk3IN3QKWDRB2Ixlt7usICbi1Qlvla3MylfqRr
 
 Запоминаем эти значения.
 
-В административной части продукта:
-- на странице `Управление структурой` (`/bitrix/admin/fileman_admin.php?lang=ru&path=%2F`) редактируем файл `/bitrix/.settings.php`
-- добавляем блок настроек, но меняем значения выше для `http` и `https` по примеру:
+В административной части продукта на странице `Управление структурой` (`/bitrix/admin/fileman_admin.php?lang=ru&path=%2F`) редактируем файл `/bitrix/.settings.php`:
+- добавляем блок настроек push сервера
+- меняем значения опции `signature_key`, указываем ваш сгенерированный уникальный секретный ключ вместо шаблона `CHANGE_SECURITY_KEY_HERE`
+- меняем значения для `http` и `https` на ваши
+- пример:
 ```bash
   'pull' => array(
     'value' => array(
@@ -633,7 +647,7 @@ oqq2gaHWkogJHDfYY8CRzBaR9d26ZuCmTHIZa2egZ2Kk3IN3QKWDRB2Ixlt7usICbi1Qlvla3MylfqRr
       'nginx_headers' => 'N',
       'push' => 'Y',
       'websocket' => 'Y',
-      'signature_key' => 'oqq2gaHWkogJHDfYY8CRzBaR9d26ZuCmTHIZa2egZ2Kk3IN3QKWDRB2Ixlt7usICbi1Qlvla3MylfqRrl1Cxhy9Af0nKDVH4GYWtE7FXbTZO8Kb9TUpysiDvPvMvTUy2',
+      'signature_key' => 'CHANGE_SECURITY_KEY_HERE',
       'signature_algo' => 'sha1',
       'guest' => 'N',
     ),
