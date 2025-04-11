@@ -805,10 +805,9 @@ php bitrix.php -h
 docker compose exec --user=root php sh
 ```
 
-Создадим каталог `/opt/browscap`, загрузим в него `browscap.ini`, подключим в настройках php. Выполняем:
+В каталог `/opt/browscap` загрузим `browscap.ini`, подключим в настройках php. Выполняем:
 ```bash
-apk add mc curl
-mkdir -p /opt/browscap
+apk add curl
 cd /opt/browscap
 curl http://browscap.org/stream?q=PHP_BrowsCapINI -o php_browscap.ini
 echo 'browscap = /opt/browscap/php_browscap.ini' > /usr/local/etc/php/conf.d/browscap.ini
@@ -836,9 +835,8 @@ docker compose restart php cron
 docker compose exec --user=root php sh
 ```
 
-Создадим каталог `/opt/geoip2` и перейдем в него:
+Переходим в каталог `/opt/geoip2`:
 ```bash
-mkdir -p /opt/geoip2
 cd /opt/geoip2
 ```
 
