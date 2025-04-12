@@ -13,6 +13,8 @@
 * [Сборка или скачивание Docker образов](#dockerimages)
   * [Базовые образы](#basicimages)
   * [Битрикс образы (bx-*)](#bitriximages)
+* [Пароли к базам данных mysql и postgresql](#databasespasswords)
+* [Секретный ключ для push сервера](#pushserversecretkey)
 * [Управление](#management)
 * [Часовой пояс (timezone)](#timezone)
 * [Адресация](#iporurls)
@@ -181,6 +183,57 @@ docker build -f Dockerfile -t bx-ssl:1.0-alpine --no-cache .
 cd dev/sources/bxpercona8041/
 docker build -f Dockerfile -t bx-percona-server:8.0.41-rhel --no-cache .
 ```
+
+<a id="databasespasswords"></a>
+# Пароли к базам данных mysql и postgresql
+
+> [!CAUTION]
+> Внимание! Перед первым запуском обязательно придумайте или сгенерируйте ваши уникальные пароли суперпользователей баз данных `mysql` и `postgresql`.
+
+Для этого используем образ `alpine` linux:
+```bash
+docker pull alpine:3.21
+```
+
+Cгенерируем ваш уникальный пароль для суперпользователя `root` базы данных `mysql` с помощью команды:
+```bash
+docker container run --rm --name mysql_password_generate alpine:3.21 sh -c '(cat /dev/urandom | tr -dc A-Za-z0-9\?\!\@\-\_\+\%\(\)\{\}\[\]\= | head -c 16) && echo ""'
+```
+
+Cгенерируем ваш уникальный пароль для суперпользователя `postgres` базы данных `postgresql` с помощью команды:
+```bash
+docker container run --rm --name postgresql_password_generate alpine:3.21 sh -c '(cat /dev/urandom | tr -dc A-Za-z0-9\?\!\@\-\_\+\%\(\)\{\}\[\]\= | head -c 16) && echo ""'
+```
+
+Шаблон пароля для суперпользователя `root` базы данных `mysql` (`CHANGE_MYSQL_ROOT_PASSWORD_HERE`) и шаблон пароля для суперпользователя `postgres` базы данных `postgresql` (`CHANGE_POSTGRESQL_POSTGRES_PASSWORD_HERE`) хранятся в файле `.env_sql` в виде:
+```bash
+MYSQL_ROOT_PASSWORD='CHANGE_MYSQL_ROOT_PASSWORD_HERE'
+POSTGRES_PASSWORD='CHANGE_POSTGRESQL_POSTGRES_PASSWORD_HERE'
+```
+
+Обязательно измените значения в файле `.env_push`, заменив шаблоны `CHANGE_MYSQL_ROOT_PASSWORD_HERE` и `CHANGE_POSTGRESQL_POSTGRES_PASSWORD_HERE` на ваши значения.
+
+<a id="pushserversecretkey"></a>
+# Секретный ключ для push сервера
+
+> [!CAUTION]
+> Внимание! Перед первым запуском обязательно придумайте или сгенерируйте ваш уникальный секретный ключ для push сервера.
+
+Для этого используем образ `alpine` linux:
+```bash
+docker pull alpine:3.21
+```
+
+Cгенерируем ваш уникальный секретный ключ с помощью команды:
+```bash
+docker container run --rm --name push_server_key_generate alpine:3.21 sh -c '(cat /dev/urandom | tr -dc A-Za-z0-9 | head -c 128) && echo ""'
+```
+
+Шаблон секретного ключа (`CHANGE_SECURITY_KEY_HERE`) для подписи соединения между клиентом и push-сервером хранится в файле `.env_push` в виде:
+```bash
+PUSH_SECURITY_KEY=CHANGE_SECURITY_KEY_HERE
+```
+Обязательно измените значение вашего уникального секретного ключа в файле `.env_push`, заменив шаблон `CHANGE_SECURITY_KEY_HERE` на ваше значение.
 
 <a id="management"></a>
 # Управление
@@ -407,14 +460,12 @@ http://10.0.1.119:8588/
 - для `mysql` версии:
   - Имя хоста (алиас) - `mysql`
   - Имя суперпользователя - `root`
-  - Пароль суперпользователя - `BiTRiX@#2025`
+  - Пароль суперпользователя - был создан вами в главе `Пароли к базам данных mysql и postgresql`, хранится в файле `.env_sql`
 
 - для `pgsql` версии:
   - Имя хоста (алиас) - `postgres`
   - Имя суперпользователя - `postgres`
-  - Пароль суперпользователя - `BiTRiX@#2025`
-
-Пароль суперпользователя для обеих баз хранится в файле `.env_sql` и по умолчанию его значение равно `BiTRiX@#2025`.
+  - Пароль суперпользователя - был создан вами в главе `Пароли к базам данных mysql и postgresql`, хранится в файле `.env_sql`
 
 <a id="restorebackup"></a>
 ## Восстановление из резервной копии
@@ -593,22 +644,7 @@ Cохранить.
 
 Параметры переменных сред контейнеров хранятся в файлах `.env_push_pub` и `.env_push_sub`.
 
-Шаблон секретного ключа (`CHANGE_SECURITY_KEY_HERE`) для подписи соединения между клиентом и push-сервером хранится в файле `.env_push` в виде:
-```bash
-PUSH_SECURITY_KEY=CHANGE_SECURITY_KEY_HERE
-```
-
-Обязательно сгенерируйте ваш уникальный секретный ключ с помощью команды:
-```bash
-docker compose exec --user=root php sh -c '(cat /dev/urandom | tr -dc A-Za-z0-9 | head -c 128) && echo ""'
-```
-
-Обязательно измените значение вашего уникального секретного ключа в файле `.env_push`, заменив шаблон `CHANGE_SECURITY_KEY_HERE`.
-
-Перезапустите оба контейнера push сервера:
-```bash
-docker compose restart push-sub push-pub
-```
+Cекретный ключ для подписи соединения между клиентом и push-сервером хранится в файле `.env_push` и был создан вами в главе `Секретный ключ для push сервера`.
 
 Возвращаемся к главам `Адресация` и `Порты` этого документа. Определяемся по какой схеме работает сайт. Например:
 - используется локальный IP вида `10.0.1.119`
@@ -1405,25 +1441,24 @@ docker compose exec --user=root redis sh -c "id"
 <a id="mysqlconsole"></a>
 ## MySQL
 
-Заходим в bash-консоль контейнера `mysql`, выполняя команду входа в консоль `mysql` из под пользователя `root` бд:
+Заходим в bash-консоль контейнера `mysql`, выполняя команду входа в консоль `mysql` из под пользователя `root` базы данных:
 ```bash
 docker compose exec mysql bash -c "mysql -u root -p"
 ```
 
-Вводим пароль суперпользователя `BiTRiX@#2025`, значение по умолчанию, которое хранится в файле `.env_sql`.
-
+Вводим пароль суперпользователя `root`, который был создан вами в главе `Пароли к базам данных mysql и postgresql`. Его значение хранится в файле `.env_sql`.
 
 Выполняем sql запросы. Для выхода вводим `exit`.
 
 <a id="postgresqlconsole"></a>
 ## PostgreSQL
 
-Заходим в bash-консоль контейнера `postgres`, выполняя команду входа в консоль `psql` из под пользователя `postgres`:
+Заходим в bash-консоль контейнера `postgres`, выполняя команду входа в консоль `psql` из под пользователя `postgres` базы данных:
 ```bash
 docker compose exec --user=postgres postgres bash -c "psql"
 ```
 
-Вводим пароль суперпользователя `BiTRiX@#2025`, значение по умолчанию, которое хранится в файле `.env_sql`.
+Вводим пароль суперпользователя `postgres`, который был создан вами в главе `Пароли к базам данных mysql и postgresql`. Его значение хранится в файле `.env_sql`.
 
 Выполняем sql запросы. Для выхода вводим `\q`.
 
