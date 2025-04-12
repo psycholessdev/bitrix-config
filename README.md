@@ -37,6 +37,7 @@
 * [Sphinx](#sphinx)
   * [Поиск с помощью Sphinx](#sphinxsearch)
 * [Почта](#email)
+  * [Отправка почты с помощью msmtp](#msmtpmta)
   * [Отправка почты через SMTP-сервера отправителя](#emailsmtpmailer)
   * [Логирование отправки почты в файл](#emaildebuglog)
 * [PHP](#php)
@@ -724,6 +725,93 @@ Cекретный ключ для подписи соединения между
 
 <a id="email"></a>
 # Почта
+
+<a id="msmtpmta"></a>
+## Отправка почты с помощью msmtp
+
+Образ `bx-php` в своем составе содержит `msmtp`, предназначенный для отправки писем.
+
+Настройки msmtp для аккаунта `default` хранятся в файле `/opt/msmtp/.msmtprc`.
+
+Значения настроек msmtp зависят от smtp сервера, с которым он будет взаимодействовать при работе.
+
+Например, локальный почтовый сервер, отвечает на порту `25`, расположен на хосте `mail.server.local`, не использует в своей работе `tls` - в файле `/opt/msmtp/.msmtprc` настройки будут выглядеть:
+```bash
+...
+host mail.server.local
+port 25
+from info@mail.server.local
+user info@mail.server.local
+password password_example
+...
+tls off
+tls_starttls off
+tls_certcheck off
+...
+```
+
+Другой пример, почтовые сервисы вида `gmail`, `yahoo`, `yandex`, `rambler` и т.д.
+
+Настройки почтовых сервисов приведены в курсе: https://dev.1c-bitrix.ru/learning/course/index.php?COURSE_ID=37&LESSON_ID=12265
+
+Для `gmail`, который отвечает на порту `587`, расположен на хосте `smtp.gmail.com`, использует в своей работе `tls` - в файле `/opt/msmtp/.msmtprc` полный список настроек выглядит так:
+
+```bash
+# smtp account configuration for default
+account default
+logfile /proc/self/fd/2
+host smtp.gmail.com
+port 587
+from [LOGIN]@gmail.com
+user [LOGIN]@gmail.com
+password [APP_PASSWORD]
+auth login
+aliases /etc/aliases
+keepbcc off
+tls on
+tls_starttls on
+tls_certcheck on
+tls_trust_file /etc/ssl/certs/ca-certificates.crt
+protocol smtp
+```
+
+Настроим отправку писем через `gmail`.
+
+В блоке настроек выше меняем `APP_PASSWORD` на пароль приложения, `LOGIN` на ваш логин в почте Google.
+
+Заходим в sh-консоль контейнера `php` из под пользователя `root`:
+```bash
+docker compose exec --user=root php sh
+```
+
+Редактируем файл `/opt/msmtp/.msmtprc`, указываем приготовленный блок настроек:
+```bash
+apk add mc
+mcedit /opt/msmtp/.msmtprc
+```
+
+Сохраняем файл и выходим из контейнера `php`.
+
+После в административной части продукта необходимо настроить модули, указав email отправителя (или От кого):
+- `Главный модуль (main)` (`bitrix/admin/settings.php?lang=ru&mid=main`)
+- `Email-маркетинг (sender)` (`/bitrix/admin/settings.php?lang=ru&mid=sender`)
+- `Интернет-магазин (sale)` (`/bitrix/admin/settings.php?lang=ru&mid=sale`)
+- `Подписка, рассылки (subscribe)` (`/bitrix/admin/settings.php?lang=ru&mid=subscribe`)
+- `Форум (forum)` (`/bitrix/admin/settings.php?lang=ru&mid=forum`)
+
+Проверить отправку почты можно на странице `Проверка системы` (`/bitrix/admin/site_checker.php?lang=ru`), запустив `Тестирование конфигурации`.
+
+Результаты будут отображены в блоке отчета `Дополнительные функции`:
+```
+Отправка почты - Отправлено. Время отправки: 1.36 сек.
+Отправка почтового сообщения больше 64Кб - Отправлено. Время отправки: 1.55 сек.
+```
+
+Детали отправки (или возникающие ошибки) будут доступны в логе контейнера `php`. Пример для двух писем из тестирования конфигурации:
+```
+Apr 12 22:52:14 host=smtp.gmail.com tls=on auth=on user=***@gmail.com from=***@gmail.com recipients=hosting_test@bitrixsoft.com mailsize=211 smtpstatus=250 smtpmsg='250 2.0.0 OK  1744498333 2adb3069b0e04-54d3d502717sm712937e87.144 - gsmtp' exitcode=EX_OK
+Apr 12 22:52:15 host=smtp.gmail.com tls=on auth=on user=***@gmail.com from=***@gmail.com recipients=hosting_test@bitrixsoft.com,noreply@bitrixsoft.com mailsize=200205 smtpstatus=250 smtpmsg='250 2.0.0 OK  1744498335 2adb3069b0e04-54d3d502618sm743850e87.107 - gsmtp' exitcode=EX_OK
+```
 
 <a id="emailsmtpmailer"></a>
 ## Отправка почты через SMTP-сервера отправителя

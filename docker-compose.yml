@@ -11,6 +11,8 @@ volumes:
     driver: local
   bxtemp_data:
     driver: local
+  msmtp_data:
+    driver: local
   browscap_data:
     driver: local
   geoip2_data:
@@ -95,6 +97,7 @@ services:
       - ./confs/php/etc/:/usr/local/etc/
       - www_data:/opt/www/
       - bxtemp_data:/opt/.bx_temp/
+      - msmtp_data:/opt/msmtp/
       - browscap_data:/opt/browscap/
       - geoip2_data:/opt/geoip2/
       - ssl_data:/ssl/
@@ -185,6 +188,7 @@ services:
       - ./confs/php/etc/:/usr/local/etc/
       - www_data:/opt/www/
       - bxtemp_data:/opt/.bx_temp/
+      - msmtp_data:/opt/msmtp/
       - browscap_data:/opt/browscap/
       - geoip2_data:/opt/geoip2/
     networks:
