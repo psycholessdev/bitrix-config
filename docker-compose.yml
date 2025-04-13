@@ -204,6 +204,7 @@ services:
     user: root
     env_file:
       - .env
+      - .env_ssl
     volumes:
       - ssl_data:/ssl/
     networks:
