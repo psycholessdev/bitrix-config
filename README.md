@@ -198,18 +198,18 @@ docker pull alpine:3.21
 
 Cгенерируем ваш уникальный пароль для суперпользователя `root` базы данных `mysql` с помощью команды:
 ```bash
-docker container run --rm --name mysql_password_generate alpine:3.21 sh -c "(cat /dev/urandom | tr -dc A-Za-z0-9\?\!\@\-\_\+\%\(\)\{\}\[\]\= | head -c 16) && echo ''"
+docker container run --rm --name mysql_password_generate alpine:3.21 sh -c "(cat /dev/urandom | tr -dc A-Za-z0-9\?\!\@\-\_\+\%\(\)\{\}\[\]\= | head -c 16) | tr -d '\' | tr -d '^' && echo ''"
 ```
 
 Cгенерируем ваш уникальный пароль для суперпользователя `postgres` базы данных `postgresql` с помощью команды:
 ```bash
-docker container run --rm --name postgresql_password_generate alpine:3.21 sh -c "(cat /dev/urandom | tr -dc A-Za-z0-9\?\!\@\-\_\+\%\(\)\{\}\[\]\= | head -c 16) && echo ''"
+docker container run --rm --name postgresql_password_generate alpine:3.21 sh -c "(cat /dev/urandom | tr -dc A-Za-z0-9\?\!\@\-\_\+\%\(\)\{\}\[\]\= | head -c 16) | tr -d '\' | tr -d '^' && echo ''"
 ```
 
 Шаблон пароля для суперпользователя `root` базы данных `mysql` (`CHANGE_MYSQL_ROOT_PASSWORD_HERE`) и шаблон пароля для суперпользователя `postgres` базы данных `postgresql` (`CHANGE_POSTGRESQL_POSTGRES_PASSWORD_HERE`) хранятся в файле `.env_sql` в виде:
 ```bash
-MYSQL_ROOT_PASSWORD='CHANGE_MYSQL_ROOT_PASSWORD_HERE'
-POSTGRES_PASSWORD='CHANGE_POSTGRESQL_POSTGRES_PASSWORD_HERE'
+MYSQL_ROOT_PASSWORD="CHANGE_MYSQL_ROOT_PASSWORD_HERE"
+POSTGRES_PASSWORD="CHANGE_POSTGRESQL_POSTGRES_PASSWORD_HERE"
 ```
 
 Обязательно измените значения в файле `.env_push`, заменив шаблоны `CHANGE_MYSQL_ROOT_PASSWORD_HERE` и `CHANGE_POSTGRESQL_POSTGRES_PASSWORD_HERE` на ваши значения.
