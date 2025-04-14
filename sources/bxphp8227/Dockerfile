@@ -68,7 +68,7 @@ COPY msmtprc /opt/msmtp/.msmtprc
 
 RUN docker-php-source delete && \
     apk add --no-cache -X http://dl-cdn.alpinelinux.org/alpine/edge/testing catdoc && \
-    apk add --no-cache msmtp openssl ca-certificates poppler-utils aspell bzip2 gettext libmcrypt libldap libsasl cyrus-sasl libmemcached libmemcached-libs icu-libs libxslt freetype libpng libjpeg-turbo libxpm libwebp libgomp zip libzip libxml2 lz4 liblzf zstd libpq rabbitmq-c libssh2 imagemagick && \
+    apk add --no-cache msmtp curl openssl ca-certificates tzdata poppler-utils aspell bzip2 gettext libmcrypt libldap libsasl cyrus-sasl libmemcached libmemcached-libs icu-libs libxslt freetype libpng libjpeg-turbo libxpm libwebp libgomp zip libzip libxml2 lz4 liblzf zstd libpq rabbitmq-c libssh2 imagemagick && \
     curl -fsSL https://getcomposer.org/download/latest-stable/composer.phar -o composer.phar && \
     chmod +x composer.phar && \
     mv composer.phar /usr/local/bin/composer && \
