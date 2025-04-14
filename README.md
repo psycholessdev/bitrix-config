@@ -198,12 +198,12 @@ docker pull alpine:3.21
 
 Cгенерируем ваш уникальный пароль для суперпользователя `root` базы данных `mysql` с помощью команды:
 ```bash
-docker container run --rm --name mysql_password_generate alpine:3.21 sh -c '(cat /dev/urandom | tr -dc A-Za-z0-9\?\!\@\-\_\+\%\(\)\{\}\[\]\= | head -c 16) && echo ""'
+docker container run --rm --name mysql_password_generate alpine:3.21 sh -c "(cat /dev/urandom | tr -dc A-Za-z0-9\?\!\@\-\_\+\%\(\)\{\}\[\]\= | head -c 16) && echo ''"
 ```
 
 Cгенерируем ваш уникальный пароль для суперпользователя `postgres` базы данных `postgresql` с помощью команды:
 ```bash
-docker container run --rm --name postgresql_password_generate alpine:3.21 sh -c '(cat /dev/urandom | tr -dc A-Za-z0-9\?\!\@\-\_\+\%\(\)\{\}\[\]\= | head -c 16) && echo ""'
+docker container run --rm --name postgresql_password_generate alpine:3.21 sh -c "(cat /dev/urandom | tr -dc A-Za-z0-9\?\!\@\-\_\+\%\(\)\{\}\[\]\= | head -c 16) && echo ''"
 ```
 
 Шаблон пароля для суперпользователя `root` базы данных `mysql` (`CHANGE_MYSQL_ROOT_PASSWORD_HERE`) и шаблон пароля для суперпользователя `postgres` базы данных `postgresql` (`CHANGE_POSTGRESQL_POSTGRES_PASSWORD_HERE`) хранятся в файле `.env_sql` в виде:
@@ -227,7 +227,7 @@ docker pull alpine:3.21
 
 Cгенерируем ваш уникальный секретный ключ с помощью команды:
 ```bash
-docker container run --rm --name push_server_key_generate alpine:3.21 sh -c '(cat /dev/urandom | tr -dc A-Za-z0-9 | head -c 128) && echo ""'
+docker container run --rm --name push_server_key_generate alpine:3.21 sh -c "(cat /dev/urandom | tr -dc A-Za-z0-9 | head -c 128) && echo ''"
 ```
 
 Шаблон секретного ключа (`CHANGE_SECURITY_KEY_HERE`) для подписи соединения между клиентом и push-сервером хранится в файле `.env_push` в виде:
