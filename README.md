@@ -147,43 +147,47 @@ docker pull node:20-alpine
 docker pull alpine:3.21
 ```
 
-Собираем образы, в названии используем bx-:
+Собираем образы, в названии используем `bx-`:
 
 - bx-sphinx:
 ```bash
 cd dev/sources/bxsphinx2211/
-docker build -f Dockerfile -t bx-sphinx:2.2.11-alpine --no-cache .
+docker build -f Dockerfile -t bx-sphinx:2.2.11-v1-alpine --no-cache .
 ```
 
 - bx-push:
 ```bash
 cd dev/sources/bxpush30/
-docker build -f Dockerfile -t bx-push:3.0-alpine --no-cache .
+docker build -f Dockerfile -t bx-push:3.0-v1-alpine --no-cache .
 ```
 
 - bx-php:
 ```bash
 cd dev/sources/bxphp8228/
-docker build -f Dockerfile -t bx-php:8.2.28-fpm-alpine --no-cache .
+docker build -f Dockerfile -t bx-php:8.2.28-fpm-v1-alpine --no-cache .
 ```
 
 - bx-nginx:
 ```bash
 cd dev/sources/bxnginx1263/
-docker build -f Dockerfile -t bx-nginx:1.26.3-alpine --no-cache .
+docker build -f Dockerfile -t bx-nginx:1.26.3-v1-alpine --no-cache .
 ```
 
 - bx-ssl:
 ```bash
 cd dev/sources/bxssl10/
-docker build -f Dockerfile -t bx-ssl:1.0-alpine --no-cache .
+docker build -f Dockerfile -t bx-ssl:1.0-v1-alpine --no-cache .
 ```
 
 - bx-percona-server:
 ```bash
 cd dev/sources/bxpercona8041/
-docker build -f Dockerfile -t bx-percona-server:8.0.41-rhel --no-cache .
+docker build -f Dockerfile -t bx-percona-server:8.0.41-v1-rhel --no-cache .
 ```
+
+Во всех образах `bx-` в названии тега указывается `v1`, состоит из:
+- общая отметка версии, указывается буквой `v`
+- номер сборки, начинается с цифры `1`
 
 <a id="databasespasswords"></a>
 # Пароли к базам данных mysql и postgresql
@@ -212,7 +216,7 @@ MYSQL_ROOT_PASSWORD="CHANGE_MYSQL_ROOT_PASSWORD_HERE"
 POSTGRES_PASSWORD="CHANGE_POSTGRESQL_POSTGRES_PASSWORD_HERE"
 ```
 
-Обязательно измените значения в файле `.env_push`, заменив шаблоны `CHANGE_MYSQL_ROOT_PASSWORD_HERE` и `CHANGE_POSTGRESQL_POSTGRES_PASSWORD_HERE` на ваши значения.
+Обязательно измените значения в файле `.env_sql`, заменив шаблоны `CHANGE_MYSQL_ROOT_PASSWORD_HERE` и `CHANGE_POSTGRESQL_POSTGRES_PASSWORD_HERE` на ваши значения.
 
 <a id="pushserversecretkey"></a>
 # Секретный ключ для push сервера

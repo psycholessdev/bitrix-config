@@ -64,7 +64,7 @@ services:
         aliases:
           - postgres
   mysql:
-    image: bx-percona-server:8.0.41-rhel
+    image: bx-percona-server:8.0.41-v1-rhel
     container_name: dev_mysql
     restart: unless-stopped
     env_file:
@@ -83,7 +83,7 @@ services:
         aliases:
           - mysql
   php:
-    image: bx-php:8.2.28-fpm-alpine
+    image: bx-php:8.2.28-fpm-v1-alpine
     container_name: dev_php
     restart: unless-stopped
     command: php-fpm -R
@@ -106,7 +106,7 @@ services:
         aliases:
           - php
   nginx:
-    image: bx-nginx:1.26.3-alpine
+    image: bx-nginx:1.26.3-v1-alpine
     container_name: dev_nginx
     restart: unless-stopped
     user: root
@@ -125,7 +125,7 @@ services:
         aliases:
           - nginx
   push-sub:
-    image: bx-push:3.0-alpine
+    image: bx-push:3.0-v1-alpine
     container_name: dev_push_sub
     restart: unless-stopped
     env_file:
@@ -142,7 +142,7 @@ services:
     depends_on:
       - redis
   push-pub:
-    image: bx-push:3.0-alpine
+    image: bx-push:3.0-v1-alpine
     container_name: dev_push_pub
     restart: unless-stopped
     env_file:
@@ -159,7 +159,7 @@ services:
     depends_on:
       - redis
   sphinx:
-    image: bx-sphinx:2.2.11-alpine
+    image: bx-sphinx:2.2.11-v1-alpine
     container_name: dev_sphinx
 #    ports:
 #      - "9306:9306"
@@ -174,7 +174,7 @@ services:
         aliases:
           - sphinx
   cron:
-    image: bx-php:8.2.28-fpm-alpine
+    image: bx-php:8.2.28-fpm-v1-alpine
     container_name: dev_cron
     restart: unless-stopped
     command: crond -f -d 8
@@ -198,7 +198,7 @@ services:
     depends_on:
       - php
   ssl:
-    image: bx-ssl:1.0-alpine
+    image: bx-ssl:1.0-v1-alpine
     container_name: dev_ssl
     restart: unless-stopped
     user: root
