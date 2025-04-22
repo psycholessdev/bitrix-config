@@ -1,7 +1,9 @@
 FROM nginx:1.26.3-alpine-slim
 
+USER root
+
 RUN cd /root/ && \
-    apk add git curl openssl ca-certificates tzdata && \
+    apk add --no-cache git curl openssl ca-certificates tzdata && \
     git clone https://github.com/cyrax13/nginx-modules.git && \
     cp /root/nginx-modules/packages/1.26.3/v1/alpine/v3.20/main/x86_64/abuild-key.rsa.pub /etc/apk/keys/ && \
     echo "/root/nginx-modules/packages/1.26.3/v1/alpine/v3.20/main" >> /etc/apk/repositories && \
@@ -11,3 +13,21 @@ RUN cd /root/ && \
     sed -i "s/.*1.26.3.*//" /etc/apk/repositories && \
     rm -f /etc/apk/keys/abuild-key.rsa.pub && \
     rm -rf /root/nginx-modules
+
+RUN addgroup -g 979 bitrix && \
+    adduser -D -u 979 -G bitrix bitrix
+
+RUN mkdir -pv /opt/www /opt/.bx_temp /opt/msmtp /opt/browscap /opt/geoip2 /ssl /var/runs/nginx && \
+    chown -R bitrix:bitrix /var/log/nginx && \
+    chown -R bitrix:bitrix /var/cache/nginx && \
+    chown -R bitrix:bitrix /var/runs/nginx && \
+    chown -R bitrix:bitrix /usr/lib/nginx/modules && \
+    chown -R bitrix:bitrix /etc/nginx && \
+    chown -R bitrix:bitrix /opt/www && \
+    chown -R bitrix:bitrix /opt/.bx_temp && \
+    chown -R bitrix:bitrix /opt/msmtp && \
+    chown -R bitrix:bitrix /opt/browscap && \
+    chown -R bitrix:bitrix /opt/geoip2 && \
+    chown -R bitrix:bitrix /ssl
+
+USER bitrix:bitrix
