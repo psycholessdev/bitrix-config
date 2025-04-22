@@ -1,5 +1,7 @@
 FROM node:20 AS builder
 
+USER root
+
 ENV PUSH=push-server.tar.gz
 
 RUN mkdir -p /opt/push-server
@@ -14,9 +16,11 @@ RUN npm install --omit=dev
 
 FROM node:20-alpine AS production
 
+USER root
+
 RUN apk --no-cache add shadow bash gettext libintl curl openssl ca-certificates tzdata && \
-    usermod -u 979 bitrix && \
-    groupmod -g 979 bitrix && \
+    addgroup -g 979 bitrix && \
+    adduser -D -u 979 -G bitrix bitrix && \
     mkdir -p /usr/local/bin && \
     mv /usr/bin/envsubst /usr/local/bin/envsubst && \
     [[ ! -d /tmp/push-server ]] && mkdir /tmp/push-server && \

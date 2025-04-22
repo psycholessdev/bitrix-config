@@ -1,6 +1,7 @@
 FROM alpine:3.21
 
-RUN addgroup -g 979 bitrix && adduser -D -u 979 -G bitrix bitrix
+RUN addgroup -g 979 bitrix && \
+    adduser -D -u 979 -G bitrix bitrix
 
 RUN apk add --no-cache curl openssl bash mc ca-certificates tzdata && \
     mkdir -pv /opt /ssl
