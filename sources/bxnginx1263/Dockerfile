@@ -3,8 +3,8 @@ FROM nginx:1.26.3-alpine-slim
 RUN cd /root/ && \
     apk add git curl openssl ca-certificates tzdata && \
     git clone https://github.com/cyrax13/nginx-modules.git && \
-    cp /root/nginx-modules/packages/1.26.3/alpine/v3.20/main/x86_64/abuild-key.rsa.pub /etc/apk/keys/ && \
-    echo "/root/nginx-modules/packages/1.26.3/alpine/v3.20/main" >> /etc/apk/repositories && \
+    cp /root/nginx-modules/packages/1.26.3/v1/alpine/v3.20/main/x86_64/abuild-key.rsa.pub /etc/apk/keys/ && \
+    echo "/root/nginx-modules/packages/1.26.3/v1/alpine/v3.20/main" >> /etc/apk/repositories && \
     apk update && \
     apk add nginx-module-xslt nginx-module-geoip nginx-module-image-filter nginx-module-njs nginx-module-perl nginx-module-brotli nginx-module-geoip2 nginx-module-ndk nginx-module-lua nginx-module-headers-more nginx-module-zip && \
     apk del git && \
