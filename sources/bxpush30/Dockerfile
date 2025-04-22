@@ -15,8 +15,8 @@ RUN npm install --omit=dev
 FROM node:20-alpine AS production
 
 RUN apk --no-cache add shadow bash gettext libintl curl openssl ca-certificates tzdata && \
-    usermod -u 6006 node && \
-    groupmod -g 6006 node && \
+    usermod -u 979 bitrix && \
+    groupmod -g 979 bitrix && \
     mkdir -p /usr/local/bin && \
     mv /usr/bin/envsubst /usr/local/bin/envsubst && \
     [[ ! -d /tmp/push-server ]] && mkdir /tmp/push-server && \
@@ -30,14 +30,14 @@ COPY docker-entrypoint.sh /usr/local/bin/
 COPY push-server-pub.json /etc/push-server/push-server-pub.json
 COPY push-server-sub.json /etc/push-server/push-server-sub.json
 
-RUN chown -R node:node /opt/push-server && \
-    chown -R node:node /tmp/push-server && \
-    chown -R node:node /etc/push-server && \
+RUN chown -R bitrix:bitrix /opt/push-server && \
+    chown -R bitrix:bitrix /tmp/push-server && \
+    chown -R bitrix:bitrix /etc/push-server && \
     chmod 0755 /usr/local/bin/docker-entrypoint.sh && \
-    chown -R node:node /var/log/push-server
+    chown -R bitrix:bitrix /var/log/push-server
 
 # VOLUME /var/log/push-server
 
-USER node:node
+USER bitrix:bitrix
 
 ENTRYPOINT ["/usr/local/bin/docker-entrypoint.sh"]
