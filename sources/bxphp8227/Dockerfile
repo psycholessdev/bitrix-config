@@ -1,5 +1,7 @@
 FROM php:8.2.27-fpm-alpine AS builder
 
+USER root
+
 RUN apk add --no-cache --virtual .build-deps \
 file \
 autoconf \
@@ -49,11 +51,9 @@ RUN docker-php-ext-configure gd --with-freetype --with-jpeg --with-xpm --with-we
 
 RUN docker-php-ext-install mysqli pdo_mysql bz2 pgsql pdo_pgsql zip gd opcache ldap exif intl calendar sodium gettext pspell xml xmlwriter xsl shmop sysvmsg sysvsem sysvshm sockets memcache memcached apcu mcrypt msgpack igbinary redis xhprof xdebug amqp ssh2 imagick
 
-RUN docker-php-source delete
-
-RUN apk del --no-network .build-deps
-
 FROM php:8.2.27-fpm-alpine AS production
+
+USER root
 
 COPY --from=builder /usr/local/lib/php/extensions/ /usr/local/lib/php/extensions/
 
@@ -78,3 +78,17 @@ RUN docker-php-source delete && \
     chmod -R a+x /etc/periodic/1min/bitrix && \
     chmod 600 /opt/msmtp/.msmtprc && \
     ln -s /opt/msmtp/.msmtprc /etc/msmtprc
+
+RUN addgroup -g 979 bitrix && \
+    adduser -D -u 979 -G bitrix bitrix
+
+RUN mkdir -pv /opt/www /opt/.bx_temp /opt/browscap /opt/geoip2 /ssl && \
+    chown -R bitrix:bitrix /usr/local/etc && \
+    chown -R bitrix:bitrix /opt/www && \
+    chown -R bitrix:bitrix /opt/.bx_temp && \
+    chown -R bitrix:bitrix /opt/msmtp && \
+    chown -R bitrix:bitrix /opt/browscap && \
+    chown -R bitrix:bitrix /opt/geoip2 && \
+    chown -R bitrix:bitrix /ssl
+
+USER bitrix:bitrix
