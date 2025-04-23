@@ -62,7 +62,7 @@ RUN set -x \
     && apk add --no-cache --virtual .checksum-deps \
         openssl \
     && case "$apkArch" in \
-        aarch64) \
+        i386) \
 # arches officially built by upstream
             apk add -X "https://nginx.org/packages/alpine/v$(egrep -o '^[0-9]+\.[0-9]+' /etc/alpine-release)/main" --no-cache $nginxPackages \
             ;; \
