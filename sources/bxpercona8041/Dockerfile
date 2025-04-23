@@ -1,4 +1,4 @@
-FROM percona/percona-server:8.0.41-32-amd64
+FROM percona/percona-server:8.0.41
 
 USER root
 
