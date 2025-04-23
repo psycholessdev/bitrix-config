@@ -123,15 +123,15 @@ docker pull memcached:1.6.38-alpine
 ## Битрикс образы (bx-*)
 
 Так же нам понадобятся:
-- база данных mysql: используем стабильный образ `percona/percona-server:8.0.41-32-amd64`, добавляем слоем сверху конфигурацию бд, собираем `bx-percona-server:8.0.41-rhel`
-- веб сервер: используем стабильный образ `nginx:1.26.3-alpine-slim`, добавляем модули слоем сверху, собираем `bx-nginx:1.26.3-alpine`
-- интерпретатор php кода: готового совместимого образа php увы нет, берем по умолчанию образ `php:8.2.28-fpm-alpine` и добавляем то, что нам надо через пару слоев сверху, собираем `bx-php:8.2.28-fpm-alpine`
-- поиск: готового образа sphinx нет, но есть собранный пакет `sphinx` на базе `alpine` linux в официальном репозитории ОС, собираем `bx-sphinx:2.2.11-alpine`, установив пакет
-- push сервер: готового образа нет, используем образ NodeJS 20-ой версии, собираем `bx-push:3.0-alpine`, используя его исходники `push-server-0.4.0`
-- генератор самоподписных ssl сертификатов: небольшой образ с пакетами на базе `alpine` linux, собираем `bx-ssl:1.0-alpine`
+- база данных mysql: используем стабильный образ `percona/percona-server:8.0.41`, добавляем слоем сверху конфигурацию бд, собираем `bx-percona-server:8.0.41-v1-rhel`
+- веб сервер: используем стабильный образ `nginx:1.26.3-alpine-slim`, добавляем модули слоем сверху, собираем `bx-nginx:1.26.3-v1-alpine`
+- интерпретатор php кода: готового совместимого образа php увы нет, берем по умолчанию образ `php:8.2.28-fpm-alpine` и добавляем то, что нам надо через пару слоев сверху, собираем `bx-php:8.2.28-fpm-v1-alpine`
+- поиск: готового образа sphinx нет, но есть собранный пакет `sphinx` на базе `alpine` linux в официальном репозитории ОС, собираем `bx-sphinx:2.2.11-v1-alpine`, установив пакет
+- push сервер: готового образа нет, используем образ NodeJS 20-ой версии, собираем `bx-push:3.0-v1-alpine`, используя его исходники `push-server-0.4.0`
+- генератор самоподписных ssl сертификатов: небольшой образ с пакетами на базе `alpine` linux, собираем `bx-ssl:1.0-v1-alpine`
 
 Список официальных Docker образов, которые будем брать с [DockerHub](https://hub.docker.com/):
-- `Percona Server`: https://hub.docker.com/_/percona
+- `Percona Server`: https://hub.docker.com/r/percona/percona-server
 - `Nginx`: https://hub.docker.com/_/nginx
 - `PHP`: https://hub.docker.com/_/php
 - `NodeJS`: https://hub.docker.com/_/node
@@ -139,7 +139,7 @@ docker pull memcached:1.6.38-alpine
 
 Для сборки нам понадобятся следующие образы (их можно предварительно скачать используя команды):
 ```bash
-docker pull percona/percona-server:8.0.41-32-amd64
+docker pull percona/percona-server:8.0.41
 docker pull nginx:1.26.3-alpine-slim
 docker pull php:8.2.28-fpm-alpine
 docker pull node:20
