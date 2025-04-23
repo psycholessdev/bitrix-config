@@ -382,9 +382,9 @@ firewall-cmd --add-port=8588/tcp --permanent && firewall-cmd --add-port=8589/tcp
 
 Используем способ, который работает одинаково на всех ОС.
 
-Заходим в sh-консоль контейнера `php` из под пользователя `root`:
+Заходим в sh-консоль контейнера `php` из под пользователя `bitrix`:
 ```bash
-docker compose exec --user=root php sh
+docker compose exec --user=bitrix php sh
 ```
 
 Переходим в корневой каталог сайта и скачиваем скрипт `bitrix_server_test.php`:
@@ -419,9 +419,9 @@ PS: для Docker Engine на Linux расположение каталога с
 
 Для восстановления из резервной копии скрипт `restore.php`: https://dev.1c-bitrix.ru/learning/course/index.php?COURSE_ID=135&CHAPTER_ID=02014&LESSON_PATH=10495.4496.2014
 
-Заходим в sh-консоль контейнера `php` из под пользователя `root`:
+Заходим в sh-консоль контейнера `php` из под пользователя `bitrix`:
 ```bash
-docker compose exec --user=root php sh
+docker compose exec --user=bitrix php sh
 ```
 
 Переходим в корневой каталог сайта и скачиваем скрипт(ы):
@@ -467,7 +467,7 @@ http://10.0.1.119:8588/
   - Имя суперпользователя - `root`
   - Пароль суперпользователя - был создан вами в главе `Пароли к базам данных mysql и postgresql`, хранится в файле `.env_sql`
 
-- для `pgsql` версии:
+- для `postgresql` версии:
   - Имя хоста (алиас) - `postgres`
   - Имя суперпользователя - `postgres`
   - Пароль суперпользователя - был создан вами в главе `Пароли к базам данных mysql и postgresql`, хранится в файле `.env_sql`
@@ -513,7 +513,7 @@ http://10.0.1.119:8588/
 
 - на табе `Настройки`:
   - указываем `Название сайта`
-  - задаем `URL сайта (без http://, например www.mysite.com)` -  10.0.1.119:8588 или 10.0.1.119:8589, dev.bx:8588 или dev.bx:8589
+  - задаем `URL сайта (без http://, например www.mysite.com)` -  10.0.1.119:8588 или 10.0.1.119:8589, dev.bx:8588 или dev.bx:8589 и т.д.
   - отмечаем опцию `Быстрая отдача файлов через Nginx` - она сконфигурирована
 
 - на табе `Авторизация`
@@ -556,9 +556,9 @@ http://10.0.1.119:8588/
 <a id="agentsoncron"></a>
 ## Выполнение агентов на cron
 
-Для работы cron заданий используется отдельный контейнер `cron` на базе образа `php`.
+Для работы cron заданий используется отдельный контейнер `cron` на базе образа `bx-php`.
 
-По умолчанию контейнер сконфигурирован на выполнение заданий модуля `Главный модуль (main)` раз в минуту:
+По умолчанию контейнер сконфигурирован на выполнение заданий модуля `Главный модуль (main)` раз в минуту, запуская это исполнение от пользователя `bitrix`:
 ```bash
 php -f /opt/www/bitrix/modules/main/tools/cron_events.php
 ```
@@ -606,7 +606,7 @@ mcedit /etc/periodic/daily/backup
 ```bash
 #!/bin/sh
 #
-php -f /opt/www/bitrix/modules/main/tools/backup.php; > /dev/null 2>&1
+su - bitrix -c 'php -f /opt/www/bitrix/modules/main/tools/backup.php; > /dev/null 2>&1'
 #
 ```
 
@@ -622,6 +622,19 @@ touch /etc/crontabs/cron.update
 ```
 
 Итог: раз в день (в 2ч ночи) контейнер запустит `backup` задание и выполнит резервное копирование.
+
+Детали создания резервной копии будут доступны в логе контейнера `cron`. Пример:
+```
+crond: USER root pid 122 cmd run-parts /etc/periodic/15min
+0.19 sec	Backup started to file: /opt/www/bitrix/backup/20250423_113000_full_vnw0wuf76rq6e5je.tar
+0.19 sec	Dumping database
+14.18 sec	Archiving database dump
+14.2 sec	Archiving files
+167.01 sec	Finished.
+Data size: 2569.42 M
+Archive size: 2569.42 M
+Time: 166.76 sec
+```
 
 Документация: https://dev.1c-bitrix.ru/learning/course/index.php?COURSE_ID=35&LESSON_ID=4464&LESSON_PATH=3906.4833.4464
 
@@ -733,7 +746,7 @@ Cекретный ключ для подписи соединения между
 <a id="msmtpmta"></a>
 ## Отправка почты с помощью msmtp
 
-Образ `bx-php` в своем составе содержит `msmtp`, предназначенный для отправки писем.
+Образ `bx-php` в своем составе содержит mta `msmtp`, предназначенный для отправки писем.
 
 Настройки msmtp для аккаунта `default` хранятся в файле `/opt/msmtp/.msmtprc`.
 
@@ -788,9 +801,19 @@ protocol smtp
 docker compose exec --user=root php sh
 ```
 
-Редактируем файл `/opt/msmtp/.msmtprc`, указываем приготовленный блок настроек:
+Устанавливаем `mc` и выходим:
 ```bash
 apk add mc
+exit
+```
+
+Заходим в sh-консоль контейнера `php` из под пользователя `bitrix`:
+```bash
+docker compose exec --user=bitrix php sh
+```
+
+Редактируем файл `/opt/msmtp/.msmtprc`, указываем приготовленный блок настроек:
+```bash
 mcedit /opt/msmtp/.msmtprc
 ```
 
@@ -900,9 +923,9 @@ function custom_mail($to, $subject, $message, $additional_headers='', $additiona
 
 В контейнере с `php` по умолчанию доступен [PHP Composer](https://getcomposer.org/).
 
-Чтобы его использовать, заходим в sh-консоль контейнера `php` из под пользователя `root`:
+Чтобы его использовать, заходим в sh-консоль контейнера `php` из под пользователя `bitrix`:
 ```bash
-docker compose exec --user=root php sh
+docker compose exec --user=bitrix php sh
 ```
 
 Проверяем его версию командой:
@@ -933,12 +956,22 @@ php bitrix.php -h
 docker compose exec --user=root php sh
 ```
 
-В каталог `/opt/browscap` загрузим `browscap.ini`, подключим в настройках php. Выполняем:
+Устанавливаем `curl`, подключаем ini файл в настройках php, выходим:
 ```bash
 apk add curl
+echo 'browscap = /opt/browscap/php_browscap.ini' > /usr/local/etc/php/conf.d/browscap.ini
+exit
+```
+
+Заходим в sh-консоль контейнера `php` из под пользователя `bitrix`:
+```bash
+docker compose exec --user=bitrix php sh
+```
+
+В каталог `/opt/browscap` загрузим `browscap.ini`. Выполняем:
+```bash
 cd /opt/browscap
 curl http://browscap.org/stream?q=PHP_BrowsCapINI -o php_browscap.ini
-echo 'browscap = /opt/browscap/php_browscap.ini' > /usr/local/etc/php/conf.d/browscap.ini
 exit
 ```
 
@@ -958,9 +991,9 @@ docker compose restart php cron
 
 Возможно пригодится настроить если нужно отслеживать геопозицию устройства для `Истории входов`: https://helpdesk.bitrix24.ru/open/16615982/
 
-Заходим в sh-консоль контейнера `php` из под пользователя `root`:
+Заходим в sh-консоль контейнера `php` из под пользователя `bitrix`:
 ```bash
-docker compose exec --user=root php sh
+docker compose exec --user=bitrix php sh
 ```
 
 Переходим в каталог `/opt/geoip2`:
@@ -977,7 +1010,7 @@ GeoLite2-Country.mmdb
 
 На странице `Список обработчиков геолокации` (`/bitrix/admin/geoip_handlers_list.php?lang=ru`) редактируем обработчик `GeoIP2` (`/bitrix/admin/geoip_handler_edit.php?lang=ru&ID=1&CLASS_NAME=%5CBitrix%5CMain%5CService%5CGeoIp%5CGeoIP2`).
 
-На табе Дополнительные:
+На табе `Дополнительные`:
 - выбираем - `Тип базы данных` - `GeoIP2/GeoLite2 City`
 - заполняем - `Абсолютный путь к файлу базы данных (*.mmdb)` - `/opt/geoip2/GeoLite2-City.mmdb`
 
@@ -1038,37 +1071,48 @@ zip
 Большинство из них активны по умолчанию.
 
 Чтобы активировать php расширение:
+
 - заходим в sh-консоль контейнера `php` из под пользователя `root`:
 ```bash
 docker compose exec --user=root php sh
 ```
-- находим файл `/usr/local/etc/php/conf.d/docker-php-ext-***.ini`, где *** название расширения, пример для imagick:
+
+- находим файл `/usr/local/etc/php/conf.d/docker-php-ext-***.ini`, где `***` название расширения, пример для `imagick`:
 ```bash
+apk add mc
 mcedit /usr/local/etc/php/conf.d/docker-php-ext-imagick.ini
 ```
-- внутри файла меняем строку активируем подключение: `extension=***.so`, где *** название расширения:
+
+- внутри файла меняем строку активируем подключение: `extension=***.so`, где `***` название расширения:
 ```bash
 extension=imagick.so
 ```
+
 - сохраняем изменения и выходим
+
 - перезапускаем контейнеры `php` и `cron`:
 ```bash
 docker compose restart php cron
 ```
 
 Чтобы  деактивировать php расширение:
+
 - заходим в sh-консоль контейнера `php` из под пользователя `root`:
 ```bash
 docker compose exec --user=root php sh
 ```
-- находим файл `/usr/local/etc/php/conf.d/docker-php-ext-***.ini`, где *** название расширения, пример для imagick:
+
+- находим файл `/usr/local/etc/php/conf.d/docker-php-ext-***.ini`, где `***` название расширения, пример для `imagick`:
 ```bash
+apk add mc
 mcedit /usr/local/etc/php/conf.d/docker-php-ext-imagick.ini
 ```
-- внутри файла меняем строку деактивируем подключение: `; extension=***.so`, где *** название расширения:
+
+- внутри файла меняем строку деактивируем подключение: `; extension=***.so`, где `***` название расширения:
 ```bash
 ; extension=imagick.so
 ```
+
 - сохраняем изменения и выходим
 - перезапускаем контейнеры `php` и `cron`:
 ```bash
@@ -1078,13 +1122,13 @@ docker compose restart php cron
 <a id="phpimagickimageengine"></a>
 ## PHP Imagick Engine для изображений
 
-Чтобы работать с изображениями с помощью PHP расширения Imagick (а не GD) активируем библиотеку для работы с изображениями на базе ImagickImageEngine.
+Чтобы работать с изображениями с помощью PHP расширения `Imagick` (а не `GD`) активируем библиотеку для работы с изображениями на базе `ImagickImageEngine`.
 
-Убедимся что в файле `/usr/local/etc/php/conf.d/docker-php-ext-imagick.ini` активировано подключение расширения `extension=imagick.so`.
+Убедимся что в файле `/usr/local/etc/php/conf.d/docker-php-ext-imagick.ini` активировано подключение расширения `imagick`. Как это сделать описано в главе `PHP расширения (extensions)`.
 
-Заходим в sh-консоль контейнера `php` из под пользователя `root`:
+Заходим в sh-консоль контейнера `php` из под пользователя `bitrix`:
 ```bash
-docker compose exec --user=root php sh
+docker compose exec --user=bitrix php sh
 ```
 
 Выполняем команду:
@@ -1358,12 +1402,12 @@ https://dev.1c-bitrix.ru/learning/course/index.php?COURSE_ID=35&LESSON_ID=2674#a
 
 Одной командой разово генерируем сертификаты корневого и промежуточного центров сертификации:
 ```bash
-docker compose exec --user=root ssl bash -c "~/cas.sh"
+docker compose exec --user=bitrix ssl bash -c "~/cas.sh"
 ```
 
 Второй - сертификат и приватный ключ для домена `dev.bx`:
 ```bash
-docker compose exec --user=root ssl bash -c "~/srv.sh dev.bx"
+docker compose exec --user=bitrix ssl bash -c "~/srv.sh dev.bx"
 ```
 
 Итого в папке `/ssl/` внутри контейнера `ssl` будет набор файлов:
@@ -1378,7 +1422,7 @@ docker compose exec --user=root ssl bash -c "~/srv.sh dev.bx"
 
 Файл `dhparam.pem` не создается, а поставляется для примера. Если нужно его сделать уникальным выполните команду:
 ```bash
-docker compose exec --user=root ssl bash -c "openssl dhparam -out /ssl/dhparam.pem 4096"
+docker compose exec --user=bitrix ssl bash -c "openssl dhparam -out /ssl/dhparam.pem 4096"
 ```
 
 > [!IMPORTANT]
@@ -1438,12 +1482,14 @@ ssl_dhparam /ssl/dhparam.pem;
 ```bash
 cp /ssl/rootCA.cert.pem /opt/www/
 cp /ssl/intermediateCA.cert.pem /opt/www/
+chown bitrix:bitrix /opt/www/rootCA.cert.pem
+chown bitrix:bitrix /opt/www/intermediateCA.cert.pem
 exit
 ```
 
 Проверям настройки `nginx`:
 ```bash
-docker compose exec --user=root nginx sh -c "nginx -t"
+docker compose exec --user=bitrix nginx sh -c "nginx -t"
 ```
 
 Если никаких ошибок нет, перезапускаем nginx:
@@ -1529,7 +1575,10 @@ docker compose exec [--user=[пользователь]] [сервис] [обол
 ```
 
 Где:
-- `пользователь`: пользователь ОС внутри контейнера, если пусто и ничего не указывать берется поведение по умолчанию, для `root` шаблон выглядит как `--user=root`
+- `пользователь`: пользователь ОС внутри контейнера:
+  - если пусто и ничего не указывать берется поведение по умолчанию
+  - для пользователя `bitrix` шаблон команды принимает вид `--user=bitrix`
+  - для пользователя `root` шаблон команды выглядит как `--user=root`
 - `сервис`: имя сервиса, указанное в файле `docker-compose.yml`, пример `mysql`, `nginx`, `php` и т.д.
 - `оболочка`: тип запускаемой оболочки внутри контейнера, пример `sh`, `bash`, `ash` и т.д.
 
@@ -1538,6 +1587,11 @@ docker compose exec [--user=[пользователь]] [сервис] [обол
 - заходим в bash-консоль контейнера `mysql`, пользователя не указываем:
 ```bash
 docker compose exec mysql bash
+```
+
+- заходим в sh-консоль контейнера `php` из под пользователя `bitrix`:
+```bash
+docker compose exec --user=bitrix php sh
 ```
 
 - заходим в sh-консоль контейнера `php` из под пользователя `root`:
@@ -1577,7 +1631,7 @@ docker compose exec --user=postgres postgres bash -c "psql"
 <a id="memcacheconsole"></a>
 ## Memcache
 
-Заходим в sh-консоль контейнера `memcache`, запуская консоль `nc`, указывая хост `127.0.0.1` и порт `11211`:
+Заходим в sh-консоль контейнера `memcached`, запуская консоль `nc`, указывая хост `127.0.0.1` и порт `11211`:
 ```bash
 docker compose exec --user=root memcached sh -c "nc 127.0.0.1 11211"
 ```
