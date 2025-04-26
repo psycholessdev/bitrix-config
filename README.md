@@ -109,13 +109,13 @@
 
 В этот список попадают (формат `название`:`полный_тег_с_указанием_версии_и_ос`):
 - `postgres:16.8-bookworm`
-- `redis:7.2.7-alpine`
+- `redis:7.2.8-alpine`
 - `memcached:1.6.38-alpine`
 
 Можно предварительно скачать список выше, используя команды:
 ```bash
 docker pull postgres:16.8-bookworm
-docker pull redis:7.2.7-alpine
+docker pull redis:7.2.8-alpine
 docker pull memcached:1.6.38-alpine
 ```
 
