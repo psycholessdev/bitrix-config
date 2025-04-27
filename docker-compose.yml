@@ -104,7 +104,7 @@ services:
         aliases:
           - php
   nginx:
-    image: bx-nginx:1.26.3-v1-alpine
+    image: bx-nginx:1.28.0-v1-alpine
     container_name: dev_nginx
     restart: unless-stopped
     env_file:

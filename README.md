@@ -124,7 +124,7 @@ docker pull memcached:1.6.38-alpine
 
 Так же нам понадобятся:
 - база данных mysql: используем стабильный образ `percona/percona-server:8.0.41`, добавляем слоем сверху конфигурацию бд, собираем `bx-percona-server:8.0.41-v1-rhel`
-- веб сервер: используем стабильный образ `nginx:1.26.3-alpine-slim`, добавляем модули слоем сверху, собираем `bx-nginx:1.26.3-v1-alpine`
+- веб сервер: используем стабильный образ `nginx:1.28.0-alpine-slim`, добавляем модули слоем сверху, собираем `bx-nginx:1.28.0-v1-alpine`
 - интерпретатор php кода: готового совместимого образа php увы нет, берем по умолчанию образ `php:8.2.28-fpm-alpine` и добавляем то, что нам надо через пару слоев сверху, собираем `bx-php:8.2.28-fpm-v1-alpine`
 - поиск: готового образа sphinx нет, но есть собранный пакет `sphinx` на базе `alpine` linux в официальном репозитории ОС, собираем `bx-sphinx:2.2.11-v1-alpine`, установив пакет
 - push сервер: готового образа нет, используем образ NodeJS 20-ой версии, собираем `bx-push:3.0-v1-alpine`, используя его исходники `push-server-0.4.0`
@@ -140,7 +140,7 @@ docker pull memcached:1.6.38-alpine
 Для сборки нам понадобятся следующие образы (их можно предварительно скачать используя команды):
 ```bash
 docker pull percona/percona-server:8.0.41
-docker pull nginx:1.26.3-alpine-slim
+docker pull nginx:1.28.0-alpine-slim
 docker pull php:8.2.28-fpm-alpine
 docker pull node:20
 docker pull node:20-alpine
@@ -169,8 +169,8 @@ docker build -f Dockerfile -t bx-php:8.2.28-fpm-v1-alpine --no-cache .
 
 - bx-nginx:
 ```bash
-cd dev/sources/bxnginx1263/
-docker build -f Dockerfile -t bx-nginx:1.26.3-v1-alpine --no-cache .
+cd dev/sources/bxnginx1280/
+docker build -f Dockerfile -t bx-nginx:1.28.0-v1-alpine --no-cache .
 ```
 
 - bx-ssl:
