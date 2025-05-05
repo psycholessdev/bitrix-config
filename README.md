@@ -128,6 +128,7 @@ docker pull memcached:1.6.38-alpine
 - интерпретатор php кода: готового совместимого образа php увы нет, берем по умолчанию образ `php:8.2.28-fpm-alpine` и добавляем то, что нам надо через пару слоев сверху, собираем `bx-php:8.2.28-fpm-v1-alpine`
 - поиск: готового образа sphinx нет, но есть собранный пакет `sphinx` на базе `alpine` linux в официальном репозитории ОС, собираем `bx-sphinx:2.2.11-v1-alpine`, установив пакет
 - push сервер: готового образа нет, используем образ NodeJS 20-ой версии, собираем `bx-push:3.0-v1-alpine`, используя его исходники `push-server-0.4.0`
+- сервис для бесплатных ssl сертификатов от `LetsEncrypt`: используем стабильный образ `goacme/lego:v4.23.1`, добавляем логику слоем сверху, собираем `bx-lego:4.23.1-v1-alpine`
 - генератор самоподписных ssl сертификатов: небольшой образ с пакетами на базе `alpine` linux, собираем `bx-ssl:1.0-v1-alpine`
 
 Список официальных Docker образов, которые будем брать с [DockerHub](https://hub.docker.com/):
@@ -136,6 +137,7 @@ docker pull memcached:1.6.38-alpine
 - `PHP`: https://hub.docker.com/_/php
 - `NodeJS`: https://hub.docker.com/_/node
 - `Alpine`: https://hub.docker.com/_/alpine
+- `Lego`: https://hub.docker.com/r/goacme/lego
 
 Для сборки нам понадобятся следующие образы (их можно предварительно скачать используя команды):
 ```bash
@@ -145,6 +147,7 @@ docker pull php:8.2.28-fpm-alpine
 docker pull node:20
 docker pull node:20-alpine
 docker pull alpine:3.21
+docker pull goacme/lego:v4.23.1
 ```
 
 Собираем образы, в названии используем `bx-`:
@@ -173,16 +176,22 @@ cd dev/sources/bxnginx1280/
 docker build -f Dockerfile -t bx-nginx:1.28.0-v1-alpine --no-cache .
 ```
 
-- bx-ssl:
-```bash
-cd dev/sources/bxssl10/
-docker build -f Dockerfile -t bx-ssl:1.0-v1-alpine --no-cache .
-```
-
 - bx-percona-server:
 ```bash
 cd dev/sources/bxpercona8041/
 docker build -f Dockerfile -t bx-percona-server:8.0.41-v1-rhel --no-cache .
+```
+
+- bx-lego:
+```bash
+cd dev/sources/bxlego4231/
+docker build -f Dockerfile -t bx-lego:4.23.1-v1-alpine --no-cache .
+```
+
+- bx-ssl:
+```bash
+cd dev/sources/bxssl10/
+docker build -f Dockerfile -t bx-ssl:1.0-v1-alpine --no-cache .
 ```
 
 Во всех образах `bx-` в названии тега указывается `v1`, состоит из:
