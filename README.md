@@ -1691,9 +1691,9 @@ ToDo
 Рассмотрим `HTTP` и `DNS` челленджи как самые часто используемые.
 
 > [!CAUTION]
-> Внимание!
-> HTTP челлендж возможно пройти `ТОЛЬКО` на порту `80`.
-> С помощью HTTP челленджа невозможно получить `wildcard` сертификаты.
+> Внимание! `HTTP` челлендж возможно пройти `ТОЛЬКО` на порту `80`.
+>
+> Внимание! С помощью `HTTP` челленджа невозможно получить `wildcard` сертификаты.
 
 Подробней в документации LetsEncrypt: https://letsencrypt.org/docs/challenge-types/
 
@@ -1708,7 +1708,7 @@ ToDo
 
 - с помощью сервиса https://dnschecker.org/ проверить резолв добавленных dns записей
 
-- запустить сайт, проверить что он отвечает по `http` и заданному домену из сети интернет, используя порт `80`
+- запустить сайт, проверить что он отвечает по `http` и заданному домену из сети интернет, используя порт `80` для `HTTP` челленджа
 
 - запустить `HTTP` челлендж, указать домен, тип сертификата и другие параметры
 
@@ -1763,7 +1763,7 @@ docker compose exec --user=bitrix lego sh
 <a id="legocommandhttpchallenge"></a>
 #### Команда для HTTP челленджа (http-01)
 
-Общая команда lego для прохождения `HTTP` челленджа имеет вид:
+Общая команда `lego` для прохождения `HTTP` челленджа имеет вид:
 
 ```bash
 /lego \
@@ -1779,7 +1779,8 @@ docker compose exec --user=bitrix lego sh
 где:
 
 - `SERVER` урл корневого центра сертификации (CA).
-Для проверки работы всей цепочки используется `staging` среда LetsEncrypt. Тогда блок принимает вид:
+
+Для проверки работы всей цепочки используется `stage` среда LetsEncrypt. Тогда блок принимает вид:
 ```bash
 --server="https://acme-staging-v02.api.letsencrypt.org/directory"
 ```
@@ -1789,7 +1790,7 @@ docker compose exec --user=bitrix lego sh
 --server="https://acme-v02.api.letsencrypt.org/directory"
 ```
 
-- `TOS` принятие текуших условий сервиса LetsEncrypt. Блок принимает вид:
+- `TOS` принятие текущих условий сервиса LetsEncrypt. Блок принимает вид:
 ```bash
 --accept-tos
 ```
@@ -1799,12 +1800,16 @@ docker compose exec --user=bitrix lego sh
 --email "info@site.dev"
 ```
 
-- `PATH` каталог, используемый для хранения данных. В пути всегда должна быть папка `/ssl/`, чтобы сертификаты можно было использовать в контейнере `nginx` и прочих.  Блок принимает вид:
+- `PATH` каталог, используемый для хранения данных.
+
+В пути всегда должна быть папка `/ssl/`, чтобы сертификаты можно было использовать в контейнере `nginx` и прочих.  Блок принимает вид:
 ```bash
 --path="/ssl/site.dev/"
 ```
 
-- `DOMAINS` домен, для которого выпускаются или перевыпускаются ssl сертификаты. Если сертификат на один домен то блок принимает вид:
+- `DOMAINS` домен, для которого выпускаются или перевыпускаются ssl сертификаты.
+
+Если сертификат на один домен, то блок принимает вид:
 ```bash
 --domains "site.dev"
 ```
@@ -1892,7 +1897,7 @@ renew
 <a id="legocommanddnschallenge"></a>
 #### Команда для DNS челленджа (dns-01)
 
-Общая команда lego для прохождения `HTTP` челленджа имеет вид:
+Общая команда `lego` для прохождения `DNS` челленджа имеет вид:
 
 ```bash
 [API_STRING]
@@ -1909,25 +1914,31 @@ renew
 
 где:
 
-- `API_STRING` строка с API выбанного dns провайдера. Приобретает разный вид в зависимости от api провайдера. Узнать параметры строки можно через справку в команде lego или на сайте проекта.
+- `API_STRING` строка с API выбанного dns провайдера. Приобретает разный вид в зависимости от API провайдера.
+
+Узнать параметры строки можно через справку в команде `lego` или на сайте проекта.
+
 Пример для dns провайдера `cloudflare`, команда:
 ```bash
 /lego dnshelp --code cloudflare
 ```
 
-Или документаци на сайте: https://go-acme.github.io/lego/dns/cloudflare/index.html
+Или документация на сайте: https://go-acme.github.io/lego/dns/cloudflare/index.html
 
 В итоге блок кода размещается до команды `/lego` и в нашем примере для dns провайдера `cloudflare` принимает вид:
 ```bash
 CLOUDFLARE_DNS_API_TOKEN=XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 ```
 
-где `XXXXXXXXX` - API токен провайдера.
+где `XXXXXXXXX...` - API токен провайдера.
 
-Для других dns провайдеров действуем аналогичным путем. Документацию можно изчить на сайте: https://go-acme.github.io/lego/dns/index.html
+Для других dns провайдеров действуем аналогичным путем.
+
+Документацию по всем dns провайдерам можно изучить на сайте: https://go-acme.github.io/lego/dns/index.html
 
 - `SERVER` урл корневого центра сертификации (CA).
-Для проверки работы всей цепочки используется `staging` среда LetsEncrypt. Тогда блок принимает вид:
+
+Для проверки работы всей цепочки используется `stage` среда LetsEncrypt. Тогда блок принимает вид:
 ```bash
 --server="https://acme-staging-v02.api.letsencrypt.org/directory"
 ```
@@ -1937,7 +1948,7 @@ CLOUDFLARE_DNS_API_TOKEN=XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 --server="https://acme-v02.api.letsencrypt.org/directory"
 ```
 
-- `TOS` принятие текуших условий сервиса LetsEncrypt. Блок принимает вид:
+- `TOS` принятие текущих условий сервиса LetsEncrypt. Блок принимает вид:
 ```bash
 --accept-tos
 ```
@@ -1947,13 +1958,16 @@ CLOUDFLARE_DNS_API_TOKEN=XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 --email "info@site.dev"
 ```
 
-- `PATH` каталог, используемый для хранения данных. В пути всегда должна быть папка `/ssl/`, чтобы сертификаты можно было использовать в контейнере `nginx` и прочих.  Блок принимает вид:
+- `PATH` каталог, используемый для хранения данных.
+
+В пути всегда должна быть папка `/ssl/`, чтобы сертификаты можно было использовать в контейнере `nginx` и прочих.  Блок принимает вид:
 ```bash
 --path="/ssl/site.dev/"
 ```
 
 - `DOMAINS` домен, для которого выпускаются или перевыпускаются ssl сертификаты.
-Если сертификат на один домен то блок принимает вид:
+
+Если сертификат на один домен, то блок принимает вид:
 ```bash
 --domains "site.dev"
 ```
@@ -2116,7 +2130,9 @@ renew
 <a id="legodeploys"></a>
 ### Выпуск сертификатов
 
-Рассмотрим процедуру получения ssl сертификатов на практите. Используем настоящий домен вида `proqacf.fun`, запустим все челленджи, получим ответы и настоящие 'боевые' сертификаты для домена(ов).
+Рассмотрим процедуру получения ssl сертификатов на практите.
+
+Для примера используем настоящий домен `proqacf.fun`, запустим все челленджи, получим ответы и настоящие 'боевые' сертификаты для домена(ов).
 
 > [!CAUTION]
 > Внимание! Данные в публикуемых ответах слегка изменены для их безопасности.
@@ -2138,7 +2154,7 @@ run
 ```
 
 Ответ:
-```bash
+```
 2025/04/30 23:17:03 No key found for account info@proqacf.fun. Generating a P256 key.
 2025/04/30 23:17:03 Saved key to /ssl/singledomain.http.b24.proqacf.fun/accounts/acme-v02.api.letsencrypt.org/info@proqacf.fun/keys/info@proqacf.fun.key
 2025/04/30 23:17:04 [INFO] acme: Registering account for info@proqacf.fun
@@ -2190,7 +2206,7 @@ run
 ```
 
 Ответ:
-```bash
+```
 2025/04/30 23:17:30 No key found for account info@proqacf.fun. Generating a P256 key.
 2025/04/30 23:17:30 Saved key to /ssl/multidomain.http.all.proqacf.fun/accounts/acme-v02.api.letsencrypt.org/info@proqacf.fun/keys/info@proqacf.fun.key
 2025/04/30 23:17:31 [INFO] acme: Registering account for info@proqacf.fun
@@ -2265,7 +2281,7 @@ run
 ```
 
 Ответ:
-```bash
+```
 2025/04/30 23:20:07 [INFO] [b25.proqacf.fun] acme: Obtaining bundled SAN certificate
 2025/04/30 23:20:08 [INFO] [b25.proqacf.fun] AuthURL: https://acme-v02.api.letsencrypt.org/acme/authz/197568154/1710485XXXX
 2025/04/30 23:20:08 [INFO] [b25.proqacf.fun] acme: Could not find solver for: tls-alpn-01
@@ -2313,7 +2329,7 @@ run
 ```
 
 Ответ:
-```bash
+```
 2025/04/30 23:21:20 No key found for account info@proqacf.fun. Generating a P256 key.
 2025/04/30 23:21:20 Saved key to /ssl/multidomain.dns.all.proqacf.fun/accounts/acme-v02.api.letsencrypt.org/info@proqacf.fun/keys/info@proqacf.fun.key
 2025/04/30 23:21:21 [INFO] acme: Registering account for info@proqacf.fun
@@ -2398,7 +2414,7 @@ run
 ```
 
 Ответ:
-```bash
+```
 2025/04/30 23:24:23 No key found for account info@proqacf.fun. Generating a P256 key.
 2025/04/30 23:24:23 Saved key to /ssl/wildcard.dns.proqacf.fun/accounts/acme-v02.api.letsencrypt.org/info@proqacf.fun/keys/info@proqacf.fun.key
 2025/04/30 23:24:24 [INFO] acme: Registering account for info@proqacf.fun
@@ -2466,12 +2482,12 @@ exit
 docker compose exec --user=bitrix nginx sh
 ```
 
-Редактируем файл `/etc/nginx/ssl/ssl.conf`, меняем настройки опций `ssl_*`:
+Редактируем файл `/etc/nginx/ssl/ssl.conf`:
 ```bash
 mcedit /etc/nginx/ssl/ssl.conf
 ```
 
-Меняем опции на:
+Меняем настройки для опций `ssl_*`:
 ```bash
 ssl_certificate /ssl/wildcard.dns.proqacf.fun/certificates/proqacf.fun.crt;
 ssl_certificate_key /ssl/wildcard.dns.proqacf.fun/certificates/proqacf.fun.key;
@@ -2494,7 +2510,7 @@ docker compose restart nginx
 https://b24.proqacf.fun:8589/
 ```
 
-Работа сайта перешла на безопасную схему, используется `https`, `ssl`, `wss` и т.д.
+Работа сайта перешла на безопасную схему, используется `https`, `ssl`, `wss` и т.д. Никаких дополнительных манипуляций внутри контейнеров не требуется.
 
 <a id="servicesconsole"></a>
 # Консоль сервисов
