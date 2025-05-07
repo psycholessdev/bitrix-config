@@ -58,6 +58,21 @@
 * [HTTPS/SSL/TLS/WSS](#httpsssltlswss)
   * [Самоподписанный сертификат](#selfsignedcerts)
   * [Бесплатный Lets Encrypt сертификат](#presentcerts)
+    * [Lego](#lego)
+    * [Перенаправление или перенос домена](#domaintransfer)
+    * [Челленджи](#letsencryptchallenges)
+      * [HTTP челлендж (http-01)](#letsencrypthttpchallenge)
+      * [DNS челлендж (dns-01)](#letsencryptdnschallenge)
+    * [Команды lego](#legocommands)
+      * [Команда для HTTP челленджа (http-01)](#legocommandhttpchallenge)
+      * [Команда для DNS челленджа (dns-01)](#legocommanddnschallenge)
+    * [Выпуск сертификатов](#legodeploys)
+      * [HTTP челлендж (http-01) для одного домена (singledomain ssl сертификат)](#httpchallengesingledomain)
+      * [HTTP челлендж (http-01) для множества поддоменов домена (multidomain ssl сертификат)](#httpchallengemultidomain)
+      * [DNS челлендж (dns-01) для одного домена (singledomain ssl сертификат)](#dnschallengesingledomain)
+      * [DNS челлендж (dns-01) для множества поддоменов домена (multidomain ssl сертификат)](#dnschallengemultidomain)
+      * [DNS челлендж (dns-01) на все множество поддоменных имен домена (wildcard ssl сертификат)](#dnschallengewildcard)
+    * [Установка сертификатов](#installpresentcerts)
 * [Консоль сервисов](#servicesconsole)
   * [Контейнер](#containerconsole)
   * [MySQL](#mysqlconsole)
@@ -1627,7 +1642,859 @@ ToDo
 <a id="presentcerts"></a>
 ## Бесплатный Lets Encrypt сертификат
 
-ToDo
+<a id="lego"></a>
+### Lego
+
+Выпустить и использовать бесплатный ssl сертификат от LetsEncrypt возможно с помощью отдельного контейнера `lego` на базе образа `bx-lego`.
+
+Внутри образа находится `LetsEncrypt` клиент и `ACME` библиотека, написанная на `Go`. По сокращениям первых букв слов получаем название проекта `LeGo` ([GitHub](https://github.com/go-acme/lego), [DockerHub](https://hub.docker.com/r/goacme/lego)).
+
+Основные фичи проекта `Lego`:
+- ACME v2 с поддержкой множества RFC и draft-ов
+- поддержка 150 dns провайдеров
+- выпуск, перевыпуск, отзыв ssl сертификатов
+- http/dns/tls челленджи
+- выпуск сертификатов:
+  - на один домен (singledomain)
+  - на множество поддоменов домена (не больше 100 в одном сертификате) (multidomain)
+  - на все множество поддоменных имен домена (*) (wildcard)
+- и многое другое
+
+<a id="domaintransfer"></a>
+### Перенаправление или перенос домена
+
+Перед тем как выполнять запросы на получение или обновление ssl сертификатов с помощью LetsEncrypt нам необходимо перенаправить (или перенести) домен от поставщика услуг на dns хостинг провайдера.
+
+Рассмотрим примеры в общих чертах, в деталях информацию необходимо найти в документации поставщиков услуг и dns провайдеров.
+
+Пример 1: домен `example.dev` приобретен в `Reg.ru`, переносим его в `YandexCloud`.
+
+В консоли `YandexCloud` добавляем домен, система потребует от нас прописать dns сервера у поставщика услуг. Возвращаемся в `Reg.ru`, прописываем требуемые dns записи `Yandex`, сохраняем.
+
+Ожидаем завершения процесса переноса. Проверить dns записи можно с помощью сервиса https://dnschecker.org/.
+
+Пример 2: домен `proj.site` приобретен в `Reg.ru`, переносим его в `CloudFlare`.
+
+В консоли `CloudFlare` добавляем домен, система потребует от нас прописать dns сервера у поставщика услуг. Возвращаемся в `Reg.ru`, прописываем требуемые dns записи `CloudFlare`, сохраняем.
+
+Ожидаем завершения процесса переноса. Проверить dns записи можно с помощью сервиса https://dnschecker.org/.
+
+<a id="letsencryptchallenges"></a>
+### Челленджи
+
+Челлендж - дословно это `вызов`, который `бросает` ваш клиент сервису `LetsEncrypt`. Эти задания содержат домен(ы) и способ его(их) проверки (верификации). При успешном выполнении клиент получает сертификат.
+
+`Lego` поддерживает три типа челленджей: `HTTP`, `DNS`, `TLS`.
+
+`TLS` челлендж рассматривать не будем в виду сложности реализации и использования.
+
+Рассмотрим `HTTP` и `DNS` челленджи как самые часто используемые.
+
+> [!CAUTION]
+> Внимание!
+> HTTP челлендж возможно пройти `ТОЛЬКО` на порту `80`.
+> С помощью HTTP челленджа невозможно получить `wildcard` сертификаты.
+
+Подробней в документации LetsEncrypt: https://letsencrypt.org/docs/challenge-types/
+
+<a id="letsencrypthttpchallenge"></a>
+#### HTTP челлендж (http-01)
+
+Чтобы выполнить это задание, завершить `HTTP` челлендж и в итоге получить бесплатный ssl сертификат вам необходимо:
+
+- в управлении dns записями вашего домена добавить:
+  - `А` запись на один домен (singledomain), пример: `example.dev` или `chat.example.dev` и т.д.
+  - `A` записи для каждого из множества поддоменов домена (multidomain), пример: `example.dev`, `chat.example.dev`, `forum.example.dev` и т.д.
+
+- с помощью сервиса https://dnschecker.org/ проверить резолв добавленных dns записей
+
+- запустить сайт, проверить что он отвечает по `http` и заданному домену из сети интернет, используя порт `80`
+
+- запустить `HTTP` челлендж, указать домен, тип сертификата и другие параметры
+
+<a id="letsencryptdnschallenge"></a>
+#### DNS челлендж (dns-01)
+
+Чтобы выполнить это задание, завершить `DNS` челлендж и в итоге получить бесплатный ssl сертификат вам необходимо:
+
+- в управлении dns записями вашего домена добавить:
+  - `А` запись на один домен (singledomain), пример: `example.dev` или `chat.example.dev` и т.д.
+  - `A` записи для каждого из множества поддоменов домена (multidomain), пример: `example.dev`, `chat.example.dev`, `forum.example.dev` и т.д.
+  - `А` запись для множества имен домена (wildcard), пример: `example.dev` или `*.example.dev`
+
+- с помощью сервиса https://dnschecker.org/ проверить резолв добавленных dns записей
+
+- запустить `DNS` челлендж, указать домен, тип сертификата и другие параметры
+
+<a id="legocommands"></a>
+### Команды lego
+
+Заходим в sh-консоль контейнера `lego` из под пользователя `bitrix`:
+```bash
+docker compose exec --user=bitrix lego sh
+```
+
+Основная точка входа это команда `/lego`, после которой следует набор параметров. Узнать их можно, добавив запрос справки `help` одним из способов:
+```bash
+/lego help
+/lego -h
+/lego --help
+```
+
+Так же можно узнать справку по выбранной команде, выполнив:
+
+```bash
+/lego run --help
+/lego renew --help
+/lego revoke --help
+/lego list --help
+/lego dnshelp --help
+```
+
+где:
+- `run` - создание аккаунта, выпуск и установка ssl сертификата
+- `renew` - перевыпуск (обновление) ssl сертификата
+- `revoke` - отзыв ssl сертификата
+- `list` - отображение сертификатов и аккаунтов
+- `dnshelp` - справка по параметрам dns сервиса (для DNS челленджа)
+
+Все возможные варианты параметров команд указаны в документации: https://go-acme.github.io/lego/usage/cli/options/index.html
+
+<a id="legocommandhttpchallenge"></a>
+#### Команда для HTTP челленджа (http-01)
+
+Общая команда lego для прохождения `HTTP` челленджа имеет вид:
+
+```bash
+/lego \
+[SERVER]
+[TOS]
+[EMAIL]
+[PATH]
+[DOMAINS]
+[HTTP_PARAMS]
+[TYPE]
+```
+
+где:
+
+- `SERVER` урл корневого центра сертификации (CA).
+Для проверки работы всей цепочки используется `staging` среда LetsEncrypt. Тогда блок принимает вид:
+```bash
+--server="https://acme-staging-v02.api.letsencrypt.org/directory"
+```
+
+Для использования в продакшен режиме блок принимает вид:
+```bash
+--server="https://acme-v02.api.letsencrypt.org/directory"
+```
+
+- `TOS` принятие текуших условий сервиса LetsEncrypt. Блок принимает вид:
+```bash
+--accept-tos
+```
+
+- `EMAIL` адрес электронной почты, используемый для регистрации и восстановления контакта. Блок принимает вид:
+```bash
+--email "info@site.dev"
+```
+
+- `PATH` каталог, используемый для хранения данных. В пути всегда должна быть папка `/ssl/`, чтобы сертификаты можно было использовать в контейнере `nginx` и прочих.  Блок принимает вид:
+```bash
+--path="/ssl/site.dev/"
+```
+
+- `DOMAINS` домен, для которого выпускаются или перевыпускаются ssl сертификаты. Если сертификат на один домен то блок принимает вид:
+```bash
+--domains "site.dev"
+```
+
+В случае multidomain сертификата домены можно указать несколько раз, блок принимает вид:
+```bash
+--domains "shop.site.dev"
+--domains "wiki.site.dev"
+--domains "forum.site.dev"
+```
+
+- `HTTP_PARAMS` обязательный блок параметров `HTTP` челленджа, нужно указать:
+```bash
+--http
+--http.port ":80"
+```
+
+- `TYPE` тип команды, `run` - выпуск, `renew` - перевыпуск и т.д. Блок принимает вид:
+```bash
+run
+```
+
+Итого, собрав все воедино, получаем следующие команды:
+
+- выпуск сертификата на единственный домен `site.dev` с сохранением данных в папке `/ssl`:
+
+```bash
+/lego \
+--server="https://acme-v02.api.letsencrypt.org/directory" \
+--accept-tos \
+--email "info@site.dev" \
+--path="/ssl/site.dev/" \
+--domains "site.dev" \
+--http \
+--http.port ":80" \
+run
+```
+
+- перевыпуск сертификата на домен `site.dev`:
+
+```bash
+/lego \
+--server="https://acme-v02.api.letsencrypt.org/directory" \
+--accept-tos \
+--email "info@site.dev" \
+--path="/ssl/site.dev/" \
+--domains "site.dev" \
+--http \
+--http.port ":80" \
+renew
+```
+
+- выпуск сертификата для нескольких доменов (`shop.site.dev`, `wiki.site.dev`, `forum.site.dev`) с сохранением данных в папке `/ssl`, используя `stage` среду:
+
+```bash
+/lego \
+--server="https://acme-staging-v02.api.letsencrypt.org/directory" \
+--accept-tos \
+--email "info@site.dev" \
+--path="/ssl/site.dev/" \
+--domains "shop.site.dev" \
+--domains "wiki.site.dev" \
+--domains "forum.site.dev" \
+--http \
+--http.port ":80" \
+run
+```
+
+- перевыпуск сертификата для нескольких доменов, используя `stage` среду:
+
+```bash
+/lego \
+--server="https://acme-staging-v02.api.letsencrypt.org/directory" \
+--accept-tos \
+--email "info@site.dev" \
+--path="/ssl/site.dev/" \
+--domains "shop.site.dev" \
+--domains "wiki.site.dev" \
+--domains "forum.site.dev" \
+--http \
+--http.port ":80" \
+renew
+```
+
+<a id="legocommanddnschallenge"></a>
+#### Команда для DNS челленджа (dns-01)
+
+Общая команда lego для прохождения `HTTP` челленджа имеет вид:
+
+```bash
+[API_STRING]
+/lego \
+[SERVER]
+[TOS]
+[EMAIL]
+[PATH]
+[DOMAINS]
+[DNS_RESOLVERS]
+[DNS_PROVIDER]
+[TYPE]
+```
+
+где:
+
+- `API_STRING` строка с API выбанного dns провайдера. Приобретает разный вид в зависимости от api провайдера. Узнать параметры строки можно через справку в команде lego или на сайте проекта.
+Пример для dns провайдера `cloudflare`, команда:
+```bash
+/lego dnshelp --code cloudflare
+```
+
+Или документаци на сайте: https://go-acme.github.io/lego/dns/cloudflare/index.html
+
+В итоге блок кода размещается до команды `/lego` и в нашем примере для dns провайдера `cloudflare` принимает вид:
+```bash
+CLOUDFLARE_DNS_API_TOKEN=XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+```
+
+где `XXXXXXXXX` - API токен провайдера.
+
+Для других dns провайдеров действуем аналогичным путем. Документацию можно изчить на сайте: https://go-acme.github.io/lego/dns/index.html
+
+- `SERVER` урл корневого центра сертификации (CA).
+Для проверки работы всей цепочки используется `staging` среда LetsEncrypt. Тогда блок принимает вид:
+```bash
+--server="https://acme-staging-v02.api.letsencrypt.org/directory"
+```
+
+Для использования в продакшен режиме блок принимает вид:
+```bash
+--server="https://acme-v02.api.letsencrypt.org/directory"
+```
+
+- `TOS` принятие текуших условий сервиса LetsEncrypt. Блок принимает вид:
+```bash
+--accept-tos
+```
+
+- `EMAIL` адрес электронной почты, используемый для регистрации и восстановления контакта. Блок принимает вид:
+```bash
+--email "info@site.dev"
+```
+
+- `PATH` каталог, используемый для хранения данных. В пути всегда должна быть папка `/ssl/`, чтобы сертификаты можно было использовать в контейнере `nginx` и прочих.  Блок принимает вид:
+```bash
+--path="/ssl/site.dev/"
+```
+
+- `DOMAINS` домен, для которого выпускаются или перевыпускаются ssl сертификаты.
+Если сертификат на один домен то блок принимает вид:
+```bash
+--domains "site.dev"
+```
+
+В случае multidomain сертификата домены можно указать несколько раз, блок принимает вид:
+```bash
+--domains "shop.site.dev"
+--domains "wiki.site.dev"
+--domains "forum.site.dev"
+```
+
+В случае wildcard сертификата нужно указать домен и *.домен, блок принимает вид:
+```bash
+--domains "site.dev"
+--domains "*.site.dev"
+```
+
+- `DNS_RESOLVERS` список dns резолверов, используемых для рекурсивного сканирования dns записей домена. Одна иди несколько строчек в формате `host:port`, блок принимает вид:
+```bash
+--dns.resolvers 1.1.1.1:53
+--dns.resolvers 8.8.8.8:53
+--dns.resolvers 9.9.9.9:53
+--dns.resolvers 1.0.0.1:53
+--dns.resolvers 8.8.4.4:53
+```
+
+- `DNS_PROVIDER` короткое название используемого провайдера для прохождения DNS челленджа, например блок принимает вид:
+```bash
+--dns cloudflare
+```
+Полный список всех dns провайдеров доступен в документации: https://go-acme.github.io/lego/dns/index.html
+
+- `TYPE` тип команды, `run` - выпуск, `renew` - перевыпуск и т.д. Блок принимает вид:
+```bash
+run
+```
+
+Итого, собрав все воедино, получаем следующие команды (в примерах используется `cloudflare`):
+
+- выпуск сертификата на единственный домен `site.dev` с сохранением данных в папке `/ssl`, используя dns провайдер `cloudflare`, обращаясь к API с токеном `CLOUDFLARE_DNS_API_TOKEN`:
+
+```bash
+CLOUDFLARE_DNS_API_TOKEN=XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX \
+/lego \
+--server="https://acme-v02.api.letsencrypt.org/directory" \
+--accept-tos \
+--email "info@site.dev" \
+--path="/ssl/site.dev/" \
+--domains "site.dev" \
+--dns.resolvers 1.1.1.1:53 \
+--dns.resolvers 8.8.8.8:53 \
+--dns.resolvers 9.9.9.9:53 \
+--dns.resolvers 1.0.0.1:53 \
+--dns.resolvers 8.8.4.4:53 \
+--dns cloudflare \
+run
+```
+
+- перевыпуск сертификата на домен `site.dev`:
+
+```bash
+CLOUDFLARE_DNS_API_TOKEN=XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX \
+/lego \
+--server="https://acme-v02.api.letsencrypt.org/directory" \
+--accept-tos \
+--email "info@site.dev" \
+--path="/ssl/site.dev/" \
+--domains "site.dev" \
+--dns.resolvers 1.1.1.1:53 \
+--dns.resolvers 8.8.8.8:53 \
+--dns.resolvers 9.9.9.9:53 \
+--dns.resolvers 1.0.0.1:53 \
+--dns.resolvers 8.8.4.4:53 \
+--dns cloudflare \
+renew
+```
+
+- выпуск сертификата для нескольких доменов (`shop.site.dev`, `wiki.site.dev`, `forum.site.dev`) с сохранением данных в папке `/ssl`, используя `stage` среду и dns провайдер `cloudflare`, обращаясь к API с токеном `CLOUDFLARE_DNS_API_TOKEN`:
+
+```bash
+CLOUDFLARE_DNS_API_TOKEN=XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX \
+/lego \
+--server="https://acme-staging-v02.api.letsencrypt.org/directory" \
+--accept-tos \
+--email "info@site.dev" \
+--path="/ssl/site.dev/" \
+--domains "shop.site.dev" \
+--domains "wiki.site.dev" \
+--domains "forum.site.dev" \
+--dns.resolvers 1.1.1.1:53 \
+--dns.resolvers 8.8.8.8:53 \
+--dns.resolvers 9.9.9.9:53 \
+--dns.resolvers 1.0.0.1:53 \
+--dns.resolvers 8.8.4.4:53 \
+--dns cloudflare \
+run
+```
+
+- перевыпуск сертификата для нескольких доменов, используя `stage` среду:
+
+```bash
+CLOUDFLARE_DNS_API_TOKEN=XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX \
+/lego \
+--server="https://acme-staging-v02.api.letsencrypt.org/directory" \
+--accept-tos \
+--email "info@site.dev" \
+--path="/ssl/site.dev/" \
+--domains "shop.site.dev" \
+--domains "wiki.site.dev" \
+--domains "forum.site.dev" \
+--dns.resolvers 1.1.1.1:53 \
+--dns.resolvers 8.8.8.8:53 \
+--dns.resolvers 9.9.9.9:53 \
+--dns.resolvers 1.0.0.1:53 \
+--dns.resolvers 8.8.4.4:53 \
+--dns cloudflare \
+renew
+```
+
+- выпуск wildcard сертификата на множество поддоменов основного домена (`site.dev`, `*.site.dev`) с сохранением данных в папке `/ssl`, используя dns провайдер `cloudflare`, обращаясь к API с токеном `CLOUDFLARE_DNS_API_TOKEN`:
+
+```bash
+CLOUDFLARE_DNS_API_TOKEN=XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX \
+/lego \
+--server="https://acme-v02.api.letsencrypt.org/directory" \
+--accept-tos \
+--email "info@site.dev" \
+--path="/ssl/site.dev/" \
+--domains "site.dev" \
+--domains "*.site.dev" \
+--dns.resolvers 1.1.1.1:53 \
+--dns.resolvers 8.8.8.8:53 \
+--dns.resolvers 9.9.9.9:53 \
+--dns.resolvers 1.0.0.1:53 \
+--dns.resolvers 8.8.4.4:53 \
+--dns cloudflare \
+run
+```
+
+- перевыпуск сертификата для нескольких доменов, используя `stage` среду:
+
+```bash
+CLOUDFLARE_DNS_API_TOKEN=XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX \
+/lego \
+--server="https://acme-v02.api.letsencrypt.org/directory" \
+--accept-tos \
+--email "info@site.dev" \
+--path="/ssl/site.dev/" \
+--domains "site.dev" \
+--domains "*.site.dev" \
+--dns.resolvers 1.1.1.1:53 \
+--dns.resolvers 8.8.8.8:53 \
+--dns.resolvers 9.9.9.9:53 \
+--dns.resolvers 1.0.0.1:53 \
+--dns.resolvers 8.8.4.4:53 \
+--dns cloudflare \
+renew
+```
+
+<a id="legodeploys"></a>
+### Выпуск сертификатов
+
+Рассмотрим процедуру получения ssl сертификатов на практите. Используем настоящий домен вида `proqacf.fun`, запустим все челленджи, получим ответы и настоящие 'боевые' сертификаты для домена(ов).
+
+> [!CAUTION]
+> Внимание! Данные в публикуемых ответах слегка изменены для их безопасности.
+
+<a id="httpchallengesingledomain"></a>
+#### HTTP челлендж (http-01) для одного домена (singledomain ssl сертификат)
+
+Запрос:
+```bash
+/lego \
+--server="https://acme-v02.api.letsencrypt.org/directory" \
+--accept-tos \
+--email "info@proqacf.fun" \
+--path="/ssl/singledomain.http.b24.proqacf.fun/" \
+--domains "b24.proqacf.fun" \
+--http \
+--http.port ":80" \
+run
+```
+
+Ответ:
+```bash
+2025/04/30 23:17:03 No key found for account info@proqacf.fun. Generating a P256 key.
+2025/04/30 23:17:03 Saved key to /ssl/singledomain.http.b24.proqacf.fun/accounts/acme-v02.api.letsencrypt.org/info@proqacf.fun/keys/info@proqacf.fun.key
+2025/04/30 23:17:04 [INFO] acme: Registering account for info@proqacf.fun
+!!!! HEADS UP !!!!
+
+Your account credentials have been saved in your
+configuration directory at "/ssl/singledomain.http.b24.proqacf.fun/accounts".
+
+You should make a secure backup of this folder now. This
+configuration directory will also contain certificates and
+private keys obtained from the ACME server so making regular
+backups of this folder is ideal.
+2025/04/30 23:17:04 [INFO] [b24.proqacf.fun] acme: Obtaining bundled SAN certificate
+2025/04/30 23:17:05 [INFO] [b24.proqacf.fun] AuthURL: https://acme-v02.api.letsencrypt.org/acme/authz/197567964/1710482XXXX
+2025/04/30 23:17:05 [INFO] [b24.proqacf.fun] acme: Could not find solver for: tls-alpn-01
+2025/04/30 23:17:05 [INFO] [b24.proqacf.fun] acme: use http-01 solver
+2025/04/30 23:17:05 [INFO] [b24.proqacf.fun] acme: Trying to solve HTTP-01
+2025/04/30 23:17:06 [INFO] [b24.proqacf.fun] Served key authentication
+2025/04/30 23:17:06 [INFO] [b24.proqacf.fun] Served key authentication
+2025/04/30 23:17:06 [INFO] [b24.proqacf.fun] Served key authentication
+2025/04/30 23:17:06 [INFO] [b24.proqacf.fun] Served key authentication
+2025/04/30 23:17:06 [INFO] [b24.proqacf.fun] Served key authentication
+2025/04/30 23:17:13 [INFO] [b24.proqacf.fun] The server validated our request
+2025/04/30 23:17:13 [INFO] [b24.proqacf.fun] acme: Validations succeeded; requesting certificates
+2025/04/30 23:17:13 [INFO] Wait for certificate [timeout: 30s, interval: 500ms]
+2025/04/30 23:17:15 [INFO] [b24.proqacf.fun] Server responded with a certificate.
+```
+
+Последняя строка в ответе `Server responded with a certificate` означает успешное выполнение задания и выпуск ssl сертификата.
+
+Файлы сертификатов будут расположены в папке `/ssl/singledomain.http.b24.proqacf.fun/certificates/`.
+
+<a id="httpchallengemultidomain"></a>
+#### HTTP челлендж (http-01) для множества поддоменов домена (multidomain ssl сертификат)
+
+Запрос:
+```bash
+/lego \
+--server="https://acme-v02.api.letsencrypt.org/directory" \
+--accept-tos \
+--email "info@proqacf.fun" \
+--path="/ssl/multidomain.http.all.proqacf.fun/" \
+--domains "b24.proqacf.fun" \
+--domains "wiki.proqacf.fun" \
+--domains "shop.proqacf.fun" \
+--http \
+--http.port ":80" \
+run
+```
+
+Ответ:
+```bash
+2025/04/30 23:17:30 No key found for account info@proqacf.fun. Generating a P256 key.
+2025/04/30 23:17:30 Saved key to /ssl/multidomain.http.all.proqacf.fun/accounts/acme-v02.api.letsencrypt.org/info@proqacf.fun/keys/info@proqacf.fun.key
+2025/04/30 23:17:31 [INFO] acme: Registering account for info@proqacf.fun
+!!!! HEADS UP !!!!
+
+Your account credentials have been saved in your
+configuration directory at "/ssl/multidomain.http.all.proqacf.fun/accounts".
+
+You should make a secure backup of this folder now. This
+configuration directory will also contain certificates and
+private keys obtained from the ACME server so making regular
+backups of this folder is ideal.
+2025/04/30 23:17:31 [INFO] [b24.proqacf.fun, wiki.proqacf.fun, shop.proqacf.fun] acme: Obtaining bundled SAN certificate
+2025/04/30 23:17:32 [INFO] [b24.proqacf.fun] AuthURL: https://acme-v02.api.letsencrypt.org/acme/authz/197567994/1710483XXXX
+2025/04/30 23:17:32 [INFO] [shop.proqacf.fun] AuthURL: https://acme-v02.api.letsencrypt.org/acme/authz/197567994/1710483XXXX
+2025/04/30 23:17:32 [INFO] [wiki.proqacf.fun] AuthURL: https://acme-v02.api.letsencrypt.org/acme/authz/197567994/1710483XXXX
+2025/04/30 23:17:32 [INFO] [b24.proqacf.fun] acme: Could not find solver for: tls-alpn-01
+2025/04/30 23:17:32 [INFO] [b24.proqacf.fun] acme: use http-01 solver
+2025/04/30 23:17:32 [INFO] [shop.proqacf.fun] acme: Could not find solver for: tls-alpn-01
+2025/04/30 23:17:32 [INFO] [shop.proqacf.fun] acme: use http-01 solver
+2025/04/30 23:17:32 [INFO] [wiki.proqacf.fun] acme: Could not find solver for: tls-alpn-01
+2025/04/30 23:17:32 [INFO] [wiki.proqacf.fun] acme: use http-01 solver
+2025/04/30 23:17:32 [INFO] [b24.proqacf.fun] acme: Trying to solve HTTP-01
+2025/04/30 23:17:32 [INFO] [b24.proqacf.fun] Served key authentication
+2025/04/30 23:17:33 [INFO] [b24.proqacf.fun] Served key authentication
+2025/04/30 23:17:33 [INFO] [b24.proqacf.fun] Served key authentication
+2025/04/30 23:17:33 [INFO] [b24.proqacf.fun] Served key authentication
+2025/04/30 23:17:33 [INFO] [b24.proqacf.fun] Served key authentication
+2025/04/30 23:17:35 [INFO] [b24.proqacf.fun] The server validated our request
+2025/04/30 23:17:35 [INFO] [shop.proqacf.fun] acme: Trying to solve HTTP-01
+2025/04/30 23:17:35 [INFO] [shop.proqacf.fun] Served key authentication
+2025/04/30 23:17:36 [INFO] [shop.proqacf.fun] Served key authentication
+2025/04/30 23:17:36 [INFO] [shop.proqacf.fun] Served key authentication
+2025/04/30 23:17:36 [INFO] [shop.proqacf.fun] Served key authentication
+2025/04/30 23:17:36 [INFO] [shop.proqacf.fun] Served key authentication
+2025/04/30 23:17:38 [INFO] [shop.proqacf.fun] The server validated our request
+2025/04/30 23:17:38 [INFO] [wiki.proqacf.fun] acme: Trying to solve HTTP-01
+2025/04/30 23:17:39 [INFO] [wiki.proqacf.fun] Served key authentication
+2025/04/30 23:17:39 [INFO] [wiki.proqacf.fun] Served key authentication
+2025/04/30 23:17:39 [INFO] [wiki.proqacf.fun] Served key authentication
+2025/04/30 23:17:39 [INFO] [wiki.proqacf.fun] Served key authentication
+2025/04/30 23:17:39 [INFO] [wiki.proqacf.fun] Served key authentication
+2025/04/30 23:17:43 [INFO] [wiki.proqacf.fun] The server validated our request
+2025/04/30 23:17:43 [INFO] [b24.proqacf.fun, wiki.proqacf.fun, shop.proqacf.fun] acme: Validations succeeded; requesting certificates
+2025/04/30 23:17:43 [INFO] Wait for certificate [timeout: 30s, interval: 500ms]
+2025/04/30 23:17:45 [INFO] [b24.proqacf.fun] Server responded with a certificate.
+```
+
+Последняя строка в ответе `Server responded with a certificate` означает успешное выполнение задания и выпуск ssl сертификата.
+
+Файлы сертификатов будут расположены в папке `/ssl/multidomain.http.all.proqacf.fun/certificates/`.
+
+<a id="dnschallengesingledomain"></a>
+#### DNS челлендж (dns-01) для одного домена (singledomain ssl сертификат)
+
+Запрос:
+```bash
+CLOUDFLARE_DNS_API_TOKEN=A3n9tXXX-BuiBd5RlITXXXXXX-5LBuWreZXXXXXX \
+/lego \
+--server="https://acme-v02.api.letsencrypt.org/directory" \
+--accept-tos \
+--email "info@proqacf.fun" \
+--path="/ssl/singledomain.dns.b25.proqacf.fun/" \
+--domains "b25.proqacf.fun" \
+--dns.resolvers 1.1.1.1:53 \
+--dns.resolvers 8.8.8.8:53 \
+--dns.resolvers 9.9.9.9:53 \
+--dns.resolvers 1.0.0.1:53 \
+--dns.resolvers 8.8.4.4:53 \
+--dns cloudflare \
+run
+```
+
+Ответ:
+```bash
+2025/04/30 23:20:07 [INFO] [b25.proqacf.fun] acme: Obtaining bundled SAN certificate
+2025/04/30 23:20:08 [INFO] [b25.proqacf.fun] AuthURL: https://acme-v02.api.letsencrypt.org/acme/authz/197568154/1710485XXXX
+2025/04/30 23:20:08 [INFO] [b25.proqacf.fun] acme: Could not find solver for: tls-alpn-01
+2025/04/30 23:20:08 [INFO] [b25.proqacf.fun] acme: Could not find solver for: http-01
+2025/04/30 23:20:08 [INFO] [b25.proqacf.fun] acme: use dns-01 solver
+2025/04/30 23:20:08 [INFO] [b25.proqacf.fun] acme: Preparing to solve DNS-01
+2025/04/30 23:20:10 [INFO] cloudflare: new record for b25.proqacf.fun, ID fbc9f8e6f11bd574496a8d9135a4XXXX
+2025/04/30 23:20:10 [INFO] [b25.proqacf.fun] acme: Trying to solve DNS-01
+2025/04/30 23:20:11 [INFO] [b25.proqacf.fun] acme: Checking DNS record propagation. [nameservers=1.1.1.1:53,8.8.8.8:53,9.9.9.9:53,1.0.0.1:53,8.8.4.4:53]
+2025/04/30 23:20:13 [INFO] Wait for propagation [timeout: 2m0s, interval: 2s]
+2025/04/30 23:20:13 [INFO] [b25.proqacf.fun] acme: Waiting for DNS record propagation.
+2025/04/30 23:20:15 [INFO] [b25.proqacf.fun] acme: Waiting for DNS record propagation.
+2025/04/30 23:20:20 [INFO] [b25.proqacf.fun] The server validated our request
+2025/04/30 23:20:20 [INFO] [b25.proqacf.fun] acme: Cleaning DNS-01 challenge
+2025/04/30 23:20:21 [INFO] [b25.proqacf.fun] acme: Validations succeeded; requesting certificates
+2025/04/30 23:20:21 [INFO] Wait for certificate [timeout: 30s, interval: 500ms]
+2025/04/30 23:20:24 [INFO] [b25.proqacf.fun] Server responded with a certificate.
+```
+
+Последняя строка в ответе `Server responded with a certificate` означает успешное выполнение задания и выпуск ssl сертификата.
+
+Файлы сертификатов будут расположены в папке `/ssl/singledomain.dns.b25.proqacf.fun/`.
+
+<a id="dnschallengemultidomain"></a>
+#### DNS челлендж (dns-01) для множества поддоменов домена (multidomain ssl сертификат)
+
+Запрос:
+```bash
+CLOUDFLARE_DNS_API_TOKEN=A3n9tXXX-BuiBd5RlITXXXXXX-5LBuWreZXXXXXX \
+/lego \
+--server="https://acme-v02.api.letsencrypt.org/directory" \
+--accept-tos \
+--email "info@proqacf.fun" \
+--path="/ssl/multidomain.dns.all.proqacf.fun/" \
+--domains "b25.proqacf.fun" \
+--domains "wiki.proqacf.fun" \
+--domains "shop.proqacf.fun" \
+--dns.resolvers 1.1.1.1:53 \
+--dns.resolvers 8.8.8.8:53 \
+--dns.resolvers 9.9.9.9:53 \
+--dns.resolvers 1.0.0.1:53 \
+--dns.resolvers 8.8.4.4:53 \
+--dns cloudflare \
+run
+```
+
+Ответ:
+```bash
+2025/04/30 23:21:20 No key found for account info@proqacf.fun. Generating a P256 key.
+2025/04/30 23:21:20 Saved key to /ssl/multidomain.dns.all.proqacf.fun/accounts/acme-v02.api.letsencrypt.org/info@proqacf.fun/keys/info@proqacf.fun.key
+2025/04/30 23:21:21 [INFO] acme: Registering account for info@proqacf.fun
+!!!! HEADS UP !!!!
+
+Your account credentials have been saved in your
+configuration directory at "/ssl/multidomain.dns.all.proqacf.fun/accounts".
+
+You should make a secure backup of this folder now. This
+configuration directory will also contain certificates and
+private keys obtained from the ACME server so making regular
+backups of this folder is ideal.
+2025/04/30 23:21:21 [INFO] [b25.proqacf.fun, wiki.proqacf.fun, shop.proqacf.fun] acme: Obtaining bundled SAN certificate
+2025/04/30 23:21:22 [INFO] [b25.proqacf.fun] AuthURL: https://acme-v02.api.letsencrypt.org/acme/authz/197568584/1710486XXXX
+2025/04/30 23:21:22 [INFO] [shop.proqacf.fun] AuthURL: https://acme-v02.api.letsencrypt.org/acme/authz/197568584/1710486XXXX
+2025/04/30 23:21:22 [INFO] [wiki.proqacf.fun] AuthURL: https://acme-v02.api.letsencrypt.org/acme/authz/197568584/1710486XXXX
+2025/04/30 23:21:22 [INFO] [b25.proqacf.fun] acme: Could not find solver for: tls-alpn-01
+2025/04/30 23:21:22 [INFO] [b25.proqacf.fun] acme: Could not find solver for: http-01
+2025/04/30 23:21:22 [INFO] [b25.proqacf.fun] acme: use dns-01 solver
+2025/04/30 23:21:22 [INFO] [shop.proqacf.fun] acme: Could not find solver for: tls-alpn-01
+2025/04/30 23:21:22 [INFO] [shop.proqacf.fun] acme: Could not find solver for: http-01
+2025/04/30 23:21:22 [INFO] [shop.proqacf.fun] acme: use dns-01 solver
+2025/04/30 23:21:22 [INFO] [wiki.proqacf.fun] acme: Could not find solver for: tls-alpn-01
+2025/04/30 23:21:22 [INFO] [wiki.proqacf.fun] acme: Could not find solver for: http-01
+2025/04/30 23:21:22 [INFO] [wiki.proqacf.fun] acme: use dns-01 solver
+2025/04/30 23:21:22 [INFO] [b25.proqacf.fun] acme: Preparing to solve DNS-01
+2025/04/30 23:21:25 [INFO] cloudflare: new record for b25.proqacf.fun, ID d7988d0a8952175b7480b2636065XXXX
+2025/04/30 23:21:25 [INFO] [shop.proqacf.fun] acme: Preparing to solve DNS-01
+2025/04/30 23:21:26 [INFO] cloudflare: new record for shop.proqacf.fun, ID e202bae64f3cb22c8ae543fb6563XXXX
+2025/04/30 23:21:26 [INFO] [wiki.proqacf.fun] acme: Preparing to solve DNS-01
+2025/04/30 23:21:27 [INFO] cloudflare: new record for wiki.proqacf.fun, ID e7c3e21d948f97315cb4cb6c4f1dXXXX
+2025/04/30 23:21:27 [INFO] [b25.proqacf.fun] acme: Trying to solve DNS-01
+2025/04/30 23:21:27 [INFO] [b25.proqacf.fun] acme: Checking DNS record propagation. [nameservers=1.1.1.1:53,8.8.8.8:53,9.9.9.9:53,1.0.0.1:53,8.8.4.4:53]
+2025/04/30 23:21:29 [INFO] Wait for propagation [timeout: 2m0s, interval: 2s]
+2025/04/30 23:21:29 [INFO] [b25.proqacf.fun] acme: Waiting for DNS record propagation.
+2025/04/30 23:21:38 [INFO] [b25.proqacf.fun] The server validated our request
+2025/04/30 23:21:38 [INFO] [shop.proqacf.fun] acme: Trying to solve DNS-01
+2025/04/30 23:21:38 [INFO] [shop.proqacf.fun] acme: Checking DNS record propagation. [nameservers=1.1.1.1:53,8.8.8.8:53,9.9.9.9:53,1.0.0.1:53,8.8.4.4:53]
+2025/04/30 23:21:40 [INFO] Wait for propagation [timeout: 2m0s, interval: 2s]
+2025/04/30 23:21:40 [INFO] [shop.proqacf.fun] acme: Waiting for DNS record propagation.
+2025/04/30 23:21:42 [INFO] [shop.proqacf.fun] acme: Waiting for DNS record propagation.
+2025/04/30 23:21:45 [INFO] [shop.proqacf.fun] acme: Waiting for DNS record propagation.
+2025/04/30 23:21:47 [INFO] [shop.proqacf.fun] acme: Waiting for DNS record propagation.
+2025/04/30 23:21:49 [INFO] [shop.proqacf.fun] acme: Waiting for DNS record propagation.
+2025/04/30 23:21:55 [INFO] [shop.proqacf.fun] The server validated our request
+2025/04/30 23:21:55 [INFO] [wiki.proqacf.fun] acme: Trying to solve DNS-01
+2025/04/30 23:21:55 [INFO] [wiki.proqacf.fun] acme: Checking DNS record propagation. [nameservers=1.1.1.1:53,8.8.8.8:53,9.9.9.9:53,1.0.0.1:53,8.8.4.4:53]
+2025/04/30 23:21:57 [INFO] Wait for propagation [timeout: 2m0s, interval: 2s]
+2025/04/30 23:22:03 [INFO] [wiki.proqacf.fun] The server validated our request
+2025/04/30 23:22:03 [INFO] [b25.proqacf.fun] acme: Cleaning DNS-01 challenge
+2025/04/30 23:22:04 [INFO] [shop.proqacf.fun] acme: Cleaning DNS-01 challenge
+2025/04/30 23:22:05 [INFO] [wiki.proqacf.fun] acme: Cleaning DNS-01 challenge
+2025/04/30 23:22:06 [INFO] [b25.proqacf.fun, wiki.proqacf.fun, shop.proqacf.fun] acme: Validations succeeded; requesting certificates
+2025/04/30 23:22:06 [INFO] Wait for certificate [timeout: 30s, interval: 500ms]
+2025/04/30 23:22:09 [INFO] [b25.proqacf.fun] Server responded with a certificate.
+```
+
+Последняя строка в ответе `Server responded with a certificate` означает успешное выполнение задания и выпуск ssl сертификата.
+
+Файлы сертификатов будут расположены в папке `/ssl/multidomain.dns.all.proqacf.fun/`.
+
+<a id="dnschallengewildcard"></a>
+#### DNS челлендж (dns-01) на все множество поддоменных имен (*) домена (wildcard ssl сертификат)
+
+Запрос:
+```bash
+CLOUDFLARE_DNS_API_TOKEN=A3n9tXXX-BuiBd5RlITXXXXXX-5LBuWreZXXXXXX \
+/lego \
+--server="https://acme-v02.api.letsencrypt.org/directory" \
+--accept-tos \
+--email "info@proqacf.fun" \
+--path="/ssl/wildcard.dns.proqacf.fun/" \
+--domains "proqacf.fun" \
+--domains "*.proqacf.fun" \
+--dns.resolvers 1.1.1.1:53 \
+--dns.resolvers 8.8.8.8:53 \
+--dns.resolvers 9.9.9.9:53 \
+--dns.resolvers 1.0.0.1:53 \
+--dns.resolvers 8.8.4.4:53 \
+--dns cloudflare \
+run
+```
+
+Ответ:
+```bash
+2025/04/30 23:24:23 No key found for account info@proqacf.fun. Generating a P256 key.
+2025/04/30 23:24:23 Saved key to /ssl/wildcard.dns.proqacf.fun/accounts/acme-v02.api.letsencrypt.org/info@proqacf.fun/keys/info@proqacf.fun.key
+2025/04/30 23:24:24 [INFO] acme: Registering account for info@proqacf.fun
+!!!! HEADS UP !!!!
+
+Your account credentials have been saved in your
+configuration directory at "/ssl/wildcard.dns.proqacf.fun/accounts".
+
+You should make a secure backup of this folder now. This
+configuration directory will also contain certificates and
+private keys obtained from the ACME server so making regular
+backups of this folder is ideal.
+2025/04/30 23:24:24 [INFO] [proqacf.fun, *.proqacf.fun] acme: Obtaining bundled SAN certificate
+2025/04/30 23:24:25 [INFO] [*.proqacf.fun] AuthURL: https://acme-v02.api.letsencrypt.org/acme/authz/197568934/1710489XXXX
+2025/04/30 23:24:25 [INFO] [proqacf.fun] AuthURL: https://acme-v02.api.letsencrypt.org/acme/authz/197568934/1710489XXXX
+2025/04/30 23:24:25 [INFO] [*.proqacf.fun] acme: use dns-01 solver
+2025/04/30 23:24:25 [INFO] [proqacf.fun] acme: Could not find solver for: tls-alpn-01
+2025/04/30 23:24:25 [INFO] [proqacf.fun] acme: Could not find solver for: http-01
+2025/04/30 23:24:25 [INFO] [proqacf.fun] acme: use dns-01 solver
+2025/04/30 23:24:25 [INFO] [*.proqacf.fun] acme: Preparing to solve DNS-01
+2025/04/30 23:24:27 [INFO] cloudflare: new record for proqacf.fun, ID 89d9516b6d1eb7c3dab27a614e2cXXXX
+2025/04/30 23:24:27 [INFO] [proqacf.fun] acme: Preparing to solve DNS-01
+2025/04/30 23:24:28 [INFO] cloudflare: new record for proqacf.fun, ID f6b4267536ad6391637367c10c27XXXX
+2025/04/30 23:24:28 [INFO] [*.proqacf.fun] acme: Trying to solve DNS-01
+2025/04/30 23:24:28 [INFO] [*.proqacf.fun] acme: Checking DNS record propagation. [nameservers=1.1.1.1:53,8.8.8.8:53,9.9.9.9:53,1.0.0.1:53,8.8.4.4:53]
+2025/04/30 23:24:30 [INFO] Wait for propagation [timeout: 2m0s, interval: 2s]
+2025/04/30 23:24:30 [INFO] [*.proqacf.fun] acme: Waiting for DNS record propagation.
+2025/04/30 23:24:33 [INFO] [*.proqacf.fun] acme: Waiting for DNS record propagation.
+2025/04/30 23:24:40 [INFO] [*.proqacf.fun] The server validated our request
+2025/04/30 23:24:40 [INFO] [proqacf.fun] acme: Trying to solve DNS-01
+2025/04/30 23:24:40 [INFO] [proqacf.fun] acme: Checking DNS record propagation. [nameservers=1.1.1.1:53,8.8.8.8:53,9.9.9.9:53,1.0.0.1:53,8.8.4.4:53]
+2025/04/30 23:24:42 [INFO] Wait for propagation [timeout: 2m0s, interval: 2s]
+2025/04/30 23:24:49 [INFO] [proqacf.fun] The server validated our request
+2025/04/30 23:24:49 [INFO] [*.proqacf.fun] acme: Cleaning DNS-01 challenge
+2025/04/30 23:24:50 [INFO] [proqacf.fun] acme: Cleaning DNS-01 challenge
+2025/04/30 23:24:50 [INFO] [proqacf.fun, *.proqacf.fun] acme: Validations succeeded; requesting certificates
+2025/04/30 23:24:50 [INFO] Wait for certificate [timeout: 30s, interval: 500ms]
+2025/04/30 23:24:53 [INFO] [proqacf.fun] Server responded with a certificate.
+```
+
+Последняя строка в ответе `Server responded with a certificate` означает успешное выполнение задания и выпуск ssl сертификата.
+
+Файлы сертификатов будут расположены в папке `/ssl/wildcard.dns.proqacf.fun/`.
+
+<a id="installpresentcerts"></a>
+### Установка сертификатов
+
+После выпуска ssl сертификатов одним из способов выше нам нужно в ssl конфигурацию `nginx` прописать новые сертификаты.
+
+Пример ниже для домена `proqacf.fun`, wildcard сертификаты выпущены и содержатся в папке `/ssl/wildcard.dns.proqacf.fun/`.
+
+Заходим в sh-консоль контейнера `nginx` из под пользователя `root`:
+```bash
+docker compose exec --user=root nginx sh
+```
+
+Выполняем:
+```bash
+apk add mc
+exit
+```
+
+Заходим в sh-консоль контейнера `nginx` из под пользователя `bitrix`:
+```bash
+docker compose exec --user=bitrix nginx sh
+```
+
+Редактируем файл `/etc/nginx/ssl/ssl.conf`, меняем настройки опций `ssl_*`:
+```bash
+mcedit /etc/nginx/ssl/ssl.conf
+```
+
+Меняем опции на:
+```bash
+ssl_certificate /ssl/wildcard.dns.proqacf.fun/certificates/proqacf.fun.crt;
+ssl_certificate_key /ssl/wildcard.dns.proqacf.fun/certificates/proqacf.fun.key;
+ssl_trusted_certificate /ssl/wildcard.dns.proqacf.fun/certificates/proqacf.fun.issuer.crt;
+ssl_dhparam /ssl/dhparam.pem;
+```
+
+Выходим из консоли контейнера и проверям настройки `nginx`:
+```bash
+docker compose exec --user=bitrix nginx sh -c "nginx -t"
+```
+
+Если никаких ошибок нет, перезапускаем nginx:
+```bash
+docker compose restart nginx
+```
+
+Итог: после настройки выше переходим на сайт по урлу с доменом `b24.proqacf.fun`, используя `https` и порт `8589` в урле:
+```bash
+https://b24.proqacf.fun:8589/
+```
+
+Работа сайта перешла на безопасную схему, используется `https`, `ssl`, `wss` и т.д.
 
 <a id="servicesconsole"></a>
 # Консоль сервисов
