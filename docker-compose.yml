@@ -28,6 +28,7 @@ services:
       - .env
 #    ports:
 #      - "11211:11211"
+    init: true
     networks:
       dev:
         aliases:
@@ -44,6 +45,7 @@ services:
     volumes:
       - redis_data:/data
       - ./confs/redis/redis.conf:/usr/local/etc/redis/redis.conf
+    init: true
     networks:
       dev:
         aliases:
@@ -59,6 +61,7 @@ services:
 #      - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
+    init: true
     networks:
       dev:
         aliases:
@@ -78,6 +81,7 @@ services:
       - mysql_lib_data:/var/lib/mysql
     cap_add:
       - SYS_NICE
+    init: true
     networks:
       dev:
         aliases:
@@ -99,6 +103,7 @@ services:
       - browscap_data:/opt/browscap/
       - geoip2_data:/opt/geoip2/
       - ssl_data:/ssl/
+    init: true
     networks:
       dev:
         aliases:
@@ -117,6 +122,7 @@ services:
       - www_data:/opt/www/
       - bxtemp_data:/opt/.bx_temp/
       - ssl_data:/ssl/
+    init: true
     networks:
       dev:
         aliases:
@@ -132,6 +138,7 @@ services:
       - .env_redis
 #    ports:
 #      - "8010:8010"
+    init: true
     networks:
       dev:
         aliases:
@@ -149,6 +156,7 @@ services:
       - .env_redis
 #    ports:
 #      - "9010:9010"
+    init: true
     networks:
       dev:
         aliases:
@@ -166,6 +174,7 @@ services:
       - .env
     volumes:
       - ./confs/sphinx/sphinx.conf:/opt/sphinx/conf/sphinx.conf
+    init: true
     networks:
       dev:
         aliases:
@@ -188,6 +197,7 @@ services:
       - msmtp_data:/opt/msmtp/
       - browscap_data:/opt/browscap/
       - geoip2_data:/opt/geoip2/
+    init: true
     networks:
       dev:
         aliases:
@@ -203,6 +213,7 @@ services:
       - .env_ssl
     volumes:
       - ssl_data:/ssl/
+    init: true
     networks:
       dev:
         aliases:
@@ -219,6 +230,7 @@ services:
       - "80:80"
     volumes:
       - ssl_data:/ssl/
+    init: true
     networks:
       dev:
         aliases:
