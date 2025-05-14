@@ -30,6 +30,8 @@ services:
 #      - "11211:11211"
     init: true
     cgroup: private
+    security_opt:
+      - no-new-privileges
     networks:
       dev:
         aliases:
@@ -48,6 +50,8 @@ services:
       - ./confs/redis/redis.conf:/usr/local/etc/redis/redis.conf
     init: true
     cgroup: private
+    security_opt:
+      - no-new-privileges
     networks:
       dev:
         aliases:
@@ -65,6 +69,8 @@ services:
       - postgres_data:/var/lib/postgresql/data
     init: true
     cgroup: private
+    security_opt:
+      - no-new-privileges
     networks:
       dev:
         aliases:
@@ -86,6 +92,8 @@ services:
       - SYS_NICE
     init: true
     cgroup: private
+    security_opt:
+      - no-new-privileges
     networks:
       dev:
         aliases:
@@ -109,6 +117,8 @@ services:
       - ssl_data:/ssl/
     init: true
     cgroup: private
+    security_opt:
+      - no-new-privileges
     networks:
       dev:
         aliases:
@@ -129,6 +139,8 @@ services:
       - ssl_data:/ssl/
     init: true
     cgroup: private
+    security_opt:
+      - no-new-privileges
     networks:
       dev:
         aliases:
@@ -146,6 +158,8 @@ services:
 #      - "8010:8010"
     init: true
     cgroup: private
+    security_opt:
+      - no-new-privileges
     networks:
       dev:
         aliases:
@@ -165,6 +179,8 @@ services:
 #      - "9010:9010"
     init: true
     cgroup: private
+    security_opt:
+      - no-new-privileges
     networks:
       dev:
         aliases:
@@ -184,6 +200,8 @@ services:
       - ./confs/sphinx/sphinx.conf:/opt/sphinx/conf/sphinx.conf
     init: true
     cgroup: private
+    security_opt:
+      - no-new-privileges
     networks:
       dev:
         aliases:
@@ -208,6 +226,8 @@ services:
       - geoip2_data:/opt/geoip2/
     init: true
     cgroup: private
+    security_opt:
+      - no-new-privileges
     networks:
       dev:
         aliases:
@@ -225,6 +245,8 @@ services:
       - ssl_data:/ssl/
     init: true
     cgroup: private
+    security_opt:
+      - no-new-privileges
     networks:
       dev:
         aliases:
@@ -243,6 +265,8 @@ services:
       - ssl_data:/ssl/
     init: true
     cgroup: private
+    security_opt:
+      - no-new-privileges
     networks:
       dev:
         aliases:
