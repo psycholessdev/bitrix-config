@@ -29,6 +29,7 @@ services:
 #    ports:
 #      - "11211:11211"
     init: true
+    cgroup: private
     networks:
       dev:
         aliases:
@@ -46,6 +47,7 @@ services:
       - redis_data:/data
       - ./confs/redis/redis.conf:/usr/local/etc/redis/redis.conf
     init: true
+    cgroup: private
     networks:
       dev:
         aliases:
@@ -62,6 +64,7 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data
     init: true
+    cgroup: private
     networks:
       dev:
         aliases:
@@ -82,6 +85,7 @@ services:
     cap_add:
       - SYS_NICE
     init: true
+    cgroup: private
     networks:
       dev:
         aliases:
@@ -104,6 +108,7 @@ services:
       - geoip2_data:/opt/geoip2/
       - ssl_data:/ssl/
     init: true
+    cgroup: private
     networks:
       dev:
         aliases:
@@ -123,6 +128,7 @@ services:
       - bxtemp_data:/opt/.bx_temp/
       - ssl_data:/ssl/
     init: true
+    cgroup: private
     networks:
       dev:
         aliases:
@@ -139,6 +145,7 @@ services:
 #    ports:
 #      - "8010:8010"
     init: true
+    cgroup: private
     networks:
       dev:
         aliases:
@@ -157,6 +164,7 @@ services:
 #    ports:
 #      - "9010:9010"
     init: true
+    cgroup: private
     networks:
       dev:
         aliases:
@@ -175,6 +183,7 @@ services:
     volumes:
       - ./confs/sphinx/sphinx.conf:/opt/sphinx/conf/sphinx.conf
     init: true
+    cgroup: private
     networks:
       dev:
         aliases:
@@ -198,6 +207,7 @@ services:
       - browscap_data:/opt/browscap/
       - geoip2_data:/opt/geoip2/
     init: true
+    cgroup: private
     networks:
       dev:
         aliases:
@@ -214,6 +224,7 @@ services:
     volumes:
       - ssl_data:/ssl/
     init: true
+    cgroup: private
     networks:
       dev:
         aliases:
@@ -231,6 +242,7 @@ services:
     volumes:
       - ssl_data:/ssl/
     init: true
+    cgroup: private
     networks:
       dev:
         aliases:
