@@ -32,6 +32,8 @@ services:
     cgroup: private
     security_opt:
       - no-new-privileges
+    cap_drop:
+      - ALL
     tmpfs:
       - /tmp:noexec,nodev,nosuid
       - /var/tmp:noexec,nodev,nosuid
