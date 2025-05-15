@@ -87,6 +87,14 @@ services:
     cgroup: private
     security_opt:
       - no-new-privileges
+    cap_drop:
+      - ALL
+    cap_add:
+      - CHOWN
+      - FOWNER
+      - SETUID
+      - SETGID
+      - DAC_OVERRIDE
     tmpfs:
       - /tmp:noexec,nodev,nosuid
       - /var/tmp:noexec,nodev,nosuid
@@ -108,12 +116,14 @@ services:
     volumes:
       - mysql_log_data:/var/log/mysql
       - mysql_lib_data:/var/lib/mysql
-    cap_add:
-      - SYS_NICE
     init: true
     cgroup: private
     security_opt:
       - no-new-privileges
+    cap_drop:
+      - ALL
+    cap_add:
+      - SYS_NICE
     tmpfs:
       - /tmp:noexec,nodev,nosuid
       - /var/tmp:noexec,nodev,nosuid
