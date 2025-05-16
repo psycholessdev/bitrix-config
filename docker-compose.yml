@@ -197,7 +197,7 @@ services:
         aliases:
           - nginx
   push-sub:
-    image: bx-push:3.0-v1-alpine
+    image: bx-push:3.1-v1-alpine
     container_name: dev_push_sub
     restart: unless-stopped
     env_file:
@@ -224,7 +224,7 @@ services:
     depends_on:
       - redis
   push-pub:
-    image: bx-push:3.0-v1-alpine
+    image: bx-push:3.1-v1-alpine
     container_name: dev_push_pub
     restart: unless-stopped
     env_file:

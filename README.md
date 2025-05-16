@@ -147,7 +147,7 @@ docker pull memcached:1.6.38-alpine
 - веб сервер: используем стабильный образ `nginx:1.28.0-alpine-slim`, добавляем модули слоем сверху, собираем `bx-nginx:1.28.0-v1-alpine`
 - интерпретатор PHP-кода: готового совместимого образа PHP нет, берем по умолчанию образ `php:8.2.28-fpm-alpine` и добавляем то, что нам надо через пару слоев сверху, собираем `bx-php:8.2.28-fpm-v1-alpine`
 - поиск: готового образа Sphinx нет, но есть собранный пакет `sphinx` на базе `alpine` linux в официальном репозитории ОС, собираем `bx-sphinx:2.2.11-v1-alpine`, установив пакет
-- Push-сервер: готового образа нет, используем образ NodeJS 20-ой версии, собираем `bx-push:3.0-v1-alpine`, используя его исходники `push-server-0.4.0`
+- Push-сервер: готового образа нет, используем образ NodeJS 22-ой версии, собираем `bx-push:3.1-v1-alpine`, используя его исходники `push-server-0.4.0`
 - сервис для бесплатных SSL-сертификатов от `LetsEncrypt`: используем стабильный образ `goacme/lego:v4.23.1`, добавляем логику слоем сверху, собираем `bx-lego:4.23.1-v1-alpine`
 - генератор самоподписных SSL-сертификатов: небольшой образ с пакетами на базе `alpine` linux, собираем `bx-ssl:1.0-v1-alpine`
 
@@ -164,8 +164,8 @@ docker pull memcached:1.6.38-alpine
 docker pull percona/percona-server:8.0.41
 docker pull nginx:1.28.0-alpine-slim
 docker pull php:8.2.28-fpm-alpine
-docker pull node:20
-docker pull node:20-alpine
+docker pull node:22
+docker pull node:22-alpine
 docker pull alpine:3.21
 docker pull goacme/lego:v4.23.1
 ```
@@ -180,8 +180,8 @@ docker build -f Dockerfile -t bx-sphinx:2.2.11-v1-alpine --no-cache .
 
 - bx-push:
 ```bash
-cd dev/sources/bxpush30/
-docker build -f Dockerfile -t bx-push:3.0-v1-alpine --no-cache .
+cd dev/sources/bxpush31/
+docker build -f Dockerfile -t bx-push:3.1-v1-alpine --no-cache .
 ```
 
 - bx-php:
