@@ -30,18 +30,19 @@ RUN apk add --no-cache --virtual .build-deps \
     imagemagick imagemagick-dev
 
 RUN docker-php-source extract && \
-    mkdir -p /usr/src/php/ext/memcache && curl -fsSL https://github.com/cyrax13/pecl.php.net/raw/main/memcache-8.2.tgz | tar xvz -C "/usr/src/php/ext/memcache" --strip 1 && \
-    mkdir -p /usr/src/php/ext/memcached && curl -fsSL https://github.com/cyrax13/pecl.php.net/raw/main/memcached-3.3.0.tgz | tar xvz -C "/usr/src/php/ext/memcached" --strip 1 && \
-    mkdir -p /usr/src/php/ext/apcu && curl -fsSL https://github.com/cyrax13/pecl.php.net/raw/main/apcu-5.1.24.tgz | tar xvz -C "/usr/src/php/ext/apcu" --strip 1 && \
-    mkdir -p /usr/src/php/ext/mcrypt && curl -fsSL https://github.com/cyrax13/pecl.php.net/raw/main/mcrypt-1.0.7.tgz | tar xvz -C "/usr/src/php/ext/mcrypt" --strip 1 && \
-    mkdir -p /usr/src/php/ext/msgpack && curl -fsSL https://github.com/cyrax13/pecl.php.net/raw/main/msgpack-3.0.0.tgz | tar xvz -C "/usr/src/php/ext/msgpack" --strip 1 && \
-    mkdir -p /usr/src/php/ext/igbinary && curl -fsSL https://github.com/cyrax13/pecl.php.net/raw/main/igbinary-3.2.16.tgz | tar xvz -C "/usr/src/php/ext/igbinary" --strip 1 && \
-    mkdir -p /usr/src/php/ext/redis && curl -fsSL https://github.com/cyrax13/pecl.php.net/raw/main/redis-6.1.0.tgz | tar xvz -C "/usr/src/php/ext/redis" --strip 1 && \
-    mkdir -p /usr/src/php/ext/xhprof && curl -fsSL https://github.com/cyrax13/pecl.php.net/raw/main/xhprof-2.3.10.tgz | tar xvz -C "/usr/src/php/ext/xhprof" --strip 1 && \
-    mkdir -p /usr/src/php/ext/xdebug && curl -fsSL https://github.com/cyrax13/pecl.php.net/raw/main/xdebug-3.4.1.tgz | tar xvz -C "/usr/src/php/ext/xdebug" --strip 1 && \
-    mkdir -p /usr/src/php/ext/amqp && curl -fsSL https://github.com/cyrax13/pecl.php.net/raw/main/amqp-2.1.2.tgz | tar xvz -C "/usr/src/php/ext/amqp" --strip 1 && \
-    mkdir -p /usr/src/php/ext/ssh2 && curl -fsSL https://github.com/cyrax13/pecl.php.net/raw/main/ssh2-1.4.1.tgz | tar xvz -C "/usr/src/php/ext/ssh2" --strip 1 && \
-    mkdir -p /usr/src/php/ext/imagick && curl -fsSL https://github.com/cyrax13/pecl.php.net/raw/main/imagick-3.7.0.tgz | tar xvz -C "/usr/src/php/ext/imagick" --strip 1 && \
+    mkdir -p /usr/src/php/ext/memcache && curl -fsSL https://pecl.php.net/get/memcache-8.2.tgz | tar xvz -C "/usr/src/php/ext/memcache" --strip 1 && \
+    mkdir -p /usr/src/php/ext/memcached && curl -fsSL https://pecl.php.net/get/memcached-3.3.0.tgz | tar xvz -C "/usr/src/php/ext/memcached" --strip 1 && \
+    mkdir -p /usr/src/php/ext/apcu && curl -fsSL https://pecl.php.net/get/apcu-5.1.24.tgz | tar xvz -C "/usr/src/php/ext/apcu" --strip 1 && \
+    mkdir -p /usr/src/php/ext/mcrypt && curl -fsSL https://pecl.php.net/get/mcrypt-1.0.7.tgz | tar xvz -C "/usr/src/php/ext/mcrypt" --strip 1 && \
+    mkdir -p /usr/src/php/ext/msgpack && curl -fsSL https://pecl.php.net/get/msgpack-3.0.0.tgz | tar xvz -C "/usr/src/php/ext/msgpack" --strip 1 && \
+    mkdir -p /usr/src/php/ext/igbinary && curl -fsSL https://pecl.php.net/get/igbinary-3.2.16.tgz | tar xvz -C "/usr/src/php/ext/igbinary" --strip 1 && \
+    mkdir -p /usr/src/php/ext/redis && curl -fsSL https://pecl.php.net/get/redis-6.1.0.tgz | tar xvz -C "/usr/src/php/ext/redis" --strip 1 && \
+    mkdir -p /usr/src/php/ext/xhprof && curl -fsSL https://pecl.php.net/get/xhprof-2.3.10.tgz | tar xvz -C "/usr/src/php/ext/xhprof" --strip 1 && \
+    mkdir -p /usr/src/php/ext/xdebug && curl -fsSL https://pecl.php.net/get/xdebug-3.4.1.tgz | tar xvz -C "/usr/src/php/ext/xdebug" --strip 1 && \
+    mkdir -p /usr/src/php/ext/amqp && curl -fsSL https://pecl.php.net/get/amqp-2.1.2.tgz | tar xvz -C "/usr/src/php/ext/amqp" --strip 1 && \
+    mkdir -p /usr/src/php/ext/ssh2 && curl -fsSL https://pecl.php.net/get/ssh2-1.4.1.tgz | tar xvz -C "/usr/src/php/ext/ssh2" --strip 1 && \
+    mkdir -p /usr/src/php/ext/imagick && curl -fsSL https://pecl.php.net/get/imagick-3.7.0.tgz | tar xvz -C "/usr/src/php/ext/imagick" --strip 1 && \
+    cp -fr /usr/src/php/ext/xhprof/extension/* /usr/src/php/ext/xhprof/ && \
     cp -fr /usr/src/php/ext/igbinary /usr/local/include/php/ext/igbinary && \
     cp -fr /usr/src/php/ext/msgpack /usr/local/include/php/ext/msgpack
 
