@@ -104,7 +104,7 @@ services:
         aliases:
           - postgres
   mysql:
-    image: bx-percona-server:8.0.41-v1-rhel
+    image: bx-percona-server:8.0.42-v1-rhel
     container_name: dev_mysql
     restart: unless-stopped
     env_file:
