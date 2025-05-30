@@ -15,6 +15,7 @@
 * [Сборка или скачивание Docker образов](#dockerimages)
   * [Базовые образы](#basicimages)
   * [Битрикс образы (bx-*)](#bitriximages)
+  * [Модули для Nginx](#nginxmodulesimage)
 * [Пароли к базам данных MySQL и PostgreSQL](#databasespasswords)
 * [Секретный ключ для Push-сервера](#pushserversecretkey)
 * [Управление](#management)
@@ -49,6 +50,9 @@
   * [Расширения (extensions)](#phpextensions)
   * [Imagick Engine для изображений](#phpimagickimageengine)
   * [security: Веб-антивирус](#phpsecurityantivirus)
+* [Nginx](#nginx)
+  * [Модули для Nginx](#nginxmodules)
+  * [Подключение или отключение модуля для Nginx](#nginxmoduleonoroff)
 * [Memcache и Redis](#memcacheandredis)
   * [Memcache](#memcache)
   * [Redis](#redis)
@@ -146,7 +150,7 @@ docker pull memcached:1.6.38-alpine
 
 Также нам понадобятся:
 - база данных MySQL: используем стабильный образ `percona/percona-server:8.0.42`, добавляем слоем сверху конфигурацию бд, собираем `bx-percona-server:8.0.42-v1-rhel`
-- веб сервер: используем стабильный образ `nginx:1.28.0-alpine-slim`, добавляем модули слоем сверху, собираем `bx-nginx:1.28.0-v1-alpine`
+- веб-сервер: используем стабильный образ `nginx:1.28.0-alpine-slim`, добавляем модули слоем сверху, собираем `bx-nginx:1.28.0-v1-alpine`
 - интерпретатор PHP-кода: готового совместимого образа PHP нет, берем по умолчанию образ `php:8.2.28-fpm-alpine` и добавляем то, что нам надо через пару слоев сверху, собираем `bx-php:8.2.28-fpm-v1-alpine`
 - поиск: готового образа Sphinx нет, но есть собранный пакет `sphinx` на базе `alpine` linux в официальном репозитории ОС, собираем `bx-sphinx:2.2.11-v1-alpine`, установив пакет
 - Push-сервер: готового образа нет, используем образ NodeJS 22-ой версии, собираем `bx-push:3.1-v1-alpine`, используя его исходники `push-server-0.4.0`
@@ -219,6 +223,105 @@ docker build -f Dockerfile -t bx-ssl:1.0-v1-alpine --no-cache .
 Во всех образах `bx-` в названии тега указывается `v1`, состоит из:
 - общая отметка версии, указывается буквой `v`
 - номер сборки, начинается с цифры `1`
+
+<a id="nginxmodulesimage"></a>
+## Модули для Nginx
+
+> [!CAUTION]
+> Внимание! Информация о сборке модулей для Nginx предоставляется для ознакомления. Повторять шаги ниже не требуется.
+
+В образе веб-сервера `bx-nginx` используются следующие модули:
+- `brotli`
+- `geoip`
+- `geoip2`
+- `headers-more`
+- `image-filter`
+- `lua`
+- `ndk`
+- `njs`
+- `perl`
+- `xslt`
+- `zip`
+
+Модули собираются на базе стабильного образа `nginx:1.28.0-alpine-slim`, используя официальный образ Nginx с [DockerHub](https://hub.docker.com/):
+- `Nginx`: https://hub.docker.com/_/nginx
+
+Образ Nginx можно предварительно скачать, используя команду:
+```bash
+docker pull nginx:1.28.0-alpine-slim
+```
+
+Для сборки потребуется `Dockerfile` от версии `1.28.0`, найти который можно на [GitHub](https://github.com/nginx/docker-nginx).
+
+Скачиваем файл для версии 1.28.0 по ссылке: [https://github.com/nginx/docker-nginx/blob/7f1d49f6f222f7e588a9066fd53a0ce43c3466a5/stable/alpine/Dockerfile](https://github.com/nginx/docker-nginx/blob/7f1d49f6f222f7e588a9066fd53a0ce43c3466a5/stable/alpine/Dockerfile)
+
+Модифицируем файл, добавляем нужные модули по списку выше и служебную часть. Пример всех изменений файла для версии 1.28.0 можно найти в папке `/sources/nginx1280modules/`.
+
+Запускаем сборку образа `nginx_modules`, указываем две архитектуры `amd64` и `arm64` в команде:
+
+```bash
+cd dev/sources/nginx1280modules/
+docker build --platform linux/arm64,linux/amd64 -f Dockerfile -t nginx_modules:1.28.0-v1-alpine --no-cache .
+```
+
+После нужно запустить два контейнера, используя собранный образ выше. По одному для каждой архитектуры: `amd64` и `arm64`.
+
+Для `amd64` выполняем команду:
+```bash
+docker run --platform=linux/amd64 -d --name=nginxmodules1280testingamd64 -it nginx_modules:1.28.0-v1-alpine
+```
+
+Для `arm64` выполняем команду:
+```bash
+docker run --platform=linux/arm64 -d --name=nginxmodules1280testingarm64 -it nginx_modules:1.28.0-v1-alpine
+```
+
+Собранные модули Nginx будут доступны в каталоге `/root/packages/` у каждого запущенного контейнера.
+
+Внутри контейнера переходим в каталог `/root/packages/`, архивируем содержимое и забираем zip-файл:
+
+- для `amd64` выполняем:
+
+```bash
+apk add mc zip
+cd /root/packages/
+zip -r nginxmodules_amd64.zip *
+exit
+```
+
+- для `arm64` выполняем:
+
+```bash
+apk add mc zip
+cd /root/packages/
+zip -r nginxmodules_arm64.zip *
+exit
+```
+
+Останавливаем и удаляем контейнеры, они больше не нужны.
+
+Для `amd64` выполняем команду:
+```bash
+docker container stop nginxmodules1280testingamd64 && docker container rm nginxmodules1280testingamd64
+```
+
+Для `arm64` выполняем команду:
+```bash
+docker container stop nginxmodules1280testingarm64 && docker container rm nginxmodules1280testingarm64
+```
+
+Содержимое обоих архивов (`nginxmodules_amd64.zip` и `nginxmodules_arm64.zip`) размещаем в репозитории `bitrix24/nginx-modules` на [GitHub](https://github.com/bitrix24/nginx-modules).
+
+Каждый zip архив содержит:
+- каталог с названием архитектуры: `x86_64` (для `amd64`) или `aarch64` (для `arm64`)
+- файлы модулей в формате пакетов ОС `Alpine Linux` - `*.apk`
+- модули, собранные для работы Nginx в режиме отладки (debug), содержат `dbg` в названии файла
+- файл индекс репозитория - `APKINDEX.tar.gz`
+- rsa ключ подписи файлов модулей в репозитории - `abuild-key.rsa.pub`
+
+Собранные модули для Nginx будут использоваться при сборке образа `bx-nginx`.
+
+Механизм сборки для версии `1.28.0` можно найти в файле `/sources/bxnginx1280/Dockerfile`.
 
 <a id="databasespasswords"></a>
 # Пароли к базам данных MySQL и PostgreSQL
@@ -1247,6 +1350,63 @@ docker compose restart php cron
 Документация:
 https://dev.1c-bitrix.ru/user_help/settings/security/security_antivirus.php
 https://dev.1c-bitrix.ru/learning/course/index.php?COURSE_ID=35&LESSON_ID=2674#antivirus
+
+<a id="nginx"></a>
+# Nginx
+
+<a id="nginxmodules"></a>
+## Модули для Nginx
+
+Подключение модулей Nginx производится в файле `/etc/nginx/inc/modules.conf` контейнера, содержимое которого можно найти в файле `/confs/nginx/inc/modules.conf` репозитория.
+
+По умолчанию в контейнере `nginx`, запущенного из образа `bx-nginx`, подключаются следующие модули:
+- `brotli`
+- `headers-more`
+- `zip`
+
+<a id="nginxmoduleonoroff"></a>
+## Подключение или отключение модуля для Nginx
+
+Заходим в sh-консоль контейнера `nginx` из-под пользователя `root`:
+```bash
+docker compose exec --user=root nginx sh
+```
+
+Выполняем:
+```bash
+apk add mc
+exit
+```
+
+Заходим в sh-консоль контейнера `nginx` из-под пользователя `bitrix`:
+```bash
+docker compose exec --user=bitrix nginx sh
+```
+
+Редактируем файл `/etc/nginx/inc/modules.conf`:
+```bash
+mcedit /etc/nginx/inc/modules.conf
+```
+
+Для подключения модуля приводим строку к виду `load_module "/usr/lib/nginx/modules/***.so";`. Пример для модуля `perl`:
+```bash
+load_module "/usr/lib/nginx/modules/ngx_http_perl_module.so";
+```
+
+Для отключения модуля приводим строку к виду `#load_module "/usr/lib/nginx/modules/***.so";`. Пример для модуля `perl`:
+```bash
+#load_module "/usr/lib/nginx/modules/ngx_http_perl_module.so";
+```
+
+Выходим из консоли контейнера и проверяем настройки `nginx`:
+```bash
+docker compose exec --user=bitrix nginx sh -c "nginx -t"
+```
+
+Если никаких ошибок нет, перезапускаем контейнер `nginx`:
+```bash
+docker compose restart nginx
+```
 
 <a id="memcacheandredis"></a>
 # Memcache и Redis
