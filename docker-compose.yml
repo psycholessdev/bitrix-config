@@ -104,7 +104,7 @@ services:
         aliases:
           - postgres
   mysql:
-    image: bx-percona-server:8.0.42-v1-rhel
+    image: bitrix24/percona-server:8.0.42-v1-rhel
     container_name: dev_mysql
     restart: unless-stopped
     env_file:
@@ -133,7 +133,7 @@ services:
         aliases:
           - mysql
   php:
-    image: bx-php:8.2.28-fpm-v1-alpine
+    image: bitrix24/php:8.2.28-fpm-v1-alpine
     container_name: dev_php
     restart: unless-stopped
     env_file:
@@ -164,7 +164,7 @@ services:
         aliases:
           - php
   nginx:
-    image: bx-nginx:1.28.0-v1-alpine
+    image: bitrix24/nginx:1.28.0-v1-alpine
     container_name: dev_nginx
     restart: unless-stopped
     env_file:
@@ -197,7 +197,7 @@ services:
         aliases:
           - nginx
   push-sub:
-    image: bx-push:3.1-v1-alpine
+    image: bitrix24/push:3.1-v1-alpine
     container_name: dev_push_sub
     restart: unless-stopped
     env_file:
@@ -224,7 +224,7 @@ services:
     depends_on:
       - redis
   push-pub:
-    image: bx-push:3.1-v1-alpine
+    image: bitrix24/push:3.1-v1-alpine
     container_name: dev_push_pub
     restart: unless-stopped
     env_file:
@@ -251,7 +251,7 @@ services:
     depends_on:
       - redis
   sphinx:
-    image: bx-sphinx:2.2.11-v1-alpine
+    image: bitrix24/sphinx:2.2.11-v1-alpine
     container_name: dev_sphinx
 #    ports:
 #      - "9306:9306"
@@ -276,7 +276,7 @@ services:
         aliases:
           - sphinx
   cron:
-    image: bx-php:8.2.28-fpm-v1-alpine
+    image: bitrix24/php:8.2.28-fpm-v1-alpine
     container_name: dev_cron
     restart: unless-stopped
     command: crond -f -d 8
@@ -313,7 +313,7 @@ services:
     depends_on:
       - php
   ssl:
-    image: bx-ssl:1.0-v1-alpine
+    image: bitrix24/ssl:1.0-v1-alpine
     container_name: dev_ssl
     restart: unless-stopped
     env_file:
@@ -343,7 +343,7 @@ services:
     depends_on:
       - nginx
   lego:
-    image: bx-lego:4.23.1-v1-alpine
+    image: bitrix24/lego:4.23.1-v1-alpine
     container_name: dev_lego
     restart: unless-stopped
     env_file:

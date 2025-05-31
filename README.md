@@ -14,7 +14,7 @@
 * [Docker и Docker Compose](#docker)
 * [Сборка или скачивание Docker образов](#dockerimages)
   * [Базовые образы](#basicimages)
-  * [Битрикс образы (bx-*)](#bitriximages)
+  * [Битрикс образы](#bitriximages)
   * [Модули для Nginx](#nginxmodulesimage)
 * [Пароли к базам данных MySQL и PostgreSQL](#databasespasswords)
 * [Секретный ключ для Push-сервера](#pushserversecretkey)
@@ -146,16 +146,16 @@ docker pull memcached:1.6.38-alpine
 ```
 
 <a id="bitriximages"></a>
-## Битрикс образы (bx-*)
+## Битрикс образы
 
 Также нам понадобятся:
-- база данных MySQL: используем стабильный образ `percona/percona-server:8.0.42`, добавляем слоем сверху конфигурацию бд, собираем `bx-percona-server:8.0.42-v1-rhel`
-- веб-сервер: используем стабильный образ `nginx:1.28.0-alpine-slim`, добавляем модули слоем сверху, собираем `bx-nginx:1.28.0-v1-alpine`
-- интерпретатор PHP-кода: готового совместимого образа PHP нет, берем по умолчанию образ `php:8.2.28-fpm-alpine` и добавляем то, что нам надо через пару слоев сверху, собираем `bx-php:8.2.28-fpm-v1-alpine`
-- поиск: готового образа Sphinx нет, но есть собранный пакет `sphinx` на базе `alpine` linux в официальном репозитории ОС, собираем `bx-sphinx:2.2.11-v1-alpine`, установив пакет
-- Push-сервер: готового образа нет, используем образ NodeJS 22-ой версии, собираем `bx-push:3.1-v1-alpine`, используя его исходники `push-server-0.4.0`
-- сервис для бесплатных SSL-сертификатов от `LetsEncrypt`: используем стабильный образ `goacme/lego:v4.23.1`, добавляем логику слоем сверху, собираем `bx-lego:4.23.1-v1-alpine`
-- генератор самоподписных SSL-сертификатов: небольшой образ с пакетами на базе `alpine` linux, собираем `bx-ssl:1.0-v1-alpine`
+- база данных MySQL: используем стабильный образ `percona/percona-server:8.0.42`, добавляем слоем сверху конфигурацию бд, собираем `bitrix24/percona-server:8.0.42-v1-rhel`
+- веб-сервер: используем стабильный образ `nginx:1.28.0-alpine-slim`, добавляем модули слоем сверху, собираем `bitrix24/nginx:1.28.0-v1-alpine`
+- интерпретатор PHP-кода: готового совместимого образа PHP нет, берем по умолчанию образ `php:8.2.28-fpm-alpine` и добавляем то, что нам надо через пару слоев сверху, собираем `bitrix24/php:8.2.28-fpm-v1-alpine`
+- поиск: готового образа Sphinx нет, но есть собранный пакет `sphinx` на базе `Alpine Linux` в официальном репозитории ОС, собираем `bitrix24/sphinx:2.2.11-v1-alpine`, установив пакет
+- Push-сервер: готового образа нет, используем образ NodeJS 22-ой версии, собираем `bitrix24/push:3.1-v1-alpine`, используя его исходники `push-server-0.4.0`
+- сервис для бесплатных SSL-сертификатов от `LetsEncrypt`: используем стабильный образ `goacme/lego:v4.23.1`, добавляем логику слоем сверху, собираем `bitrix24/lego:4.23.1-v1-alpine`
+- генератор самоподписных SSL-сертификатов: небольшой образ с пакетами на базе `Alpine Linux`, собираем `bitrix24/ssl:1.0-v1-alpine`
 
 Список официальных Docker образов, которые будем брать с [DockerHub](https://hub.docker.com/):
 - `Percona Server`: https://hub.docker.com/r/percona/percona-server
@@ -176,51 +176,51 @@ docker pull alpine:3.21
 docker pull goacme/lego:v4.23.1
 ```
 
-Собираем образы, в названии используем `bx-`:
+Собираем образы, в названии используем `bitrix24`:
 
-- bx-sphinx:
+- bitrix24/sphinx:
 ```bash
 cd dev/sources/bxsphinx2211/
-docker build -f Dockerfile -t bx-sphinx:2.2.11-v1-alpine --no-cache .
+docker build -f Dockerfile -t bitrix24/sphinx:2.2.11-v1-alpine --no-cache .
 ```
 
-- bx-push:
+- bitrix24/push:
 ```bash
 cd dev/sources/bxpush31/
-docker build -f Dockerfile -t bx-push:3.1-v1-alpine --no-cache .
+docker build -f Dockerfile -t bitrix24/push:3.1-v1-alpine --no-cache .
 ```
 
-- bx-php:
+- bitrix24/php:
 ```bash
 cd dev/sources/bxphp8228/
-docker build -f Dockerfile -t bx-php:8.2.28-fpm-v1-alpine --no-cache .
+docker build -f Dockerfile -t bitrix24/php:8.2.28-fpm-v1-alpine --no-cache .
 ```
 
-- bx-nginx:
+- bitrix24/nginx:
 ```bash
 cd dev/sources/bxnginx1280/
-docker build -f Dockerfile -t bx-nginx:1.28.0-v1-alpine --no-cache .
+docker build -f Dockerfile -t bitrix24/nginx:1.28.0-v1-alpine --no-cache .
 ```
 
-- bx-percona-server:
+- bitrix24/percona-server:
 ```bash
 cd dev/sources/bxpercona8042/
-docker build -f Dockerfile -t bx-percona-server:8.0.42-v1-rhel --no-cache .
+docker build -f Dockerfile -t bitrix24/percona-server:8.0.42-v1-rhel --no-cache .
 ```
 
-- bx-lego:
+- bitrix24/lego:
 ```bash
 cd dev/sources/bxlego4231/
-docker build -f Dockerfile -t bx-lego:4.23.1-v1-alpine --no-cache .
+docker build -f Dockerfile -t bitrix24/lego:4.23.1-v1-alpine --no-cache .
 ```
 
-- bx-ssl:
+- bitrix24/ssl:
 ```bash
 cd dev/sources/bxssl10/
-docker build -f Dockerfile -t bx-ssl:1.0-v1-alpine --no-cache .
+docker build -f Dockerfile -t bitrix24/ssl:1.0-v1-alpine --no-cache .
 ```
 
-Во всех образах `bx-` в названии тега указывается `v1`, состоит из:
+Во всех образах `bitrix24` в названии тега указывается `v1`, состоит из:
 - общая отметка версии, указывается буквой `v`
 - номер сборки, начинается с цифры `1`
 
@@ -230,7 +230,7 @@ docker build -f Dockerfile -t bx-ssl:1.0-v1-alpine --no-cache .
 > [!CAUTION]
 > Внимание! Информация о сборке модулей для Nginx предоставляется для ознакомления. Повторять шаги ниже не требуется.
 
-В образе веб-сервера `bx-nginx` используются следующие модули:
+В образе веб-сервера `bitrix24/nginx` используются следующие модули:
 - `brotli`
 - `geoip`
 - `geoip2`
@@ -319,7 +319,7 @@ docker container stop nginxmodules1280testingarm64 && docker container rm nginxm
 - файл индекс репозитория - `APKINDEX.tar.gz`
 - rsa ключ подписи файлов модулей в репозитории - `abuild-key.rsa.pub`
 
-Собранные модули для Nginx будут использоваться при сборке образа `bx-nginx`.
+Собранные модули для Nginx будут использоваться при сборке образа `bitrix24/nginx`.
 
 Механизм сборки для версии `1.28.0` можно найти в файле `/sources/bxnginx1280/Dockerfile`.
 
@@ -691,7 +691,7 @@ http://10.0.1.119:8588/
 <a id="agentsoncron"></a>
 ## Выполнение агентов на cron
 
-Для работы cron заданий используется отдельный контейнер `cron` на базе образа `bx-php`.
+Для работы cron заданий используется отдельный контейнер `cron` на базе образа `bitrix24/php`.
 
 По умолчанию контейнер сконфигурирован на выполнение заданий модуля `Главный модуль (main)` раз в минуту, запуская это исполнение от пользователя `bitrix`:
 ```bash
@@ -793,7 +793,7 @@ Cохранить.
 <a id="pushserver"></a>
 ## Push-сервер
 
-Для работы Push-сервера будет запущено два контейнера: один для режима `pub`, второй для режима `sub`. Оба используют один образ `bx-push`.
+Для работы Push-сервера будет запущено два контейнера: один для режима `pub`, второй для режима `sub`. Оба используют один образ `bitrix24/push`.
 
 Параметры переменных сред контейнеров хранятся в файлах `.env_push_pub` и `.env_push_sub`.
 
@@ -853,7 +853,7 @@ Cекретный ключ для подписи соединения между
 <a id="sphinxsearch"></a>
 ## Поиск с помощью Sphinx
 
-Для работы полнотекстового поиска, используя `Sphinx`, будет запущен один контейнер на базе образа `bx-sphinx`.
+Для работы полнотекстового поиска, используя `Sphinx`, будет запущен один контейнер на базе образа `bitrix24/sphinx`.
 
 Для запуска и настройки:
 - переходим в настройки модуля `Поиск` (`/bitrix/admin/settings.php?lang=ru&mid=search`)
@@ -881,7 +881,7 @@ Cекретный ключ для подписи соединения между
 <a id="msmtpmta"></a>
 ## Отправка почты с помощью msmtp
 
-Образ `bx-php` в своем составе содержит mta `msmtp`, предназначенный для отправки писем.
+Образ `bitrix24/php` в своем составе содержит mta `msmtp`, предназначенный для отправки писем.
 
 Настройки msmtp для аккаунта `default` хранятся в файле `/opt/msmtp/.msmtprc`.
 
@@ -1164,7 +1164,7 @@ GeoLite2-Country.mmdb
 <a id="phpextensions"></a>
 ## PHP расширения (extensions)
 
-Образ `bx-php` в своем составе содержит следующие PHP расширения (extensions):
+Образ `bitrix24/php` в своем составе содержит следующие PHP расширения (extensions):
 ```bash
 amqp
 apcu
@@ -1359,7 +1359,7 @@ https://dev.1c-bitrix.ru/learning/course/index.php?COURSE_ID=35&LESSON_ID=2674#a
 
 Подключение модулей Nginx производится в файле `/etc/nginx/inc/modules.conf` контейнера, содержимое которого можно найти в файле `/confs/nginx/inc/modules.conf` репозитория.
 
-По умолчанию в контейнере `nginx`, запущенного из образа `bx-nginx`, подключаются следующие модули:
+По умолчанию в контейнере `nginx`, запущенного из образа `bitrix24/nginx`, подключаются следующие модули:
 - `brotli`
 - `headers-more`
 - `zip`
@@ -1570,7 +1570,7 @@ docker compose restart nginx
 <a id="selfsignedcerts"></a>
 ## Самоподписанный сертификат
 
-Сгенерировать и использовать SSL-сертификат в режиме самоподписи возможно с помощью отдельного контейнера `ssl` на базе образа `bx-ssl`.
+Сгенерировать и использовать SSL-сертификат в режиме самоподписи возможно с помощью отдельного контейнера `ssl` на базе образа `bitrix24/ssl`.
 
 Данные, отображаемые в сертификатах корневого и промежуточного центров сертификации, хранятся в файле `.env_ssl`. Строки настроек начинаются с `CA_`.
 
@@ -1953,7 +1953,7 @@ update-ca-trust extract
 <a id="lego"></a>
 ### Lego
 
-Выпустить и использовать бесплатный SSL-сертификат от LetsEncrypt возможно с помощью отдельного контейнера `lego` на базе образа `bx-lego`.
+Выпустить и использовать бесплатный SSL-сертификат от LetsEncrypt возможно с помощью отдельного контейнера `lego` на базе образа `bitrix24/lego`.
 
 Внутри образа находится `LetsEncrypt` клиент и `ACME` библиотека, написанная на `Go`. По сокращениям первых букв слов получаем название проекта `LeGo` ([GitHub](https://github.com/go-acme/lego), [DockerHub](https://hub.docker.com/r/goacme/lego)).
 
