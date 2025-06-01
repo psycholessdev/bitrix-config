@@ -12,10 +12,6 @@
 # Содержимое
 
 * [Docker и Docker Compose](#docker)
-* [Сборка или скачивание Docker образов](#dockerimages)
-  * [Базовые образы](#basicimages)
-  * [Битрикс образы](#bitriximages)
-  * [Модули для Nginx](#nginxmodulesimage)
 * [Пароли к базам данных MySQL и PostgreSQL](#databasespasswords)
 * [Секретный ключ для Push-сервера](#pushserversecretkey)
 * [Управление](#management)
@@ -91,6 +87,10 @@
   * [Memcache](#memcacheconsole)
   * [Redis](#redisconsole)
 * [Кастомизация](#customization)
+* [Сборка или скачивание Docker образов](#dockerimages)
+  * [Базовые образы](#basicimages)
+  * [Битрикс образы](#bitriximages)
+  * [Модули для Nginx](#nginxmodulesimage)
 
 <a id="docker"></a>
 # Docker и Docker Compose
@@ -119,209 +119,6 @@
 
 Ознакомьтесь с документацией и разверните `Docker Compose`, если это требуется отдельно:
 - `Docker Compose`: https://docs.docker.com/compose/
-
-<a id="dockerimages"></a>
-# Сборка или скачивание Docker образов
-
-Наша цель - подготовить или собрать максимально совместимые и готовые образы для продуктов компании 1С-Битрикс, запускающие набор ПО в контейнерах.
-
-<a id="basicimages"></a>
-## Базовые образы
-
-Там где возможно будем использовать официальные Docker образы ПО, теги для которых будем брать с [DockerHub](https://hub.docker.com/):
-- `PostgreSQL`: https://hub.docker.com/_/postgres
-- `Redis`: https://hub.docker.com/_/redis
-- `Memcached`: https://hub.docker.com/_/memcached
-
-В этот список попадают (формат `название`:`полный_тег_с_указанием_версии_и_ос`):
-- `postgres:16.9-bookworm`
-- `redis:7.2.8-alpine`
-- `memcached:1.6.38-alpine`
-
-Можно предварительно скачать ПО из списка выше с помощью команд:
-```bash
-docker pull postgres:16.9-bookworm
-docker pull redis:7.2.8-alpine
-docker pull memcached:1.6.38-alpine
-```
-
-<a id="bitriximages"></a>
-## Битрикс образы
-
-Также нам понадобятся:
-- база данных MySQL: используем стабильный образ `percona/percona-server:8.0.42`, добавляем слоем сверху конфигурацию бд, собираем `bitrix24/percona-server:8.0.42-v1-rhel`
-- веб-сервер: используем стабильный образ `nginx:1.28.0-alpine-slim`, добавляем модули слоем сверху, собираем `bitrix24/nginx:1.28.0-v1-alpine`
-- интерпретатор PHP-кода: готового совместимого образа PHP нет, берем по умолчанию образ `php:8.2.28-fpm-alpine` и добавляем то, что нам надо через пару слоев сверху, собираем `bitrix24/php:8.2.28-fpm-v1-alpine`
-- поиск: готового образа Sphinx нет, но есть собранный пакет `sphinx` на базе `Alpine Linux` в официальном репозитории ОС, собираем `bitrix24/sphinx:2.2.11-v1-alpine`, установив пакет
-- Push-сервер: готового образа нет, используем образ NodeJS 22-ой версии, собираем `bitrix24/push:3.1-v1-alpine`, используя его исходники `push-server-0.4.0`
-- сервис для бесплатных SSL-сертификатов от `LetsEncrypt`: используем стабильный образ `goacme/lego:v4.23.1`, добавляем логику слоем сверху, собираем `bitrix24/lego:4.23.1-v1-alpine`
-- генератор самоподписных SSL-сертификатов: небольшой образ с пакетами на базе `Alpine Linux`, собираем `bitrix24/ssl:1.0-v1-alpine`
-
-Список официальных Docker образов, которые будем брать с [DockerHub](https://hub.docker.com/):
-- `Percona Server`: https://hub.docker.com/r/percona/percona-server
-- `Nginx`: https://hub.docker.com/_/nginx
-- `PHP`: https://hub.docker.com/_/php
-- `NodeJS`: https://hub.docker.com/_/node
-- `Alpine`: https://hub.docker.com/_/alpine
-- `Lego`: https://hub.docker.com/r/goacme/lego
-
-Для сборки нам понадобятся следующие образы (их можно предварительно скачать, используя команды):
-```bash
-docker pull percona/percona-server:8.0.42
-docker pull nginx:1.28.0-alpine-slim
-docker pull php:8.2.28-fpm-alpine
-docker pull node:22
-docker pull node:22-alpine
-docker pull alpine:3.21
-docker pull goacme/lego:v4.23.1
-```
-
-Собираем образы, в названии используем `bitrix24`:
-
-- bitrix24/sphinx:
-```bash
-cd dev/sources/bxsphinx2211/
-docker build -f Dockerfile -t bitrix24/sphinx:2.2.11-v1-alpine --no-cache .
-```
-
-- bitrix24/push:
-```bash
-cd dev/sources/bxpush31/
-docker build -f Dockerfile -t bitrix24/push:3.1-v1-alpine --no-cache .
-```
-
-- bitrix24/php:
-```bash
-cd dev/sources/bxphp8228/
-docker build -f Dockerfile -t bitrix24/php:8.2.28-fpm-v1-alpine --no-cache .
-```
-
-- bitrix24/nginx:
-```bash
-cd dev/sources/bxnginx1280/
-docker build -f Dockerfile -t bitrix24/nginx:1.28.0-v1-alpine --no-cache .
-```
-
-- bitrix24/percona-server:
-```bash
-cd dev/sources/bxpercona8042/
-docker build -f Dockerfile -t bitrix24/percona-server:8.0.42-v1-rhel --no-cache .
-```
-
-- bitrix24/lego:
-```bash
-cd dev/sources/bxlego4231/
-docker build -f Dockerfile -t bitrix24/lego:4.23.1-v1-alpine --no-cache .
-```
-
-- bitrix24/ssl:
-```bash
-cd dev/sources/bxssl10/
-docker build -f Dockerfile -t bitrix24/ssl:1.0-v1-alpine --no-cache .
-```
-
-Во всех образах `bitrix24` в названии тега указывается `v1`, состоит из:
-- общая отметка версии, указывается буквой `v`
-- номер сборки, начинается с цифры `1`
-
-<a id="nginxmodulesimage"></a>
-## Модули для Nginx
-
-> [!CAUTION]
-> Внимание! Информация о сборке модулей для Nginx предоставляется для ознакомления. Повторять шаги ниже не требуется.
-
-В образе веб-сервера `bitrix24/nginx` используются следующие модули:
-- `brotli`
-- `geoip`
-- `geoip2`
-- `headers-more`
-- `image-filter`
-- `lua`
-- `ndk`
-- `njs`
-- `perl`
-- `xslt`
-- `zip`
-
-Модули собираются на базе стабильного образа `nginx:1.28.0-alpine-slim`, используя официальный образ Nginx с [DockerHub](https://hub.docker.com/):
-- `Nginx`: https://hub.docker.com/_/nginx
-
-Образ Nginx можно предварительно скачать, используя команду:
-```bash
-docker pull nginx:1.28.0-alpine-slim
-```
-
-Для сборки потребуется `Dockerfile` от версии `1.28.0`, найти который можно на [GitHub](https://github.com/nginx/docker-nginx).
-
-Скачиваем файл для версии 1.28.0 по ссылке: [https://github.com/nginx/docker-nginx/blob/7f1d49f6f222f7e588a9066fd53a0ce43c3466a5/stable/alpine/Dockerfile](https://github.com/nginx/docker-nginx/blob/7f1d49f6f222f7e588a9066fd53a0ce43c3466a5/stable/alpine/Dockerfile)
-
-Модифицируем файл, добавляем нужные модули по списку выше и служебную часть. Пример всех изменений файла для версии 1.28.0 можно найти в папке `/sources/nginx1280modules/`.
-
-Запускаем сборку образа `nginx_modules`, указываем две архитектуры `amd64` и `arm64` в команде:
-
-```bash
-cd dev/sources/nginx1280modules/
-docker build --platform linux/arm64,linux/amd64 -f Dockerfile -t nginx_modules:1.28.0-v1-alpine --no-cache .
-```
-
-После нужно запустить два контейнера, используя собранный образ выше. По одному для каждой архитектуры: `amd64` и `arm64`.
-
-Для `amd64` выполняем команду:
-```bash
-docker run --platform=linux/amd64 -d --name=nginxmodules1280testingamd64 -it nginx_modules:1.28.0-v1-alpine
-```
-
-Для `arm64` выполняем команду:
-```bash
-docker run --platform=linux/arm64 -d --name=nginxmodules1280testingarm64 -it nginx_modules:1.28.0-v1-alpine
-```
-
-Собранные модули Nginx будут доступны в каталоге `/root/packages/` у каждого запущенного контейнера.
-
-Внутри контейнера переходим в каталог `/root/packages/`, архивируем содержимое и забираем zip-файл:
-
-- для `amd64` выполняем:
-
-```bash
-apk add mc zip
-cd /root/packages/
-zip -r nginxmodules_amd64.zip *
-exit
-```
-
-- для `arm64` выполняем:
-
-```bash
-apk add mc zip
-cd /root/packages/
-zip -r nginxmodules_arm64.zip *
-exit
-```
-
-Останавливаем и удаляем контейнеры, они больше не нужны.
-
-Для `amd64` выполняем команду:
-```bash
-docker container stop nginxmodules1280testingamd64 && docker container rm nginxmodules1280testingamd64
-```
-
-Для `arm64` выполняем команду:
-```bash
-docker container stop nginxmodules1280testingarm64 && docker container rm nginxmodules1280testingarm64
-```
-
-Содержимое обоих архивов (`nginxmodules_amd64.zip` и `nginxmodules_arm64.zip`) размещаем в репозитории `bitrix24/nginx-modules` на [GitHub](https://github.com/bitrix24/nginx-modules).
-
-Каждый zip архив содержит:
-- каталог с названием архитектуры: `x86_64` (для `amd64`) или `aarch64` (для `arm64`)
-- файлы модулей в формате пакетов ОС `Alpine Linux` - `*.apk`
-- модули, собранные для работы Nginx в режиме отладки (debug), содержат `dbg` в названии файла
-- файл индекс репозитория - `APKINDEX.tar.gz`
-- rsa ключ подписи файлов модулей в репозитории - `abuild-key.rsa.pub`
-
-Собранные модули для Nginx будут использоваться при сборке образа `bitrix24/nginx`.
-
-Механизм сборки для версии `1.28.0` можно найти в файле `/sources/bxnginx1280/Dockerfile`.
 
 <a id="databasespasswords"></a>
 # Пароли к базам данных MySQL и PostgreSQL
@@ -2980,6 +2777,209 @@ docker compose exec --user=root valkey sh -c "valkey-cli -h 127.0.0.1 -p 6379"
 
 Итого: мы успешно запустили новый контейнер valkey, проверили его работу. Теперь его можно использовать для хранения кеша или хранения сессий по примеру, как описано выше в этом файле.
 
+<a id="dockerimages"></a>
+# Сборка или скачивание Docker образов
+
+Наша цель - подготовить или собрать максимально совместимые и готовые образы для продуктов компании 1С-Битрикс, запускающие набор ПО в контейнерах.
+
+<a id="basicimages"></a>
+## Базовые образы
+
+Там где возможно будем использовать официальные Docker образы ПО, теги для которых будем брать с [DockerHub](https://hub.docker.com/):
+- `PostgreSQL`: https://hub.docker.com/_/postgres
+- `Redis`: https://hub.docker.com/_/redis
+- `Memcached`: https://hub.docker.com/_/memcached
+
+В этот список попадают (формат `название`:`полный_тег_с_указанием_версии_и_ос`):
+- `postgres:16.9-bookworm`
+- `redis:7.2.8-alpine`
+- `memcached:1.6.38-alpine`
+
+Можно предварительно скачать ПО из списка выше с помощью команд:
+```bash
+docker pull postgres:16.9-bookworm
+docker pull redis:7.2.8-alpine
+docker pull memcached:1.6.38-alpine
+```
+
+<a id="bitriximages"></a>
+## Битрикс образы
+
+Также нам понадобятся:
+- база данных MySQL: используем стабильный образ `percona/percona-server:8.0.42`, добавляем слоем сверху конфигурацию бд, собираем `bitrix24/percona-server:8.0.42-v1-rhel`
+- веб-сервер: используем стабильный образ `nginx:1.28.0-alpine-slim`, добавляем модули слоем сверху, собираем `bitrix24/nginx:1.28.0-v1-alpine`
+- интерпретатор PHP-кода: готового совместимого образа PHP нет, берем по умолчанию образ `php:8.2.28-fpm-alpine` и добавляем то, что нам надо через пару слоев сверху, собираем `bitrix24/php:8.2.28-fpm-v1-alpine`
+- поиск: готового образа Sphinx нет, но есть собранный пакет `sphinx` на базе `Alpine Linux` в официальном репозитории ОС, собираем `bitrix24/sphinx:2.2.11-v1-alpine`, установив пакет
+- Push-сервер: готового образа нет, используем образ NodeJS 22-ой версии, собираем `bitrix24/push:3.1-v1-alpine`, используя его исходники `push-server-0.4.0`
+- сервис для бесплатных SSL-сертификатов от `LetsEncrypt`: используем стабильный образ `goacme/lego:v4.23.1`, добавляем логику слоем сверху, собираем `bitrix24/lego:4.23.1-v1-alpine`
+- генератор самоподписных SSL-сертификатов: небольшой образ с пакетами на базе `Alpine Linux`, собираем `bitrix24/ssl:1.0-v1-alpine`
+
+Список официальных Docker образов, которые будем брать с [DockerHub](https://hub.docker.com/):
+- `Percona Server`: https://hub.docker.com/r/percona/percona-server
+- `Nginx`: https://hub.docker.com/_/nginx
+- `PHP`: https://hub.docker.com/_/php
+- `NodeJS`: https://hub.docker.com/_/node
+- `Alpine`: https://hub.docker.com/_/alpine
+- `Lego`: https://hub.docker.com/r/goacme/lego
+
+Для сборки нам понадобятся следующие образы (их можно предварительно скачать, используя команды):
+```bash
+docker pull percona/percona-server:8.0.42
+docker pull nginx:1.28.0-alpine-slim
+docker pull php:8.2.28-fpm-alpine
+docker pull node:22
+docker pull node:22-alpine
+docker pull alpine:3.21
+docker pull goacme/lego:v4.23.1
+```
+
+Собираем образы, в названии используем `bitrix24`:
+
+- bitrix24/sphinx:
+```bash
+cd dev/sources/bxsphinx2211/
+docker build -f Dockerfile -t bitrix24/sphinx:2.2.11-v1-alpine --no-cache .
+```
+
+- bitrix24/push:
+```bash
+cd dev/sources/bxpush31/
+docker build -f Dockerfile -t bitrix24/push:3.1-v1-alpine --no-cache .
+```
+
+- bitrix24/php:
+```bash
+cd dev/sources/bxphp8228/
+docker build -f Dockerfile -t bitrix24/php:8.2.28-fpm-v1-alpine --no-cache .
+```
+
+- bitrix24/nginx:
+```bash
+cd dev/sources/bxnginx1280/
+docker build -f Dockerfile -t bitrix24/nginx:1.28.0-v1-alpine --no-cache .
+```
+
+- bitrix24/percona-server:
+```bash
+cd dev/sources/bxpercona8042/
+docker build -f Dockerfile -t bitrix24/percona-server:8.0.42-v1-rhel --no-cache .
+```
+
+- bitrix24/lego:
+```bash
+cd dev/sources/bxlego4231/
+docker build -f Dockerfile -t bitrix24/lego:4.23.1-v1-alpine --no-cache .
+```
+
+- bitrix24/ssl:
+```bash
+cd dev/sources/bxssl10/
+docker build -f Dockerfile -t bitrix24/ssl:1.0-v1-alpine --no-cache .
+```
+
+Во всех образах `bitrix24` в названии тега указывается `v1`, состоит из:
+- общая отметка версии, указывается буквой `v`
+- номер сборки, начинается с цифры `1`
+
+<a id="nginxmodulesimage"></a>
+## Модули для Nginx
+
+> [!CAUTION]
+> Внимание! Информация о сборке модулей для Nginx предоставляется для ознакомления. Повторять шаги ниже не требуется.
+
+В образе веб-сервера `bitrix24/nginx` используются следующие модули:
+- `brotli`
+- `geoip`
+- `geoip2`
+- `headers-more`
+- `image-filter`
+- `lua`
+- `ndk`
+- `njs`
+- `perl`
+- `xslt`
+- `zip`
+
+Модули собираются на базе стабильного образа `nginx:1.28.0-alpine-slim`, используя официальный образ Nginx с [DockerHub](https://hub.docker.com/):
+- `Nginx`: https://hub.docker.com/_/nginx
+
+Образ Nginx можно предварительно скачать, используя команду:
+```bash
+docker pull nginx:1.28.0-alpine-slim
+```
+
+Для сборки потребуется `Dockerfile` от версии `1.28.0`, найти который можно на [GitHub](https://github.com/nginx/docker-nginx).
+
+Скачиваем файл для версии 1.28.0 по ссылке: [https://github.com/nginx/docker-nginx/blob/7f1d49f6f222f7e588a9066fd53a0ce43c3466a5/stable/alpine/Dockerfile](https://github.com/nginx/docker-nginx/blob/7f1d49f6f222f7e588a9066fd53a0ce43c3466a5/stable/alpine/Dockerfile)
+
+Модифицируем файл, добавляем нужные модули по списку выше и служебную часть. Пример всех изменений файла для версии 1.28.0 можно найти в папке `/sources/nginx1280modules/`.
+
+Запускаем сборку образа `nginx_modules`, указываем две архитектуры `amd64` и `arm64` в команде:
+
+```bash
+cd dev/sources/nginx1280modules/
+docker build --platform linux/arm64,linux/amd64 -f Dockerfile -t nginx_modules:1.28.0-v1-alpine --no-cache .
+```
+
+После нужно запустить два контейнера, используя собранный образ выше. По одному для каждой архитектуры: `amd64` и `arm64`.
+
+Для `amd64` выполняем команду:
+```bash
+docker run --platform=linux/amd64 -d --name=nginxmodules1280testingamd64 -it nginx_modules:1.28.0-v1-alpine
+```
+
+Для `arm64` выполняем команду:
+```bash
+docker run --platform=linux/arm64 -d --name=nginxmodules1280testingarm64 -it nginx_modules:1.28.0-v1-alpine
+```
+
+Собранные модули Nginx будут доступны в каталоге `/root/packages/` у каждого запущенного контейнера.
+
+Внутри контейнера переходим в каталог `/root/packages/`, архивируем содержимое и забираем zip-файл:
+
+- для `amd64` выполняем:
+
+```bash
+apk add mc zip
+cd /root/packages/
+zip -r nginxmodules_amd64.zip *
+exit
+```
+
+- для `arm64` выполняем:
+
+```bash
+apk add mc zip
+cd /root/packages/
+zip -r nginxmodules_arm64.zip *
+exit
+```
+
+Останавливаем и удаляем контейнеры, они больше не нужны.
+
+Для `amd64` выполняем команду:
+```bash
+docker container stop nginxmodules1280testingamd64 && docker container rm nginxmodules1280testingamd64
+```
+
+Для `arm64` выполняем команду:
+```bash
+docker container stop nginxmodules1280testingarm64 && docker container rm nginxmodules1280testingarm64
+```
+
+Содержимое обоих архивов (`nginxmodules_amd64.zip` и `nginxmodules_arm64.zip`) размещаем в репозитории `bitrix24/nginx-modules` на [GitHub](https://github.com/bitrix24/nginx-modules).
+
+Каждый zip архив содержит:
+- каталог с названием архитектуры: `x86_64` (для `amd64`) или `aarch64` (для `arm64`)
+- файлы модулей в формате пакетов ОС `Alpine Linux` - `*.apk`
+- модули, собранные для работы Nginx в режиме отладки (debug), содержат `dbg` в названии файла
+- файл индекс репозитория - `APKINDEX.tar.gz`
+- rsa ключ подписи файлов модулей в репозитории - `abuild-key.rsa.pub`
+
+Собранные модули для Nginx будут использоваться при сборке образа `bitrix24/nginx`.
+
+Механизм сборки для версии `1.28.0` можно найти в файле `/sources/bxnginx1280/Dockerfile`.
+
 ------------------------------------------------
 
-[1С-Битрикс: Разработчикам](https://dev.1c-bitrix.ru/)
+[1С-Битрикс: Разработчикам](https://dev.1c-bitrix.ru)
