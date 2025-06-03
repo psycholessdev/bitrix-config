@@ -2805,6 +2805,9 @@ docker pull memcached:1.6.38-alpine
 <a id="bitriximages"></a>
 ## Битрикс образы
 
+> [!CAUTION]
+> Внимание! Сборку образов необходимо проводить в продукте `Docker Desktop` в связи с наличием в сборщике двух архитектур: `x86_64` (для `amd64`) и `aarch64` (для `arm64`).
+
 Также нам понадобятся:
 - база данных MySQL: используем стабильный образ `percona/percona-server:8.0.42`, добавляем слоем сверху конфигурацию бд, собираем `bitrix24/percona-server:8.0.42-v1-rhel`
 - веб-сервер: используем стабильный образ `nginx:1.28.0-alpine-slim`, добавляем модули слоем сверху, собираем `bitrix24/nginx:1.28.0-v1-alpine`
@@ -2835,46 +2838,46 @@ docker pull goacme/lego:v4.23.1
 
 Собираем образы, в названии используем `bitrix24`:
 
-- bitrix24/sphinx:
+- `bitrix24/sphinx`:
 ```bash
 cd dev/sources/bxsphinx2211/
-docker build -f Dockerfile -t bitrix24/sphinx:2.2.11-v1-alpine --no-cache .
+docker buildx build --platform linux/arm64,linux/amd64 --provenance=false -f Dockerfile -t bitrix24/sphinx:2.2.11-v1-alpine --no-cache .
 ```
 
-- bitrix24/push:
+- `bitrix24/push`:
 ```bash
 cd dev/sources/bxpush31/
-docker build -f Dockerfile -t bitrix24/push:3.1-v1-alpine --no-cache .
+docker buildx build --platform linux/arm64,linux/amd64 --provenance=false -f Dockerfile -t bitrix24/push:3.1-v1-alpine --no-cache .
 ```
 
-- bitrix24/php:
+- `bitrix24/php`:
 ```bash
 cd dev/sources/bxphp8228/
-docker build -f Dockerfile -t bitrix24/php:8.2.28-fpm-v1-alpine --no-cache .
+docker buildx build --platform linux/arm64,linux/amd64 --provenance=false -f Dockerfile -t bitrix24/php:8.2.28-fpm-v1-alpine --no-cache .
 ```
 
-- bitrix24/nginx:
+- `bitrix24/nginx`:
 ```bash
 cd dev/sources/bxnginx1280/
-docker build -f Dockerfile -t bitrix24/nginx:1.28.0-v1-alpine --no-cache .
+docker buildx build --platform linux/arm64,linux/amd64 --provenance=false -f Dockerfile -t bitrix24/nginx:1.28.0-v1-alpine --no-cache .
 ```
 
-- bitrix24/percona-server:
+- `bitrix24/percona-server`:
 ```bash
 cd dev/sources/bxpercona8042/
-docker build -f Dockerfile -t bitrix24/percona-server:8.0.42-v1-rhel --no-cache .
+docker buildx build --platform linux/arm64,linux/amd64 --provenance=false -f Dockerfile -t bitrix24/percona-server:8.0.42-v1-rhel --no-cache .
 ```
 
-- bitrix24/lego:
+- `bitrix24/lego`:
 ```bash
 cd dev/sources/bxlego4231/
-docker build -f Dockerfile -t bitrix24/lego:4.23.1-v1-alpine --no-cache .
+docker buildx build --platform linux/arm64,linux/amd64 --provenance=false -f Dockerfile -t bitrix24/lego:4.23.1-v1-alpine --no-cache .
 ```
 
-- bitrix24/ssl:
+- `bitrix24/ssl`:
 ```bash
 cd dev/sources/bxssl10/
-docker build -f Dockerfile -t bitrix24/ssl:1.0-v1-alpine --no-cache .
+docker buildx build --platform linux/arm64,linux/amd64 --provenance=false -f Dockerfile -t bitrix24/ssl:1.0-v1-alpine --no-cache .
 ```
 
 Во всех образах `bitrix24` в названии тега указывается `v1`, состоит из:
@@ -2918,7 +2921,7 @@ docker pull nginx:1.28.0-alpine-slim
 
 ```bash
 cd dev/sources/nginx1280modules/
-docker build --platform linux/arm64,linux/amd64 -f Dockerfile -t nginx_modules:1.28.0-v1-alpine --no-cache .
+docker buildx build --platform linux/arm64,linux/amd64 --provenance=false -f Dockerfile -t nginx_modules:1.28.0-v1-alpine --no-cache .
 ```
 
 После нужно запустить два контейнера, используя собранный образ выше. По одному для каждой архитектуры: `amd64` и `arm64`.
