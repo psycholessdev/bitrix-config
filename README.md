@@ -1,4 +1,4 @@
-# dev сайт - контейнерное окружение для Битрикс
+# Контейнерное окружение для Битрикс
 
 Проект представляет собой dev сайт, он же девелоперский сайт, предназначенный для тестирования, разработки, примера использования окружения на базе технологий [Docker](https://www.docker.com/).
 
@@ -176,7 +176,7 @@ PUSH_SECURITY_KEY=CHANGE_SECURITY_KEY_HERE
 
 Управление (или оркестровка) набором контейнеров или одним из контейнеров осуществляется через `Docker Compose`.
 
-Переходим в каталог проекта `cd dev` и выполняем команды ниже.
+Переходим в каталог проекта `cd env-docker` и выполняем команды ниже.
 
 Запустить все контейнеры и оставить их работать в фоне:
 ```bash
@@ -2840,43 +2840,43 @@ docker pull goacme/lego:v4.23.1
 
 - `bitrix24/sphinx`:
 ```bash
-cd dev/sources/bxsphinx2211/
+cd env-docker/sources/bxsphinx2211/
 docker buildx build --platform linux/arm64,linux/amd64 --provenance=false -f Dockerfile -t bitrix24/sphinx:2.2.11-v1-alpine --no-cache .
 ```
 
 - `bitrix24/push`:
 ```bash
-cd dev/sources/bxpush31/
+cd env-docker/sources/bxpush31/
 docker buildx build --platform linux/arm64,linux/amd64 --provenance=false -f Dockerfile -t bitrix24/push:3.1-v1-alpine --no-cache .
 ```
 
 - `bitrix24/php`:
 ```bash
-cd dev/sources/bxphp8228/
+cd env-docker/sources/bxphp8228/
 docker buildx build --platform linux/arm64,linux/amd64 --provenance=false -f Dockerfile -t bitrix24/php:8.2.28-fpm-v1-alpine --no-cache .
 ```
 
 - `bitrix24/nginx`:
 ```bash
-cd dev/sources/bxnginx1280/
+cd env-docker/sources/bxnginx1280/
 docker buildx build --platform linux/arm64,linux/amd64 --provenance=false -f Dockerfile -t bitrix24/nginx:1.28.0-v1-alpine --no-cache .
 ```
 
 - `bitrix24/percona-server`:
 ```bash
-cd dev/sources/bxpercona8042/
+cd env-docker/sources/bxpercona8042/
 docker buildx build --platform linux/arm64,linux/amd64 --provenance=false -f Dockerfile -t bitrix24/percona-server:8.0.42-v1-rhel --no-cache .
 ```
 
 - `bitrix24/lego`:
 ```bash
-cd dev/sources/bxlego4231/
+cd env-docker/sources/bxlego4231/
 docker buildx build --platform linux/arm64,linux/amd64 --provenance=false -f Dockerfile -t bitrix24/lego:4.23.1-v1-alpine --no-cache .
 ```
 
 - `bitrix24/ssl`:
 ```bash
-cd dev/sources/bxssl10/
+cd env-docker/sources/bxssl10/
 docker buildx build --platform linux/arm64,linux/amd64 --provenance=false -f Dockerfile -t bitrix24/ssl:1.0-v1-alpine --no-cache .
 ```
 
@@ -2920,7 +2920,7 @@ docker pull nginx:1.28.0-alpine-slim
 Запускаем сборку образа `nginx_modules`, указываем две архитектуры `amd64` и `arm64` в команде:
 
 ```bash
-cd dev/sources/nginx1280modules/
+cd env-docker/sources/nginx1280modules/
 docker buildx build --platform linux/arm64,linux/amd64 --provenance=false -f Dockerfile -t nginx_modules:1.28.0-v1-alpine --no-cache .
 ```
 
