@@ -237,12 +237,12 @@ docker compose exec nginx sh
 
 Значение по умолчанию задано как:
 ```bash
-TZ=Europe/Kaliningrad
+TZ=Europe/Moscow
 ```
 
 Исключение составляет контейнер с `php`, значение часового пояса (timezone) которого продублировано в отдельном файле `confs/php/etc/php/conf.d/timezone.ini` как:
 ```bash
-date.timezone = Europe/Kaliningrad
+date.timezone = Europe/Moscow
 ```
 
 При необходимости смените значение в обоих файлах. Перезапустите все контейнеры:
