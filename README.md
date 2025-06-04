@@ -14,8 +14,8 @@
 * [Docker и Docker Compose](#docker)
 * [Пароли к базам данных MySQL и PostgreSQL](#databasespasswords)
 * [Секретный ключ для Push-сервера](#pushserversecretkey)
-* [Управление](#management)
 * [Часовой пояс (timezone)](#timezone)
+* [Управление](#management)
 * [Адресация](#iporurls)
 * [Порты](#ports)
 * [Доступ к сайту](#siteaccess)
@@ -171,6 +171,33 @@ PUSH_SECURITY_KEY=CHANGE_SECURITY_KEY_HERE
 ```
 Обязательно измените значение вашего уникального секретного ключа в файле `.env_push`, заменив шаблон `CHANGE_SECURITY_KEY_HERE` на ваше значение.
 
+<a id="timezone"></a>
+# Часовой пояс (timezone)
+
+Значение часового пояса (timezone), используемой контейнерами, хранится в файле `.env`.
+
+Значение по умолчанию задано как:
+```bash
+TZ=Europe/Moscow
+```
+
+Исключение составляет контейнер с `php`, значение часового пояса (timezone) которого продублировано в отдельном файле `confs/php/etc/php/conf.d/timezone.ini` как:
+```bash
+date.timezone = Europe/Moscow
+```
+
+При необходимости смените значение в обоих файлах до создания и запуска контейнеров проекта. Например, для часового пояса `Europe/Kaliningrad` измените значение:
+
+- в файле `.env`:
+```bash
+TZ=Europe/Kaliningrad
+```
+
+- в файле `confs/php/etc/php/conf.d/timezone.ini`:
+```bash
+date.timezone = Europe/Kaliningrad
+```
+
 <a id="management"></a>
 # Управление
 
@@ -229,26 +256,6 @@ docker compose exec nginx sh
 ```
 
 Подробней можно прочитать в документации docker compose: https://docs.docker.com/reference/cli/docker/compose/
-
-<a id="timezone"></a>
-# Часовой пояс (timezone)
-
-Значение часового пояса (timezone), используемой контейнерами, хранится в файле `.env`.
-
-Значение по умолчанию задано как:
-```bash
-TZ=Europe/Moscow
-```
-
-Исключение составляет контейнер с `php`, значение часового пояса (timezone) которого продублировано в отдельном файле `confs/php/etc/php/conf.d/timezone.ini` как:
-```bash
-date.timezone = Europe/Moscow
-```
-
-При необходимости смените значение в обоих файлах. Перезапустите все контейнеры:
-```bash
-docker compose restart
-```
 
 <a id="iporurls"></a>
 # Адресация
