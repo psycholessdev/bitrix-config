@@ -505,7 +505,7 @@ php -f /opt/www/bitrix/modules/main/tools/cron_events.php
 Это задание будет выполнятся только в том случае, если дистрибутив установлен.
 
 Для завершения настройки необходимо в административной части продукта на странице `Управление структурой` (`/bitrix/admin/fileman_admin.php?lang=ru&path=%2F`) отредактировать файл `/bitrix/php_interface/dbconn.php`, добавить строку:
-```bash
+```php
 define("BX_CRONTAB_SUPPORT", true);
 ```
 
@@ -585,7 +585,7 @@ Time: 166.76 sec
 По умолчанию конфигурация `nginx` предварительно подготовлена таким образом, чтобы временные файлы хранились вне пределов корневой директории сайта, так как это существенно повышает защищенность от известных атак.
 
 Для завершения настройки и усиления безопасности, необходимо в административной части продукта на странице `Управление структурой` (`/bitrix/admin/fileman_admin.php?lang=ru&path=%2F`) отредактировать файл `/bitrix/php_interface/dbconn.php`, добавить строку:
-```bash
+```php
 define("BX_TEMPORARY_FILES_DIRECTORY", "/opt/.bx_temp");
 ```
 
@@ -621,7 +621,7 @@ Cекретный ключ для подписи соединения между
 - меняем значения опции `signature_key`, указываем ваш сгенерированный уникальный секретный ключ вместо шаблона `CHANGE_SECURITY_KEY_HERE`
 - меняем значения для `http` и `https` на ваши
 - пример:
-```bash
+```php
   'pull' => array(
     'value' => array(
       'path_to_listener' => 'http://10.0.1.119:8588/bitrix/sub/',
@@ -789,7 +789,7 @@ Apr 12 22:52:15 host=smtp.gmail.com tls=on auth=on user=***@gmail.com from=***@g
 Активируем возможность использования SMTP-сервера отправителя: https://dev.1c-bitrix.ru/learning/course/index.php?COURSE_ID=43&LESSON_ID=23612&LESSON_PATH=3913.3516.5062.2795.23612
 
 Для этого в административной части продукта на странице `Управление структурой` (`/bitrix/admin/fileman_admin.php?lang=ru&path=%2F`) редактируем файл `/bitrix/.settings.php`, добавляем блок настроек:
-```bash
+```php
     'smtp' => [
         'value' => [
             'enabled' => true,
@@ -826,12 +826,12 @@ Apr 12 22:52:15 host=smtp.gmail.com tls=on auth=on user=***@gmail.com from=***@g
 Если отправка почты не работает, можно включить логирование процесса отправки в файл для диагностики проблемы.
 
 Для этого в административной части продукта на странице `Управление структурой` (`/bitrix/admin/fileman_admin.php?lang=ru&path=%2F`) редактируем файл `/bitrix/php_interface/dbconn.php`, добавляем строку:
-```bash
+```php
 define("LOG_FILENAME", $_SERVER["DOCUMENT_ROOT"]."/bitrix/modules/mail_log.txt");
 ```
 
 Создаем файл `/bitrix/php_interface/init.php` если его нет, добавляем код функции `custom_mail`:
-```bash
+```php
 function custom_mail($to, $subject, $message, $additional_headers='', $additional_parameters='')
 {
     AddMessage2Log(
@@ -1080,7 +1080,7 @@ docker compose exec --user=bitrix php sh
 В административной части продукта:
 - на странице `Управление структурой` (`/bitrix/admin/fileman_admin.php?lang=ru&path=%2F`) редактируем файл `/bitrix/.settings.php`
 - добавляем блок настроек:
-```bash
+```php
         'services' => [
                 'value' => [
                         'main.imageEngine' => [
@@ -1237,7 +1237,7 @@ docker compose restart nginx
 В административной части продукта на странице `Управление структурой` (`/bitrix/admin/fileman_admin.php?lang=ru&path=%2F`) отредактируем файл `/bitrix/.settings.php`, добавляем блок настроек, который определит вариант хранения:
 
 - `memcache`:
-```bash
+```php
         'cache' => [
                 'value' => [
                         'type' => [
@@ -1254,7 +1254,7 @@ docker compose restart nginx
 ```
 
 - `redis`:
-```bash
+```php
         'cache' => [
                 'value' => [
                         'type' => [
@@ -1280,7 +1280,7 @@ docker compose restart nginx
 В административной части продукта на странице `Управление структурой` (`/bitrix/admin/fileman_admin.php?lang=ru&path=%2F`) отредактируем файл `/bitrix/.settings.php`, добавляем блок настроек, который определит вариант хранения:
 
 - `memcache`, разделенная сессия:
-```bash
+```php
         // memcache separated
         'session' => [
                 'value' => [
@@ -1299,7 +1299,7 @@ docker compose restart nginx
 ```
 
 - `redis`:
-```bash
+```php
         // redis
         'session' => [
                 'value' => [
@@ -1316,7 +1316,7 @@ docker compose restart nginx
 ```
 
 - `database`:
-```bash
+```php
         // database
         'session' => [
                 'value' => [
@@ -1555,7 +1555,7 @@ http://dev.bx:8588/intermediateCA.cert.pem
 
 Выбор пути зависит от используемой вами ОС Linux.
 
-Для ОС Debian, Ubuntu и ОС на их базе
+Для ОС `Debian`, `Ubuntu` и ОС на их базе
 
 Устанавливаем пакет `ca-certificates` и создаем объединенный траст файл со всеми сертификатами:
 ```bash
@@ -1584,7 +1584,7 @@ ln -s intermediateCA.cert.crt /usr/local/share/ca-certificates/intermediateCA.ce
 update-ca-certificates
 ```
 
-Для ОС RHEL, CentOS Stream, Rocky Linux, AlmaLinux, Oracle Linux, EuroLinux, Fedora и ОС на их базе
+Для ОС `RHEL`, `CentOS Stream`, `Rocky Linux`, `AlmaLinux`, `Oracle Linux`, `EuroLinux`, `Fedora` и ОС на их базе
 
 Устанавливаем пакет `ca-certificates`:
 ```bash
@@ -1613,7 +1613,7 @@ ln -s intermediateCA.cert.pem /etc/pki/ca-trust/source/anchors/intermediateCA.ce
 update-ca-trust extract
 ```
 
-Для ОС Arch, Bluestar, Manjaro, EndeavourOS, Garuda, Mabox, RebornOS, Archcraft, ArchLabs, CachyOS и ОС на их базе
+Для ОС `Arch`, `Bluestar`, `Manjaro`, `EndeavourOS`, `Garuda`, `Mabox`, `RebornOS`, `Archcraft`, `ArchLabs`, `CachyOS` и ОС на их базе
 
 Устанавливаем пакет `ca-certificates` и обновляем траст корневых сертификатов (CA Trust) машины:
 ```bash
@@ -1697,7 +1697,7 @@ Push-сервер использует безопасные веб-сокеты,
 
 Выбор пути зависит от используемой вами ОС Linux.
 
-Для ОС Debian, Ubuntu и ОС на их базе
+Для ОС `Debian`, `Ubuntu` и ОС на их базе
 
 Удаляем символические ссылки для файлов сертификата корневого центра сертификации (`rootCA.cert.crt`) и сертификата промежуточного центра сертификации (`intermediateCA.cert.crt`):
 ```bash
@@ -1710,7 +1710,7 @@ rm -f /usr/local/share/ca-certificates/intermediateCA.cert.crt
 update-ca-certificates
 ```
 
-Для ОС RHEL, CentOS Stream, Rocky Linux, AlmaLinux, Oracle Linux, EuroLinux, Fedora и ОС на их базе
+Для ОС `RHEL`, `CentOS Stream`, `Rocky Linux`, `AlmaLinux`, `Oracle Linux`, `EuroLinux`, `Fedora` и ОС на их базе
 
 Удаляем символические ссылки для файлов сертификата корневого центра сертификации (`rootCA.cert.pem`) и сертификата промежуточного центра сертификации (`intermediateCA.cert.pem`):
 ```bash
@@ -1723,7 +1723,7 @@ rm -f /etc/pki/ca-trust/source/anchors/intermediateCA.cert.pem
 update-ca-trust extract
 ```
 
-Для ОС Arch, Bluestar, Manjaro, EndeavourOS, Garuda, Mabox, RebornOS, Archcraft, ArchLabs, CachyOS и ОС на их базе
+Для ОС `Arch`, `Bluestar`, `Manjaro`, `EndeavourOS`, `Garuda`, `Mabox`, `RebornOS`, `Archcraft`, `ArchLabs`, `CachyOS` и ОС на их базе
 
 Удаляем символические ссылки для файлов сертификата корневого центра сертификации (`rootCA.cert.crt`) и сертификата промежуточного центра сертификации (`intermediateCA.cert.crt`):
 ```bash
