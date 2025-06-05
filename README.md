@@ -126,7 +126,7 @@
 > [!CAUTION]
 > Внимание! Перед первым запуском обязательно придумайте или сгенерируйте ваши уникальные пароли суперпользователей баз данных `MySQL` и `PostgreSQL`.
 
-Для этого используем образ `alpine` linux:
+Для этого используем образ `Alpine Linux`:
 ```bash
 docker pull alpine:3.21
 ```
@@ -155,7 +155,7 @@ POSTGRES_PASSWORD="CHANGE_POSTGRESQL_POSTGRES_PASSWORD_HERE"
 > [!CAUTION]
 > Внимание! Перед первым запуском обязательно придумайте или сгенерируйте ваш уникальный секретный ключ для Push-сервера.
 
-Для этого используем образ `alpine` linux:
+Для этого используем образ `Alpine Linux`:
 ```bash
 docker pull alpine:3.21
 ```
@@ -295,7 +295,7 @@ firewall-cmd --add-port=8588/tcp --permanent && firewall-cmd --add-port=8589/tcp
 <a id="siteaccess"></a>
 # Доступ к сайту
 
-Итак, согласно разделам `Адресация` и `Порты` выше, к сайту можно обратиться по `http` или `https` следующим образом:
+Итак, согласно разделам [Адресация](#iporurls) и [Порты](#ports) выше, к сайту можно обратиться по `http` или `https` следующим образом:
 
 - через localhost:
   - http://127.0.0.1:8588/
@@ -404,12 +404,12 @@ http://10.0.1.119:8588/
 - для `MySQL` версии:
   - Имя хоста (алиас) - `mysql`
   - Имя суперпользователя - `root`
-  - Пароль суперпользователя - был создан вами в главе `Пароли к базам данных MySQL и PostgreSQL`, хранится в файле `.env_sql`
+  - Пароль суперпользователя - был создан вами в главе [Пароли к базам данных MySQL и PostgreSQL](#databasespasswords), хранится в файле `.env_sql`
 
 - для `PostgreSQL` версии:
   - Имя хоста (алиас) - `postgres`
   - Имя суперпользователя - `postgres`
-  - Пароль суперпользователя - был создан вами в главе `Пароли к базам данных MySQL и PostgreSQL`, хранится в файле `.env_sql`
+  - Пароль суперпользователя - был создан вами в главе [Пароли к базам данных MySQL и PostgreSQL](#databasespasswords), хранится в файле `.env_sql`
 
 <a id="restorebackup"></a>
 ## Восстановление из резервной копии
@@ -603,9 +603,9 @@ Cохранить.
 
 Параметры переменных сред контейнеров хранятся в файлах `.env_push_pub` и `.env_push_sub`.
 
-Cекретный ключ для подписи соединения между клиентом и push-сервером хранится в файле `.env_push` и был создан вами в главе `Секретный ключ для push-сервера`.
+Cекретный ключ для подписи соединения между клиентом и push-сервером хранится в файле `.env_push` и был создан вами в главе [Секретный ключ для Push-сервера](#pushserversecretkey).
 
-Возвращаемся к главам `Адресация` и `Порты` этого документа. Определяемся по какой схеме работает сайт. Например:
+Возвращаемся к главам [Адресация](#iporurls) и [Порты](#ports) этого документа. Определяемся по какой схеме работает сайт. Например:
 - используется локальный IP вида `10.0.1.119`
 - порт для http `8588`
 - порт для https `8589`
@@ -628,8 +628,8 @@ Cекретный ключ для подписи соединения между
       'path_to_listener_secure' => 'https://10.0.1.119:8589/bitrix/sub/',
       'path_to_modern_listener' => 'http://10.0.1.119:8588/bitrix/sub/',
       'path_to_modern_listener_secure' => 'https://10.0.1.119:8589/bitrix/sub/',
-      'path_to_mobile_listener' => 'http://#DOMAIN#:8893/bitrix/sub/',
-      'path_to_mobile_listener_secure' => 'https://#DOMAIN#:8894/bitrix/sub/',
+      'path_to_mobile_listener' => 'http://10.0.1.119:8893/bitrix/sub/',
+      'path_to_mobile_listener_secure' => 'https://10.0.1.119:8894/bitrix/sub/',
       'path_to_websocket' => 'ws://10.0.1.119:8588/bitrix/subws/',
       'path_to_websocket_secure' => 'wss://10.0.1.119:8589/bitrix/subws/',
       'path_to_publish' => 'http://10.0.1.119:8588/bitrix/pub/',
@@ -1065,7 +1065,7 @@ docker compose restart php cron
 
 Чтобы работать с изображениями с помощью PHP расширения `Imagick` (а не `GD`), активируем библиотеку для работы с изображениями на базе `ImagickImageEngine`.
 
-Убедимся, что в файле `/usr/local/etc/php/conf.d/docker-php-ext-imagick.ini` активировано подключение расширения `imagick`. Как это сделать, описано в главе `PHP расширения (extensions)`.
+Убедимся, что в файле `/usr/local/etc/php/conf.d/docker-php-ext-imagick.ini` активировано подключение расширения `imagick`. Как это сделать, описано в главе PHP [Расширения (extensions)](#phpextensions).
 
 Заходим в sh-консоль контейнера `php` из-под пользователя `bitrix`:
 ```bash
@@ -2675,7 +2675,7 @@ docker compose exec --user=root redis sh -c "id"
 docker compose exec mysql bash -c "mysql -u root -p"
 ```
 
-Вводим пароль суперпользователя `root`, который был создан вами в главе `Пароли к базам данных MySQL и PostgreSQL`. Его значение хранится в файле `.env_sql`.
+Вводим пароль суперпользователя `root`, который был создан вами в главе [Пароли к базам данных MySQL и PostgreSQL](#databasespasswords). Его значение хранится в файле `.env_sql`.
 
 Выполняем SQL-запросы. Для выхода вводим `exit`.
 
@@ -2687,7 +2687,7 @@ docker compose exec mysql bash -c "mysql -u root -p"
 docker compose exec --user=postgres postgres bash -c "psql"
 ```
 
-Вводим пароль суперпользователя `postgres`, который был создан вами в главе `Пароли к базам данных MySQL и PostgreSQL`. Его значение хранится в файле `.env_sql`.
+Вводим пароль суперпользователя `postgres`, который был создан вами в главе [Пароли к базам данных MySQL и PostgreSQL](#databasespasswords). Его значение хранится в файле `.env_sql`.
 
 Выполняем SQL-запросы. Для выхода вводим `\q`.
 
@@ -2784,7 +2784,7 @@ docker compose exec --user=root valkey sh -c "valkey-cli -h 127.0.0.1 -p 6379"
 
 Выполняем запросы (пример, `ping` или `KEYS *`). Выходим `exit`.
 
-Итого: мы успешно запустили новый контейнер valkey, проверили его работу. Теперь его можно использовать для хранения кеша или хранения сессий по примеру, как описано выше в этом файле.
+Итого: мы успешно запустили новый контейнер `valkey`, проверили его работу. Теперь его можно использовать для хранения кеша или хранения сессий по примеру, как описано выше в главе [Memcache и Redis](#memcacheandredis).
 
 <a id="dockerimages"></a>
 # Сборка или скачивание Docker образов
