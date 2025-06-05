@@ -504,12 +504,14 @@ php -f /opt/www/bitrix/modules/main/tools/cron_events.php
 
 Это задание будет выполнятся только в том случае, если дистрибутив установлен.
 
-Для включения выполнения агентов на кроне нужно в административной части продукта на странице `Управление структурой` (`/bitrix/admin/fileman_admin.php?lang=ru&path=%2F`) отредактировать файл `/bitrix/php_interface/dbconn.php`, добавить строку:
+Для завершения настройки необходимо в административной части продукта на странице `Управление структурой` (`/bitrix/admin/fileman_admin.php?lang=ru&path=%2F`) отредактировать файл `/bitrix/php_interface/dbconn.php`, добавить строку:
 ```bash
-define('BX_CRONTAB_SUPPORT', true);
+define("BX_CRONTAB_SUPPORT", true);
 ```
 
-И сохранить.
+Cохранить изменения в файле.
+
+После этого все агенты и отправка системных событий будут обрабатываться из-под cron, раз в 1 минуту. Настройка завершена.
 
 Проверить настройку можно на странице `Проверка системы` (`/bitrix/admin/site_checker.php?lang=ru`) и на странице `Список агентов` (`/bitrix/admin/agent_list.php?lang=ru`).
 
@@ -825,7 +827,7 @@ Apr 12 22:52:15 host=smtp.gmail.com tls=on auth=on user=***@gmail.com from=***@g
 
 Для этого в административной части продукта на странице `Управление структурой` (`/bitrix/admin/fileman_admin.php?lang=ru&path=%2F`) редактируем файл `/bitrix/php_interface/dbconn.php`, добавляем строку:
 ```bash
-define('LOG_FILENAME', $_SERVER["DOCUMENT_ROOT"]."/bitrix/modules/mail_log.txt");
+define("LOG_FILENAME", $_SERVER["DOCUMENT_ROOT"]."/bitrix/modules/mail_log.txt");
 ```
 
 Создаем файл `/bitrix/php_interface/init.php` если его нет, добавляем код функции `custom_mail`:
