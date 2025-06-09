@@ -44,6 +44,8 @@ services:
           - memcached
   redis:
     image: redis:7.2.9-alpine
+    #image: redis:7.4.4-alpine
+    #image: redis:8.0.2-alpine
     container_name: dev_redis
     restart: unless-stopped
     command: redis-server /usr/local/etc/redis/redis.conf
