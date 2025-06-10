@@ -2979,7 +2979,7 @@ docker container stop nginxmodules1280testingamd64 && docker container rm nginxm
 docker container stop nginxmodules1280testingarm64 && docker container rm nginxmodules1280testingarm64
 ```
 
-Содержимое обоих архивов (`nginxmodules_amd64.zip` и `nginxmodules_arm64.zip`) размещаем в репозитории `bitrix24/nginx-modules` на [GitHub](https://github.com/bitrix24/nginx-modules).
+Содержимое обоих архивов (`nginxmodules_amd64.zip` и `nginxmodules_arm64.zip`) размещаем в репозитории `bitrix-tools/nginx-modules` на [GitHub](https://github.com/bitrix-tools/nginx-modules).
 
 Каждый zip архив содержит:
 - каталог с названием архитектуры: `x86_64` (для `amd64`) или `aarch64` (для `arm64`)

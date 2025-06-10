@@ -4,7 +4,7 @@ USER root
 
 RUN cd /root/ && \
     apk add --no-cache git curl openssl ca-certificates tzdata && \
-    git clone https://github.com/bitrix24/nginx-modules.git && \
+    git clone https://github.com/bitrix-tools/nginx-modules.git && \
     cp /root/nginx-modules/packages/1.26.3/v1/alpine/v3.20/main/$(uname -m)/abuild-key.rsa.pub /etc/apk/keys/ && \
     echo "/root/nginx-modules/packages/1.26.3/v1/alpine/v3.20/main" >> /etc/apk/repositories && \
     apk update && \
