@@ -181,7 +181,7 @@ PUSH_SECURITY_KEY=CHANGE_SECURITY_KEY_HERE
 TZ=Europe/Moscow
 ```
 
-Исключение составляет контейнер с `php`, значение часового пояса (timezone) которого продублировано в отдельном файле `confs/php/etc/php/conf.d/timezone.ini` как:
+Исключение составляет контейнер с `php`, значение часового пояса (timezone) которого продублировано в отдельном файле `confs/php82/etc/php/conf.d/timezone.ini` как:
 ```bash
 date.timezone = Europe/Moscow
 ```
@@ -193,7 +193,7 @@ date.timezone = Europe/Moscow
 TZ=Europe/Kaliningrad
 ```
 
-- в файле `confs/php/etc/php/conf.d/timezone.ini`:
+- в файле `confs/php82/etc/php/conf.d/timezone.ini`:
 ```bash
 date.timezone = Europe/Kaliningrad
 ```

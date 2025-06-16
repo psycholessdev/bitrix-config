@@ -150,7 +150,7 @@ services:
 #    ports:
 #      - "9000:9000"
     volumes:
-      - ./confs/php/etc/:/usr/local/etc/
+      - ./confs/php82/etc/:/usr/local/etc/
       - www_data:/opt/www/
       - bxtemp_data:/opt/.bx_temp/
       - msmtp_data:/opt/msmtp/
@@ -297,7 +297,7 @@ services:
 #    ports:
 #      - "9001:9000"
     volumes:
-      - ./confs/php/etc/:/usr/local/etc/
+      - ./confs/php82/etc/:/usr/local/etc/
       - www_data:/opt/www/
       - bxtemp_data:/opt/.bx_temp/
       - msmtp_data:/opt/msmtp/
