@@ -1,4 +1,4 @@
-FROM php:8.4.8-fpm-alpine AS builder
+FROM php:8.4.8-fpm-alpine3.21 AS builder
 
 USER root
 
@@ -53,7 +53,7 @@ RUN docker-php-ext-configure gd --with-freetype --with-jpeg --with-xpm --with-we
 
 RUN docker-php-ext-install mysqli pdo_mysql bz2 pgsql pdo_pgsql zip gd opcache ldap exif intl calendar sodium gettext pspell xml xmlwriter xsl shmop sysvmsg sysvsem sysvshm sockets memcache memcached apcu mcrypt msgpack igbinary redis xhprof xdebug amqp ssh2 imagick
 
-FROM php:8.4.8-fpm-alpine AS production
+FROM php:8.4.8-fpm-alpine3.21 AS production
 
 USER root
 
