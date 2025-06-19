@@ -87,6 +87,8 @@
   * [Memcache](#memcacheconsole)
   * [Redis](#redisconsole)
 * [Кастомизация](#customization)
+* [Версии ПО](#softwareversions)
+  * [Текущие версии](#currentversions)
 * [Сборка или скачивание Docker образов](#dockerimages)
   * [Базовые образы](#basicimages)
   * [Битрикс образы](#bitriximages)
@@ -2785,6 +2787,24 @@ docker compose exec --user=root valkey sh -c "valkey-cli -h 127.0.0.1 -p 6379"
 Выполняем запросы (пример, `ping` или `KEYS *`). Выходим `exit`.
 
 Итого: мы успешно запустили новый контейнер `valkey`, проверили его работу. Теперь его можно использовать для хранения кеша или хранения сессий по примеру, как описано выше в главе [Memcache и Redis](#memcacheandredis).
+
+<a id="softwareversions"></a>
+# Версии ПО
+
+<a id="currentversions"></a>
+## Текущие версии
+
+По умолчанию в проекте используются следующие программы и их версии:
+```bash
+Memcached 1.6.x
+Redis 7.2.x
+PostgreSQL 16.x
+Percona Server 8.0.x
+PHP 8.2.x
+Nginx 1.28.x
+Sphinx 2.2.11
+Lego 4.23.x
+```
 
 <a id="dockerimages"></a>
 # Сборка или скачивание Docker образов
