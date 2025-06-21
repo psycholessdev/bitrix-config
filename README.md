@@ -89,6 +89,9 @@
 * [Кастомизация](#customization)
 * [Версии ПО](#softwareversions)
   * [Текущие версии](#currentversions)
+  * [Альтернативные версии](#alternativeversions)
+    * [Redis](#redisalternativeversions)
+    * [PostgreSQL](#postgresqlalternativeversions)
 * [Сборка или скачивание Docker образов](#dockerimages)
   * [Базовые образы](#basicimages)
   * [Битрикс образы](#bitriximages)
@@ -2805,6 +2808,58 @@ Nginx 1.28.x
 Sphinx 2.2.11
 Lego 4.23.x
 ```
+
+<a id="alternativeversions"></a>
+## Альтернативные версии
+
+Проект позволяет использовать альтернативные версии программ в случае, если текущие версии не удовлетворяют требованиям.
+
+<a id="redisalternativeversions"></a>
+### Redis
+
+Доступные альтернативные версии Redis: `7.4.x`, `8.0.x`.
+
+Разберем пример использования версии `7.4.x` вместо текущей версии `7.2.x`.
+
+До первого запуска проекта редактируем файл `docker-compose.yml`, в разделе `services` находим сервис `redis`. В строку с текущей версией `7.2.x` добаляем `#`, в строке с версией `7.4.x` убираем `#`. Итоговый вид:
+```bash
+#image: redis:7.2.9-alpine
+image: redis:7.4.4-alpine
+#image: redis:8.0.2-alpine
+```
+
+Запускаем все контейнеры, оставляем их работать в фоне:
+```bash
+docker compose up -d
+```
+
+Таким образом Redis будет использовать контейнер с версией `7.4.4`.
+
+Для других версий выполняем аналогичные действия.
+
+<a id="postgresqlalternativeversions"></a>
+### PostgreSQL
+
+Доступные альтернативные версии PostgreSQL: `14.x`, `15.x`, `17.x`.
+
+Разберем пример использования версии `17.x` вместо текущей версии `16.x`.
+
+До первого запуска проекта редактируем файл `docker-compose.yml`, в разделе `services` находим сервис `postgres`. В строку с текущей версией `16.x` добаляем `#`, в строке с версией `17.x` убираем `#`. Итоговый вид:
+```bash
+#image: postgres:14.18-bookworm
+#image: postgres:15.13-bookworm
+#image: postgres:16.9-bookworm
+image: postgres:17.5-bookworm
+```
+
+Запускаем все контейнеры, оставляем их работать в фоне:
+```bash
+docker compose up -d
+```
+
+Таким образом PostgreSQL будет использовать контейнер с версией `17.5`.
+
+Для других версий выполняем аналогичные действия.
 
 <a id="dockerimages"></a>
 # Сборка или скачивание Docker образов
