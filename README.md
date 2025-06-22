@@ -92,6 +92,7 @@
   * [Альтернативные версии](#alternativeversions)
     * [Redis](#redisalternativeversions)
     * [PostgreSQL](#postgresqlalternativeversions)
+    * [MySQL](#mysqlalternativeversions)
 * [Сборка или скачивание Docker образов](#dockerimages)
   * [Базовые образы](#basicimages)
   * [Битрикс образы](#bitriximages)
@@ -2860,6 +2861,26 @@ docker compose up -d
 Таким образом PostgreSQL будет использовать контейнер с версией `17.5`.
 
 Для других версий выполняем аналогичные действия.
+
+<a id="mysqlalternativeversions"></a>
+### MySQL
+
+Доступные альтернативные версии MySQL (Percona Server): `8.4.x`.
+
+Разберем пример использования версии `8.4.x` вместо текущей версии `8.0.x`.
+
+До первого запуска проекта редактируем файл `docker-compose.yml`, в разделе `services` находим сервис `mysql`. В строку с текущей версией `8.0.x` добаляем `#`, в строке с версией `8.4.x` убираем `#`. Итоговый вид:
+```bash
+#image: quay.io/bitrix24/percona-server:8.0.42-v1-rhel
+image: quay.io/bitrix24/percona-server:8.4.5-v1-rhel
+```
+
+Запускаем все контейнеры, оставляем их работать в фоне:
+```bash
+docker compose up -d
+```
+
+Таким образом MySQL будет использовать контейнер с версией `8.4.5`.
 
 <a id="dockerimages"></a>
 # Сборка или скачивание Docker образов
