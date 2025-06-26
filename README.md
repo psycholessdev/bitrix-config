@@ -2953,13 +2953,33 @@ docker pull memcached:1.6.38-alpine
 > Внимание! Сборку образов необходимо проводить в продукте `Docker Desktop` в связи с наличием в сборщике двух архитектур: `x86_64` (для `amd64`) и `aarch64` (для `arm64`).
 
 Также нам понадобятся:
-- база данных MySQL: используем стабильный образ `percona/percona-server:8.0.42`, добавляем слоем сверху конфигурацию бд, собираем `bitrix24/percona-server:8.0.42-v1-rhel`
-- веб-сервер: используем стабильный образ `nginx:1.28.0-alpine-slim`, добавляем модули слоем сверху, собираем `bitrix24/nginx:1.28.0-v1-alpine`
-- интерпретатор PHP-кода: готового совместимого образа PHP нет, берем по умолчанию образ `php:8.2.28-fpm-alpine` и добавляем то, что нам надо через пару слоев сверху, собираем `bitrix24/php:8.2.28-fpm-v1-alpine`
-- поиск: готового образа Sphinx нет, но есть собранный пакет `sphinx` на базе `Alpine Linux` в официальном репозитории ОС, собираем `bitrix24/sphinx:2.2.11-v1-alpine`, установив пакет
-- Push-сервер: готового образа нет, используем образ NodeJS 22-ой версии, собираем `bitrix24/push:3.1-v1-alpine`, используя его исходники `push-server-0.4.0`
-- сервис для бесплатных SSL-сертификатов от `LetsEncrypt`: используем стабильный образ `goacme/lego:v4.23.1`, добавляем логику слоем сверху, собираем `bitrix24/lego:4.23.1-v1-alpine`
-- генератор самоподписных SSL-сертификатов: небольшой образ с пакетами на базе `Alpine Linux`, собираем `bitrix24/ssl:1.0-v1-alpine`
+- база данных MySQL:
+  - используем стабильный образ `percona/percona-server:8.0.42` / `percona/percona-server:8.4.5`
+  - добавляем слоем сверху конфигурацию бд
+  - собираем `bitrix24/percona-server:8.0.42-v1-rhel` / `bitrix24/percona-server:8.4.5-v1-rhel`
+- веб-сервер:
+  - используем стабильный образ `nginx:1.28.0-alpine-slim`
+  - добавляем модули слоем сверху
+  - собираем `bitrix24/nginx:1.28.0-v1-alpine`
+- интерпретатор PHP-кода:
+  - готового совместимого образа PHP нет
+  - берем по умолчанию образ `php:8.2.28-fpm-alpine` / `php:8.3.22-fpm-alpine` / `php:8.4.8-fpm-alpine` и добавляем то, что нам надо через пару слоев сверху
+  - собираем `bitrix24/php:8.2.28-fpm-v1-alpine` / `bitrix24/php:8.3.22-fpm-v1-alpine` / `bitrix24/php:8.4.8-fpm-v1-alpine`
+- поиск:
+  - готового образа Sphinx нет, но есть собранный пакет `sphinx` на базе `Alpine Linux` в официальном репозитории ОС
+  - собираем `bitrix24/sphinx:2.2.11-v1-alpine`, установив пакет
+- Push-сервер:
+  - готового образа нет
+  - используем образ NodeJS 22-ой версии
+  - используем исходники `push-server-0.4.0`
+  - собираем `bitrix24/push:3.1-v1-alpine`
+- сервис для бесплатных SSL-сертификатов от `LetsEncrypt`:
+  - используем стабильный образ `goacme/lego:v4.23.1`
+  - добавляем логику слоем сверху
+  - собираем `bitrix24/lego:4.23.1-v1-alpine`
+- генератор самоподписных SSL-сертификатов:
+  - небольшой образ с пакетами на базе `Alpine Linux`
+  - собираем `bitrix24/ssl:1.0-v1-alpine`
 
 Список официальных Docker образов, которые будем брать с [DockerHub](https://hub.docker.com/):
 - `Percona Server`: https://hub.docker.com/r/percona/percona-server
@@ -2972,8 +2992,11 @@ docker pull memcached:1.6.38-alpine
 Для сборки нам понадобятся следующие образы (их можно предварительно скачать, используя команды):
 ```bash
 docker pull percona/percona-server:8.0.42
+docker pull percona/percona-server:8.4.5
 docker pull nginx:1.28.0-alpine-slim
 docker pull php:8.2.28-fpm-alpine
+docker pull php:8.3.22-fpm-alpine
+docker pull php:8.4.8-fpm-alpine
 docker pull node:22
 docker pull node:22-alpine
 docker pull alpine:3.21
@@ -2994,10 +3017,22 @@ cd env-docker/sources/bxpush31/
 docker buildx build --platform linux/arm64,linux/amd64 --provenance=false -f Dockerfile -t bitrix24/push:3.1-v1-alpine --no-cache .
 ```
 
-- `bitrix24/php`:
+- `bitrix24/php` для версии `8.2.x`:
 ```bash
 cd env-docker/sources/bxphp8228/
 docker buildx build --platform linux/arm64,linux/amd64 --provenance=false -f Dockerfile -t bitrix24/php:8.2.28-fpm-v1-alpine --no-cache .
+```
+
+- `bitrix24/php` для версии `8.3.x`:
+```bash
+cd env-docker/sources/bxphp8322/
+docker buildx build --platform linux/arm64,linux/amd64 --provenance=false -f Dockerfile -t bitrix24/php:8.3.22-fpm-v1-alpine --no-cache .
+```
+
+- `bitrix24/php` для версии `8.4.x`:
+```bash
+cd env-docker/sources/bxphp848/
+docker buildx build --platform linux/arm64,linux/amd64 --provenance=false -f Dockerfile -t bitrix24/php:8.4.8-fpm-v1-alpine --no-cache .
 ```
 
 - `bitrix24/nginx`:
@@ -3006,10 +3041,16 @@ cd env-docker/sources/bxnginx1280/
 docker buildx build --platform linux/arm64,linux/amd64 --provenance=false -f Dockerfile -t bitrix24/nginx:1.28.0-v1-alpine --no-cache .
 ```
 
-- `bitrix24/percona-server`:
+- `bitrix24/percona-server` для версии `8.0.x`:
 ```bash
 cd env-docker/sources/bxpercona8042/
 docker buildx build --platform linux/arm64,linux/amd64 --provenance=false -f Dockerfile -t bitrix24/percona-server:8.0.42-v1-rhel --no-cache .
+```
+
+- `bitrix24/percona-server` для версии `8.4.x`:
+```bash
+cd env-docker/sources/bxpercona845/
+docker buildx build --platform linux/arm64,linux/amd64 --provenance=false -f Dockerfile -t bitrix24/percona-server:8.4.5-v1-rhel --no-cache .
 ```
 
 - `bitrix24/lego`:
