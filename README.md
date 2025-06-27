@@ -46,6 +46,9 @@
   * [Расширения (extensions)](#phpextensions)
   * [Imagick Engine для изображений](#phpimagickimageengine)
   * [security: Веб-антивирус](#phpsecurityantivirus)
+  * [Роутинг](#phprouting)
+    * [Включение роутинга до запуска сайта](#phproutingbeforestart)
+    * [Включение или отключение роутинга для запущенного сайта](#phproutingafterstart)
 * [Nginx](#nginx)
   * [Модули для Nginx](#nginxmodules)
   * [Подключение или отключение модуля для Nginx](#nginxmoduleonoroff)
@@ -1165,6 +1168,81 @@ docker compose restart php cron
 Документация:
 https://dev.1c-bitrix.ru/user_help/settings/security/security_antivirus.php
 https://dev.1c-bitrix.ru/learning/course/index.php?COURSE_ID=35&LESSON_ID=2674#antivirus
+
+<a id="phprouting"></a>
+## Роутинг
+
+Для запуска новой системы роутинга нужно перенаправить обработку 404 ошибок на файл `/bitrix/routing_index.php` в конфигурации контейнера `nginx`.
+
+Сделать это можно двумя способами:
+- до первого запуска проекта в файле `confs/nginx/conf.d/default.conf` репозитория
+- если сайт уже запущен - в файле `/etc/nginx/conf.d/default.conf` контейнера `nginx`
+
+<a id="phproutingbeforestart"></a>
+### Включение роутинга до запуска сайта
+
+До первого запуска проекта редактируем файл `confs/nginx/conf.d/default.conf`.
+
+Находим в файле все строки содержащие `urlrewrite.php`. Добавляем `#` в начало таких строк. Ниже в строках с`routing_index.php` убираем `#`:
+```bash
+#fastcgi_param SCRIPT_FILENAME $document_root/bitrix/urlrewrite.php;
+fastcgi_param SCRIPT_FILENAME $document_root/bitrix/routing_index.php;
+```
+
+Запускаем все контейнеры, оставляем их работать в фоне:
+```bash
+docker compose up -d
+```
+
+Новая система роутинга запущена.
+
+Документация: https://dev.1c-bitrix.ru/learning/course/index.php?COURSE_ID=43&CHAPTER_ID=013764&LESSON_PATH=3913.3516.5062.13764
+
+<a id="phproutingafterstart"></a>
+### Включение или отключение роутинга для запущенного сайта
+
+Заходим в sh-консоль контейнера `nginx` из-под пользователя `root`:
+```bash
+docker compose exec --user=root nginx sh
+```
+
+Выполняем:
+```bash
+apk add mc
+exit
+```
+
+Заходим в sh-консоль контейнера `nginx` из-под пользователя `bitrix`:
+```bash
+docker compose exec --user=bitrix nginx sh
+```
+
+Редактируем файл `/etc/nginx/conf.d/default.conf`:
+```bash
+mcedit /etc/nginx/conf.d/default.conf
+```
+
+Для включения роутинга находим в файле все строки содержащие `urlrewrite.php`. Добавляем `#` в начало таких строк. Ниже в строках с`routing_index.php` убираем `#`:
+```bash
+#fastcgi_param SCRIPT_FILENAME $document_root/bitrix/urlrewrite.php;
+fastcgi_param SCRIPT_FILENAME $document_root/bitrix/routing_index.php;
+```
+
+Для отключения роутинга находим в файле все строки содержащие `routing_index.php`. Добавляем `#` в начало таких строк. Выше в строках с`urlrewrite.php` убираем `#`:
+```bash
+fastcgi_param SCRIPT_FILENAME $document_root/bitrix/urlrewrite.php;
+#fastcgi_param SCRIPT_FILENAME $document_root/bitrix/routing_index.php;
+```
+
+Сохраняем файл. Выходим из консоли контейнера. Проверяем настройки `nginx`:
+```bash
+docker compose exec --user=bitrix nginx sh -c "nginx -t"
+```
+
+Если никаких ошибок нет, перезапускаем контейнер `nginx`:
+```bash
+docker compose restart nginx
+```
 
 <a id="nginx"></a>
 # Nginx
