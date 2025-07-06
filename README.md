@@ -2975,9 +2975,9 @@ docker compose up -d
 В строку с текущей версией `8.2.x` добавляем `#`, в строке с версией `8.3.x` убираем `#`:
 ```bash
 php:
-#image: quay.io/bitrix24/php:8.2.28-fpm-v1-alpine
-image: quay.io/bitrix24/php:8.3.22-fpm-v1-alpine
-#image: quay.io/bitrix24/php:8.4.8-fpm-v1-alpine
+#image: quay.io/bitrix24/php:8.2.29-fpm-v1-alpine
+image: quay.io/bitrix24/php:8.3.23-fpm-v1-alpine
+#image: quay.io/bitrix24/php:8.4.10-fpm-v1-alpine
 ```
 
 В секции `volumes` в строку с текущей версией `.../82/...` добавляем `#`, в строке с версией `.../83/...` убираем `#`:
@@ -3041,8 +3041,8 @@ docker pull memcached:1.6.38-alpine
   - собираем `bitrix24/nginx:1.28.0-v1-alpine`
 - интерпретатор PHP-кода:
   - готового совместимого образа PHP нет
-  - берем по умолчанию образ `php:8.2.28-fpm-alpine` / `php:8.3.22-fpm-alpine` / `php:8.4.8-fpm-alpine` и добавляем то, что нам надо через пару слоев сверху
-  - собираем `bitrix24/php:8.2.28-fpm-v1-alpine` / `bitrix24/php:8.3.22-fpm-v1-alpine` / `bitrix24/php:8.4.8-fpm-v1-alpine`
+  - берем по умолчанию образ `php:8.2.29-fpm-alpine` / `php:8.3.23-fpm-alpine` / `php:8.4.10-fpm-alpine` и добавляем то, что нам надо через пару слоев сверху
+  - собираем `bitrix24/php:8.2.29-fpm-v1-alpine` / `bitrix24/php:8.3.23-fpm-v1-alpine` / `bitrix24/php:8.4.10-fpm-v1-alpine`
 - поиск:
   - готового образа Sphinx нет, но есть собранный пакет `sphinx` на базе `Alpine Linux` в официальном репозитории ОС
   - собираем `bitrix24/sphinx:2.2.11-v1-alpine`, установив пакет
@@ -3072,9 +3072,9 @@ docker pull memcached:1.6.38-alpine
 docker pull percona/percona-server:8.0.42
 docker pull percona/percona-server:8.4.5
 docker pull nginx:1.28.0-alpine-slim
-docker pull php:8.2.28-fpm-alpine
-docker pull php:8.3.22-fpm-alpine
-docker pull php:8.4.8-fpm-alpine
+docker pull php:8.2.29-fpm-alpine
+docker pull php:8.3.23-fpm-alpine
+docker pull php:8.4.10-fpm-alpine
 docker pull node:22
 docker pull node:22-alpine
 docker pull alpine:3.21
@@ -3097,20 +3097,20 @@ docker buildx build --platform linux/arm64,linux/amd64 --provenance=false -f Doc
 
 - `bitrix24/php` для версии `8.2.x`:
 ```bash
-cd env-docker/sources/bxphp8228/
-docker buildx build --platform linux/arm64,linux/amd64 --provenance=false -f Dockerfile -t bitrix24/php:8.2.28-fpm-v1-alpine --no-cache .
+cd env-docker/sources/bxphp8229/
+docker buildx build --platform linux/arm64,linux/amd64 --provenance=false -f Dockerfile -t bitrix24/php:8.2.29-fpm-v1-alpine --no-cache .
 ```
 
 - `bitrix24/php` для версии `8.3.x`:
 ```bash
-cd env-docker/sources/bxphp8322/
-docker buildx build --platform linux/arm64,linux/amd64 --provenance=false -f Dockerfile -t bitrix24/php:8.3.22-fpm-v1-alpine --no-cache .
+cd env-docker/sources/bxphp8323/
+docker buildx build --platform linux/arm64,linux/amd64 --provenance=false -f Dockerfile -t bitrix24/php:8.3.23-fpm-v1-alpine --no-cache .
 ```
 
 - `bitrix24/php` для версии `8.4.x`:
 ```bash
-cd env-docker/sources/bxphp848/
-docker buildx build --platform linux/arm64,linux/amd64 --provenance=false -f Dockerfile -t bitrix24/php:8.4.8-fpm-v1-alpine --no-cache .
+cd env-docker/sources/bxphp8410/
+docker buildx build --platform linux/arm64,linux/amd64 --provenance=false -f Dockerfile -t bitrix24/php:8.4.10-fpm-v1-alpine --no-cache .
 ```
 
 - `bitrix24/nginx`:
