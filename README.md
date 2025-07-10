@@ -12,6 +12,7 @@
 # Содержимое
 
 * [Docker и Docker Compose](#docker)
+* [docker-compose.yml](#dockercomposeyml)
 * [Пароли к базам данных MySQL и PostgreSQL](#databasespasswords)
 * [Секретный ключ для Push-сервера](#pushserversecretkey)
 * [Часовой пояс (timezone)](#timezone)
@@ -129,6 +130,20 @@
 
 Ознакомьтесь с документацией и разверните `Docker Compose`, если это требуется отдельно:
 - `Docker Compose`: https://docs.docker.com/compose/
+
+<a id="dockercomposeyml"></a>
+# docker-compose.yml
+
+Проект в своем составе в репозитории содержит файл `docker-compose.yml`. В нем описывается способ взаимодействия с томами (volumes), сервисами (services), сетями (networks) Docker.
+
+Команды `docker compose ***`, приведенные в этом файле, будут использовать по умочанию файл `docker-compose.yml`. Полный вид команды с указанием файла выглядит как `docker compose -f docker-compose.yml ***`.
+
+Так же можно создать отдельный файл `docker-compose-test.yml`, разместить код внутри файла (описать тома, сервисы, сеть и прочее), убрать лишнее и т.д.
+
+Тогда во всех командах указываем отдельный `.yml` файл через опцию `-f`, пример:
+```bash
+docker compose -f docker-compose-test.yml ps
+```
 
 <a id="databasespasswords"></a>
 # Пароли к базам данных MySQL и PostgreSQL
