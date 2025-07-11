@@ -2920,9 +2920,9 @@ Lego 4.23.x
 
 До первого запуска проекта редактируем файл `docker-compose.yml`, в разделе `services` находим сервис `redis`. В строку с текущей версией `7.2.x` добавляем `#`, в строке с версией `7.4.x` убираем `#`. Итоговый вид:
 ```bash
-#image: redis:7.2.9-alpine
-image: redis:7.4.4-alpine
-#image: redis:8.0.2-alpine
+#image: redis:7.2.10-alpine
+image: redis:7.4.5-alpine
+#image: redis:8.0.3-alpine
 ```
 
 Запускаем все контейнеры, оставляем их работать в фоне:
@@ -2930,7 +2930,7 @@ image: redis:7.4.4-alpine
 docker compose up -d
 ```
 
-Таким образом Redis будет использовать контейнер с версией `7.4.4`.
+Таким образом Redis будет использовать контейнер с версией `7.4.5`.
 
 Для версии `8.0.x` настройку выполняем аналогичным образом.
 
@@ -3029,13 +3029,13 @@ docker compose up -d
 
 В этот список попадают (формат `название`:`полный_тег_с_указанием_версии_и_ос`):
 - `postgres:16.9-bookworm`
-- `redis:7.2.9-alpine`
+- `redis:7.2.10-alpine`
 - `memcached:1.6.38-alpine`
 
 Можно предварительно скачать ПО из списка выше с помощью команд:
 ```bash
 docker pull postgres:16.9-bookworm
-docker pull redis:7.2.9-alpine
+docker pull redis:7.2.10-alpine
 docker pull memcached:1.6.38-alpine
 ```
 
