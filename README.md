@@ -2903,7 +2903,7 @@ Percona Server 8.0.x
 PHP 8.2.x
 Nginx 1.28.x
 Sphinx 2.2.11
-Lego 4.23.x
+Lego 4.24.x
 ```
 
 <a id="alternativeversions"></a>
@@ -3067,9 +3067,9 @@ docker pull memcached:1.6.38-alpine
   - используем исходники `push-server-0.4.0`
   - собираем `bitrix24/push:3.1-v1-alpine`
 - сервис для бесплатных SSL-сертификатов от `LetsEncrypt`:
-  - используем стабильный образ `goacme/lego:v4.23.1`
+  - используем стабильный образ `goacme/lego:v4.24.0`
   - добавляем логику слоем сверху
-  - собираем `bitrix24/lego:4.23.1-v1-alpine`
+  - собираем `bitrix24/lego:4.24.0-v1-alpine`
 - генератор самоподписных SSL-сертификатов:
   - небольшой образ с пакетами на базе `Alpine Linux`
   - собираем `bitrix24/ssl:1.0-v1-alpine`
@@ -3093,7 +3093,7 @@ docker pull php:8.4.10-fpm-alpine
 docker pull node:22
 docker pull node:22-alpine
 docker pull alpine:3.21
-docker pull goacme/lego:v4.23.1
+docker pull goacme/lego:v4.24.0
 ```
 
 Собираем образы, в названии используем `bitrix24`:
@@ -3148,8 +3148,8 @@ docker buildx build --platform linux/arm64,linux/amd64 --provenance=false -f Doc
 
 - `bitrix24/lego`:
 ```bash
-cd env-docker/sources/bxlego4231/
-docker buildx build --platform linux/arm64,linux/amd64 --provenance=false -f Dockerfile -t bitrix24/lego:4.23.1-v1-alpine --no-cache .
+cd env-docker/sources/bxlego4240/
+docker buildx build --platform linux/arm64,linux/amd64 --provenance=false -f Dockerfile -t bitrix24/lego:4.24.0-v1-alpine --no-cache .
 ```
 
 - `bitrix24/ssl`:

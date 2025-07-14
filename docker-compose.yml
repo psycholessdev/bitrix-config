@@ -357,7 +357,7 @@ services:
     depends_on:
       - nginx
   lego:
-    image: quay.io/bitrix24/lego:4.23.1-v1-alpine
+    image: quay.io/bitrix24/lego:4.24.0-v1-alpine
     container_name: dev_lego
     restart: unless-stopped
     env_file:
