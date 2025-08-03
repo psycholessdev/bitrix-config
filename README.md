@@ -3030,13 +3030,13 @@ docker compose up -d
 В этот список попадают (формат `название`:`полный_тег_с_указанием_версии_и_ос`):
 - `postgres:16.9-bookworm`
 - `redis:7.2.10-alpine`
-- `memcached:1.6.38-alpine`
+- `memcached:1.6.39-alpine`
 
 Можно предварительно скачать ПО из списка выше с помощью команд:
 ```bash
 docker pull postgres:16.9-bookworm
 docker pull redis:7.2.10-alpine
-docker pull memcached:1.6.38-alpine
+docker pull memcached:1.6.39-alpine
 ```
 
 <a id="bitriximages"></a>
