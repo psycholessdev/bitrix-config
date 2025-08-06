@@ -140,8 +140,8 @@ services:
           - mysql
   php:
     image: quay.io/bitrix24/php:8.2.29-fpm-v1-alpine
-    #image: quay.io/bitrix24/php:8.3.23-fpm-v1-alpine
-    #image: quay.io/bitrix24/php:8.4.10-fpm-v1-alpine
+    #image: quay.io/bitrix24/php:8.3.24-fpm-v1-alpine
+    #image: quay.io/bitrix24/php:8.4.11-fpm-v1-alpine
     container_name: dev_php
     restart: unless-stopped
     env_file:
@@ -290,8 +290,8 @@ services:
           - sphinx
   cron:
     image: quay.io/bitrix24/php:8.2.29-fpm-v1-alpine
-    #image: quay.io/bitrix24/php:8.3.23-fpm-v1-alpine
-    #image: quay.io/bitrix24/php:8.4.10-fpm-v1-alpine
+    #image: quay.io/bitrix24/php:8.3.24-fpm-v1-alpine
+    #image: quay.io/bitrix24/php:8.4.11-fpm-v1-alpine
     container_name: dev_cron
     restart: unless-stopped
     command: crond -f -d 8
