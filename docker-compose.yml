@@ -13,6 +13,7 @@ services:
       - php-fpm
     volumes:
       - ./nginx-conf:/etc/nginx:ro
+      - ./app:/var/www/html
       - /etc/letsencrypt/live:/etc/letsencrypt/live:ro
       - /etc/letsencrypt/archive:/etc/letsencrypt/archive:ro
     networks:
@@ -22,6 +23,7 @@ services:
     command: [ "nginx", "-g", "daemon off;" ]
   php-fpm:
     image: php:8.2-fpm
+    container_name: main-php-fpm
     volumes:
       - ./app:/var/www/html
     networks:
