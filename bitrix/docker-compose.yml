@@ -187,8 +187,8 @@ services:
     restart: unless-stopped
     env_file:
       - .env
-    ports:
-      - "8588:8588"
+    # ports:
+    #   - "8588:80"
     #   - "8589:443"
     volumes:
       - ./confs/nginx/:/etc/nginx/

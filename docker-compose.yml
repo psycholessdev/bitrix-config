@@ -19,6 +19,9 @@ services:
     networks:
       - website
       - bitrix-expose
+    environment:
+      DOMAIN: example.com
+      BITRIX_DOMAIN: dev.example.com
     restart: unless-stopped
     command: [ "nginx", "-g", "daemon off;" ]
   php-fpm:
