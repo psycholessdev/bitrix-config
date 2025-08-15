@@ -4,6 +4,8 @@ include:
 services:
   front-nginx:
     image: openquantumsafe/nginx-quic
+    build:
+      context: nginx-conf/
     container_name: front-nginx
     ports:
       - "80:80"
