@@ -9,6 +9,10 @@ volumes:
     driver: local
   www_data:
     driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: ./www_data
   bxtemp_data:
     driver: local
   msmtp_data:
@@ -183,9 +187,9 @@ services:
     restart: unless-stopped
     env_file:
       - .env
-    ports:
-      - "8588:80"
-      - "8589:443"
+    # ports:
+    #   - "8588:80"
+    #   - "8589:443"
     volumes:
       - ./confs/nginx/:/etc/nginx/
       - www_data:/opt/www/
@@ -210,6 +214,7 @@ services:
       dev:
         aliases:
           - nginx
+      bitrix-front: {}
   push-sub:
     image: quay.io/bitrix24/push:3.1-v1-alpine
     container_name: dev_push_sub
@@ -395,3 +400,5 @@ networks:
       driver: default
       config:
         - subnet: 10.10.10.0/24
+  bitrix-expose:
+    external: true
