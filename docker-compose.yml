@@ -13,7 +13,6 @@ services:
       - php-fpm
     volumes:
       - ./nginx-conf:/etc/nginx:ro
-      - ./nginx-conf/default.conf.template:/etc/nginx/templates/default.conf.template:ro
       - ./app:/var/www/html
       - /etc/letsencrypt/live:/etc/letsencrypt/live:ro
       - /etc/letsencrypt/archive:/etc/letsencrypt/archive:ro
